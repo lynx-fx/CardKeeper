@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from "../App.jsx"
 import Navbar from "./navbar.jsx"
 import "./../styles/auth.css"
 
@@ -15,7 +14,6 @@ export default function Signup() {
   })
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
-  const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleChange = (e) => {
@@ -76,8 +74,8 @@ export default function Signup() {
 
     // Simulate API call
     setTimeout(() => {
-      // Mock successful signup
-      login({
+      // Mock successful signup - just navigate to dashboard
+      console.log("Signup successful:", {
         email: formData.email,
         name: formData.name,
       })
