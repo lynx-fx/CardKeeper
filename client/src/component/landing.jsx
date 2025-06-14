@@ -1,38 +1,31 @@
-import React from 'react'
-import './../styles/landing.css'
+"use client"
 
-export default function Landing({ onGetStarted }) {
+import { Link } from "react-router-dom"
+import Navbar from "./navbar.jsx"
+import "./../styles/landing.css"
+
+export default function Landing() {
   return (
     <div className="landing">
-      <header className="header">
-        <div className="container">
-          <div className="logo">
-            <h2>WarrantyKeeper</h2>
-          </div>
-          <nav className="nav">
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How it Works</a>
-            <a href="#contact">Contact</a>
-          </nav>
-        </div>
-      </header>
+      <Navbar />
 
       <section className="hero">
         <div className="container">
           <div className="hero-content">
             <h1>Never Lose a Warranty Again</h1>
-            <p>Store, organize, and track all your warranty cards in one secure digital place. Get reminders before they expire and access them anywhere, anytime.</p>
+            <p>
+              Store, organize, and track all your warranty cards in one secure digital place. Get reminders before they
+              expire and access them anywhere, anytime.
+            </p>
             <div className="hero-buttons">
-              <button className="btn-primary" onClick={onGetStarted}>
+              <Link to="/signup" className="btn-primary">
                 Get Started Free
-              </button>
-              <button className="btn-secondary">
-                Watch Demo
-              </button>
+              </Link>
+              <button className="btn-secondary">Watch Demo</button>
             </div>
           </div>
           <div className="hero-image">
-            <img src="https://th.bing.com/th/id/R.083fcdfc4d6b20ae8914b78434565dfc?rik=vsgviEM%2bECf57w&pid=ImgRaw&r=0" alt="Warranty management dashboard" />
+            <img src="/placeholder.svg?height=400&width=500" alt="Warranty management dashboard" />
           </div>
         </div>
       </section>

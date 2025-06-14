@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import Navbar from "./navbar.jsx"
 import "./../styles/dashboard.css"
 
-export default function WarrantyDashboard({ onBackToHome }) {
+export default function WarrantyDashboard() {
   const [warranties, setWarranties] = useState([
     {
       id: 1,
@@ -64,24 +65,17 @@ export default function WarrantyDashboard({ onBackToHome }) {
 
   return (
     <div className="dashboard">
-      <header className="dashboard-header">
-        <div className="container">
-          <div className="header-content">
-            <h1>My Warranties</h1>
-            <div className="header-actions">
-              <button className="btn-secondary" onClick={onBackToHome}>
-                Back to Home
-              </button>
-              <button className="btn-primary" onClick={() => setShowAddForm(true)}>
-                Add Warranty
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="dashboard-main">
         <div className="container">
+          <div className="dashboard-header-section">
+            <h1>My Warranties</h1>
+            <button className="btn-primary" onClick={() => setShowAddForm(true)}>
+              Add Warranty
+            </button>
+          </div>
+
           <div className="dashboard-stats">
             <div className="stat-card">
               <h3>{warranties.length}</h3>
