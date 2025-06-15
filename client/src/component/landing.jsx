@@ -25,7 +25,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="hero-image">
-            <img src="/placeholder.svg?height=400&width=500" alt="Warranty management dashboard" />
+            <img src="https://th.bing.com/th/id/OIF.juGAioCXPNeQc3Nr8TVI3w?cb=thvnextc1&rs=1&pid=ImgDetMain" alt="Warranty management dashboard" />
           </div>
         </div>
       </section>

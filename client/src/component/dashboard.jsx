@@ -20,27 +20,8 @@ export default function WarrantyDashboard() {
       warrantyType: "Limited Warranty",
       description: "Latest iPhone with advanced camera system and titanium design.",
       images: [
-        "/placeholder.svg?height=300&width=400&text=Warranty+Card",
-        "/placeholder.svg?height=300&width=400&text=Receipt",
-        "/placeholder.svg?height=300&width=400&text=Product+Photo",
-      ],
-    },
-    {
-      id: 2,
-      productName: "Samsung Refrigerator",
-      brand: "Samsung",
-      purchaseDate: "2023-06-10",
-      warrantyExpiry: "2025-06-10",
-      category: "Appliances",
-      status: "Active",
-      purchasePrice: "$1,299.00",
-      store: "Best Buy",
-      serialNumber: "SAM987654321",
-      warrantyType: "Manufacturer Warranty",
-      description: "Energy-efficient refrigerator with smart features and spacious interior.",
-      images: [
-        "/placeholder.svg?height=300&width=400&text=Warranty+Document",
-        "/placeholder.svg?height=300&width=400&text=Purchase+Receipt",
+        "https://th.bing.com/th/id/OIP.HBbuY78PlcRT1X9nq2xZ0AHaHa?o=7&cb=thvnextc1rm=3&rs=1&pid=ImgDetMain",
+        "https://www.techspot.com/images/products/2023/smartphones/org/2023-09-19-product.jpg",
       ],
     },
   ])
@@ -394,6 +375,8 @@ export default function WarrantyDashboard() {
                         alt={`Warranty document ${index + 1}`}
                         className={`thumbnail ${index === selectedImageIndex ? "active" : ""}`}
                         onClick={() => setSelectedImageIndex(index)}
+                        height={400}
+                        width={300}
                       />
                     ))}
                   </div>

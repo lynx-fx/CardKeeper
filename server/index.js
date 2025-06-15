@@ -3,13 +3,32 @@ const helmet = require("helmet");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/authRouter");
+const mongoose = require("mongoose");
 
 const app = express();
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(express.json());
-app.use(cors());
-app.use(helmet());
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("Database Connected");
+  })
+  .catch((err) => {
+    console.error("Database connection error:", err);
+  });
 
 app.get("/", (req, res) => {
   res.json({ message: "Hie :3" });
@@ -18,6 +37,5 @@ app.get("/", (req, res) => {
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
 });
-
 
 app.use("/api/auth", authRouter);
