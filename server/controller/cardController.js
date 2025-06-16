@@ -1,6 +1,16 @@
 const express = require("express");
 
-// TODO
+// TODO: get cards
+exports.get = async (req, res) => {
+  try {
+    return res.status(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+};
+
+// TODO: create cards
 exports.create = async (req, res) => {
   try {
     return res
@@ -8,6 +18,30 @@ exports.create = async (req, res) => {
       .json({ success: true, message: "Card created successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+};
+
+// TODO: update cards
+exports.update = async (req, res) => {
+  try {
+    return res
+      .status(200)
+      .json({ success: true, message: "Card updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+};
+
+// TODO: delete cards
+exports.delete = async (req, res) => {
+  try {
+    return res
+      .status(200)
+      .json({ success: true, message: "Card deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
