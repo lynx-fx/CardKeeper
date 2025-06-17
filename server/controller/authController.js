@@ -55,6 +55,7 @@ exports.signup = async (req, res) => {
 
 // TODO: login
 exports.login = async (req, res) => {
+  const {email, password} = req.body;
   try {
   } catch (err) {
     console.error(err);
