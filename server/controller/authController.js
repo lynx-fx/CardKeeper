@@ -65,13 +65,15 @@ exports.login = async (req, res) => {
     }
 
     // getting user data
-    const existingUser = User.findOne({ email }).select("+password");
+    const existingUser = await User.findOne({ email }).select("+password");
 
     if (!existingUser) {
       return res
         .status(404)
         .json({ success: false, message: "User doesn't exists" });
     }
+
+    console.log(existingUser.password);
 
     // comparing password
     const result = await comparePassword(password, existingUser.password);
@@ -83,19 +85,27 @@ exports.login = async (req, res) => {
     }
 
     // signing jwt token
-    const token = jwtsign({
-      id: existingUser.id,
-      email: existingUser.email,
-    });
+    const token = jwt.sign(
+      {
+        id: existingUser.id,
+        email: existingUser.email,
+      },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: "168 hours",
+      }
+    );
     existingUser.lastLogin = Date.now();
     await existingUser.save();
 
     // response
-    return res.cookie("auth", token, {
-      expries: new Date(Date.now() + 86400000),
-      httpOnly: process.env.NODE_ENV === "production",
-      secure: process.env.NODE_ENV === "production",
-    }).json({success: true});
+    return res
+      .cookie("auth", token, {
+        expries: new Date(Date.now() + 86400000),
+        httpOnly: process.env.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === "production",
+      })
+      .json({ success: true, message: "Logged in" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
