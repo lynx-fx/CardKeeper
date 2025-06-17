@@ -3,6 +3,8 @@ const helmet = require("helmet");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/authRouter");
+const userRouter = require("./routes/userRouter");
+const cardRouter = require("./routes/cardRouter");
 const mongoose = require("mongoose");
 
 const app = express();
@@ -39,3 +41,5 @@ app.listen(process.env.PORT, () => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/card", cardRouter);

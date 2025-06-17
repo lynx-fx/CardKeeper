@@ -1,7 +1,7 @@
 const express = require("express");
 
 // TODO: get cards
-exports.get = async (req, res) => {
+exports.getCard = async (req, res) => {
   try {
     return res.status(200);
   } catch (err) {
@@ -11,7 +11,7 @@ exports.get = async (req, res) => {
 };
 
 // TODO: create cards
-exports.create = async (req, res) => {
+exports.createCard = async (req, res) => {
   try {
     return res
       .status(200)
@@ -23,7 +23,7 @@ exports.create = async (req, res) => {
 };
 
 // TODO: update cards
-exports.update = async (req, res) => {
+exports.updateCard = async (req, res) => {
   try {
     return res
       .status(200)
@@ -35,7 +35,7 @@ exports.update = async (req, res) => {
 };
 
 // TODO: delete cards
-exports.delete = async (req, res) => {
+exports.deleteCard = async (req, res) => {
   try {
     return res
       .status(200)

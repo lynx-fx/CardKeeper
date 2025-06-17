@@ -1,7 +1,11 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const cardController = require('../controller/cardController.js');
+const cardController = require("../controller/cardController.js");
 
-router.post('/create', cardController.createCard);
+router.get("/get", cardController.get);
+
+router.post("/create", cardController.createCard);
+router.post("/delete", cardController.deleteCard);
+router.put("/update", cardController.updateCard);
 
 module.exports = router;
