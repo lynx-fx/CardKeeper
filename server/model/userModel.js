@@ -17,9 +17,15 @@ const userSchema = new mongoose.Schema(
     token: {
       type: String,
       required: false,
+      select: false,
+    },
+    tokenValidation:{
+      type: Date,
+      select: false,
     },
     lastLogin: {
       type: Date,
+      select: false,
     },
   },
   { timestamps: true }

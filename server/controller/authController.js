@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 
 // middleware
 const { signUpSchema } = require("../middleware/validator.js");
+const transport = require("../middleware/sendMail.js");
 
 // Models
 const User = require("../model/userModel.js");
@@ -112,9 +113,67 @@ exports.login = async (req, res) => {
   }
 };
 
-// TODO: send mail here
+// DONE: send mail here
+// TODO: Update link to production link and email
 exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
   try {
+    // check if user exists or not
+    const existingUser = await User.findOne({ email });
+
+    if (!existingUser) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User doesn't exists." });
+    }
+
+    // Random 6 digit value
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // generating link
+    const link = `http://localhost:5173/reset?email=${encodeURIComponent(
+    email
+    )}&token=${code}`;
+
+    // Sending mail here
+    let info = await transport.sendMail({
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Reset Your Password",
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+          <div style="max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #333; text-align: center;">Reset Your Password</h2>
+            <p style="color: #555;">You requested a password reset. Click the button below to reset your password. This link will expire in <strong>10 minutes</strong>.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${link}" 
+                 style="background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; display: inline-block;">
+                 Reset Password
+              </a>
+            </div>
+            <p style="color: #555;">If you didn’t request this, please ignore this email.</p>
+            <hr style="border: none; border-top: 1px solid #ddd;">
+            <p style="color: #777; font-size: 12px; text-align: center;">&copy; ${new Date().getFullYear()} CardKeeper. All rights reserved.</p>
+          </div>
+        </div>
+      `,
+    });
+
+    // Check if email was sent successfully
+    if (info.accepted.length > 0) {
+      // Hash the code before saving
+      const hashedCode = hmacProcess(code, process.env.HMAC_CODE);
+      // Saving code as token
+      existingUser.token = hashedCode;
+      existingUser.tokenValidation = Date.now() + 10* 60* 1000; // 10 min expiration
+      await existingUser.save();
+
+      return res.status(200).json({success: true, message: "Mail sent successfully"})
+    } else {
+      return res
+        .status(500)
+        .json({ success: false, message: "Couldn't send mail" });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });

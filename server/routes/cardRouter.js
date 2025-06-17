@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const cardController = require("../controller/cardController.js");
 
-router.get("/get", cardController.get);
+router.get("/get", cardController.getCard);
 
 router.post("/create", cardController.createCard);
 router.post("/delete", cardController.deleteCard);

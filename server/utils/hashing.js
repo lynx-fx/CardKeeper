@@ -10,7 +10,7 @@ exports.comparePassword = (value, hashedValue) => {
 };
 
 exports.hmacProcess = (value, secret) => {
-  return createHmac("sha256", secretKey).update(value).digest("hex");
+  return createHmac("sha256", secret).update(value).digest("hex");
 };
 
 exports.hmacProcessVerify = (token, storedToken) => {
