@@ -13,12 +13,14 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
       select: false,
-
     },
     token: {
       type: String,
       required: false,
-    }
+    },
+    lastLogin: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

@@ -53,10 +53,49 @@ exports.signup = async (req, res) => {
   }
 };
 
-// TODO: login
+// DONE: login
 exports.login = async (req, res) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
   try {
+    const { error, value } = signUpSchema.validate({ email, password });
+    if (error) {
+      return res
+        .status()
+        .json({ success: false, message: "Use alpha numeric characters only" });
+    }
+
+    // getting user data
+    const existingUser = User.findOne({ email }).select("+password");
+
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User doesn't exists" });
+    }
+
+    // comparing password
+    const result = await comparePassword(password, existingUser.password);
+
+    if (!result) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid username or password" });
+    }
+
+    // signing jwt token
+    const token = jwtsign({
+      id: existingUser.id,
+      email: existingUser.email,
+    });
+    existingUser.lastLogin = Date.now();
+    await existingUser.save();
+
+    // response
+    return res.cookie("auth", token, {
+      expries: new Date(Date.now() + 86400000),
+      httpOnly: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production",
+    }).json({success: true});
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
