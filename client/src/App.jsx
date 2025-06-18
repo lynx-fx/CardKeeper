@@ -6,6 +6,8 @@ import "./styles/app.css";
 import Login from "./component/login.jsx";
 import Signup from "./component/signup.jsx";
 import ForgotPassword from "./component/forgotPass.jsx";
+import ResetPassword from "./component/resetPassword.jsx";
+import ChangePassword from "./component/changePassword.jsx";
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="/login" element={<Login/>} />
         <Route path="/signup" element={<Signup/>} />
         <Route path="/forgot-password" element={<ForgotPassword/>} />
+        <Route path="/reset-password" element={<ResetPassword/>} />
+        <Route path="/change-password" element={<ChangePassword/>} />
       </Routes>
     </BrowserRouter>
   );

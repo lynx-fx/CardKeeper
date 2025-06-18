@@ -10,6 +10,8 @@ export default function ForgotPassword() {
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [resendCount, setResendCount] = useState(0)
+  const [canResend, setCanResend] = useState(true)
 
   const handleChange = (e) => {
     setEmail(e.target.value)
@@ -24,7 +26,7 @@ export default function ForgotPassword() {
     if (!email) {
       newErrors.email = "Email is required"
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email is invalid"
+      newErrors.email = "Please enter a valid email address"
     }
 
     return newErrors
@@ -45,6 +47,29 @@ export default function ForgotPassword() {
     setTimeout(() => {
       setIsSubmitted(true)
       setIsLoading(false)
+      setResendCount((prev) => prev + 1)
+
+      // Disable resend for 60 seconds
+      setCanResend(false)
+      setTimeout(() => {
+        setCanResend(true)
+      }, 60000)
+    }, 1500)
+  }
+
+  const handleResend = () => {
+    if (!canResend) return
+
+    setIsLoading(true)
+    setTimeout(() => {
+      setResendCount((prev) => prev + 1)
+      setIsLoading(false)
+
+      // Disable resend for 60 seconds
+      setCanResend(false)
+      setTimeout(() => {
+        setCanResend(true)
+      }, 60000)
     }, 1000)
   }
 
@@ -56,7 +81,7 @@ export default function ForgotPassword() {
         <div className="auth-container">
           <div className="auth-card">
             <div className="auth-header">
-              <div className="success-icon">✅</div>
+              <div className="success-icon">📧</div>
               <h1>Check Your Email</h1>
               <p>
                 We've sent a password reset link to <strong>{email}</strong>
@@ -66,18 +91,47 @@ export default function ForgotPassword() {
             <div className="auth-form">
               <div className="info-box">
                 <p>
-                  If you don't see the email in your inbox, please check your spam folder. The link will expire in 24
-                  hours.
+                  <strong>What to do next:</strong>
+                  <br />
+                  1. Check your email inbox (and spam folder)
+                  <br />
+                  2. Click the reset link in the email
+                  <br />
+                  3. Follow the instructions to create a new password
                 </p>
               </div>
 
-              <Link to="/login" className="btn-primary full-width">
-                Back to Sign In
-              </Link>
+              <div className="info-box">
+                <p>
+                  <strong>Important:</strong> The reset link will expire in 10 minutes for security reasons.
+                  {resendCount > 0 && ` (Sent ${resendCount} time${resendCount > 1 ? "s" : ""})`}
+                </p>
+              </div>
 
-              <button className="btn-secondary full-width" onClick={() => setIsSubmitted(false)}>
-                Resend Email
-              </button>
+              <div className="form-actions-vertical">
+                <Link to="/login" className="btn-primary full-width">
+                  Back to Sign In
+                </Link>
+
+                <button
+                  className={`btn-secondary full-width ${!canResend ? "disabled" : ""}`}
+                  onClick={handleResend}
+                  disabled={!canResend || isLoading}
+                >
+                  {isLoading ? "Sending..." : canResend ? "Resend Email" : "Wait 60s to Resend"}
+                </button>
+
+                <button
+                  className="link-button"
+                  onClick={() => {
+                    setIsSubmitted(false)
+                    setEmail("")
+                    setResendCount(0)
+                  }}
+                >
+                  Use Different Email Address
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -92,8 +146,8 @@ export default function ForgotPassword() {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <h1>Reset Password</h1>
-            <p>Enter your email address and we'll send you a link to reset your password</p>
+            <h1>Forgot Password?</h1>
+            <p>No worries! Enter your email address and we'll send you a link to reset your password.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
@@ -106,13 +160,21 @@ export default function ForgotPassword() {
                 value={email}
                 onChange={handleChange}
                 className={errors.email ? "error" : ""}
-                placeholder="Enter your email"
+                placeholder="Enter your email address"
+                autoComplete="email"
               />
               {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
 
+            <div className="info-box">
+              <p>
+                We'll send you an email with instructions to reset your password. Make sure to check your spam folder if
+                you don't see it in your inbox.
+              </p>
+            </div>
+
             <button type="submit" className="btn-primary full-width" disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send Reset Link"}
+              {isLoading ? "Sending Reset Link..." : "Send Reset Link"}
             </button>
           </form>
 
@@ -121,6 +183,12 @@ export default function ForgotPassword() {
               Remember your password?{" "}
               <Link to="/login" className="link-button">
                 Back to Sign In
+              </Link>
+            </p>
+            <p>
+              Don't have an account?{" "}
+              <Link to="/signup" className="link-button">
+                Sign up here
               </Link>
             </p>
           </div>

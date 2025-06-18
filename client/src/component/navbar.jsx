@@ -59,6 +59,9 @@ export default function Navbar() {
 
             {isDashboardPage && (
               <div className="dashboard-actions">
+                <Link to="/change-password" className="btn-secondary">
+                  Change Password
+                </Link>
                 <Link to="/" className="btn-secondary">
                   Logout
                 </Link>
@@ -115,6 +118,9 @@ export default function Navbar() {
 
               {isDashboardPage && (
                 <div className="mobile-dashboard-actions">
+                  <Link to="/change-password" className="btn-secondary full-width" onClick={closeMobileMenu}>
+                    Change Password
+                  </Link>
                   <Link to="/" className="btn-secondary full-width" onClick={closeMobileMenu}>
                     Logout
                   </Link>
