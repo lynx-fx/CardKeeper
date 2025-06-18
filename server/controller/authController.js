@@ -180,9 +180,24 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// TODO: validate token from link
+// DONE: validate token from link
 exports.validateToken = async (req, res) => {
+  const email = req.params.email;
+  const token = req.params.token;
   try {
+    // Finding user by email
+    const existingUser = await User.findOne({email}).select("+token +tokenValidation");
+
+    if(!existingUser){
+      return res.status(401).json({success: false, message: "User doesn't exists"})
+    }
+
+    if(Date.now() > existingUser.tokenValidation){
+      return res.status(401).json({success: false, message: "Link is expired. Resend email."})
+    }
+
+    return res.status(200).json({success: true, message: "Link verified."})
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
