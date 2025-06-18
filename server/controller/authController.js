@@ -2,7 +2,10 @@
 const jwt = require("jsonwebtoken");
 
 // middleware
-const { signUpSchema } = require("../middleware/validator.js");
+const {
+  signUpSchema,
+  changePasswordSchema,
+} = require("../middleware/validator.js");
 const transport = require("../middleware/sendMail.js");
 
 // Models
@@ -15,6 +18,7 @@ const {
   hmacProcess,
   hmacProcessVerify,
 } = require("../utils/hashing.js");
+const tokenExtractor = require("../utils/tokenExtractor.js");
 
 exports.signup = async (req, res) => {
   const { email, password } = req.body;
@@ -204,7 +208,7 @@ exports.validateToken = async (req, res) => {
         .status(401)
         .json({ success: false, message: "Link is expired. Resend email." });
     }
-    
+
     // Comparing token
     const hashedCode = hmacProcess(token, process.env.HMAC_CODE);
     if (hashedCode !== existingUser.token) {
@@ -213,7 +217,7 @@ exports.validateToken = async (req, res) => {
         .json({ success: false, message: "Invalid token." });
     }
 
-    // Removing token after user to handle reuse of token
+    // Remove token to prevent reuse after verification
     existingUser.token = undefined;
     existingUser.tokenValidation = undefined;
     await existingUser.save();
@@ -225,18 +229,91 @@ exports.validateToken = async (req, res) => {
   }
 };
 
-// TODO: reset password
-exports.resetPassword = async (req, res) => {
+// TODO: change password
+exports.changePassword = async (req, res) => {
+  const { newPassword, oldPassword } = req.body;
   try {
+    // validating password
+    const { error, value } = changePasswordSchema.validate(newPassword);
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Alpha numeric characters only." });
+    }
+    // getting token
+    const token = tokenExtractor(req);
+    if (!token) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Token not provided." });
+    }
+
+    // getting user details
+    const decode = jwt.verify(token, process.env.TOKEN_SECRET);
+    const existingUser = await User.findOne({ email: decode.email }).select(
+      "+password"
+    );
+
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
+    }
+
+    // checking password
+    const result = await comparePassword(oldPassword, existingUser.password);
+    if (!result) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Incorrect old password." });
+    } else {
+      // changing password if matches
+      const hashedPassword = await hashPassword(newPassword);
+      existingUser.password = hashedPassword;
+      await existingUser.save();
+
+      return res
+        .status(200)
+        .json({ success: true, message: "Password changed successfully." });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
 
-// TODO: change password
-exports.changePassword = async (req, res) => {
-  try {
+// TODO: reset password
+exports.resetPassword = async (req, res) => {
+  const email = req.params.email;
+  const {newPassword} = req.body;
+try {
+    // validating password
+    const { error, value } = changePasswordSchema.validate(newPassword);
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Alpha numeric characters only." });
+  }
+
+    // getting user data and changing pass
+    const existingUser = await User.findOne({ email }).select(
+      "+password"
+    );
+
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
+    }
+    else {
+      const hashedPassword = await hashPassword(newPassword);
+      existingUser.password = hashedPassword;
+      await existingUser.save();
+
+      return res
+        .status(200)
+        .json({ success: true, message: "Password changed successfully." });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
