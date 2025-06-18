@@ -132,7 +132,7 @@ exports.forgotPassword = async (req, res) => {
 
     // generating link
     const link = `http://localhost:5173/reset?email=${encodeURIComponent(
-    email
+      email
     )}&token=${code}`;
 
     // Sending mail here
@@ -165,10 +165,12 @@ exports.forgotPassword = async (req, res) => {
       const hashedCode = hmacProcess(code, process.env.HMAC_CODE);
       // Saving code as token
       existingUser.token = hashedCode;
-      existingUser.tokenValidation = Date.now() + 10* 60* 1000; // 10 min expiration
+      existingUser.tokenValidation = Date.now() + 10 * 60 * 1000; // 10 min expiration
       await existingUser.save();
 
-      return res.status(200).json({success: true, message: "Mail sent successfully"})
+      return res
+        .status(200)
+        .json({ success: true, message: "Mail sent successfully" });
     } else {
       return res
         .status(500)
@@ -186,18 +188,37 @@ exports.validateToken = async (req, res) => {
   const token = req.params.token;
   try {
     // Finding user by email
-    const existingUser = await User.findOne({email}).select("+token +tokenValidation");
+    const existingUser = await User.findOne({ email }).select(
+      "+token +tokenValidation"
+    );
 
-    if(!existingUser){
-      return res.status(401).json({success: false, message: "User doesn't exists"})
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User doesn't exists" });
     }
 
-    if(Date.now() > existingUser.tokenValidation){
-      return res.status(401).json({success: false, message: "Link is expired. Resend email."})
+    // validating expiration of code
+    if (Date.now() > existingUser.tokenValidation) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Link is expired. Resend email." });
+    }
+    
+    // Comparing token
+    const hashedCode = hmacProcess(token, process.env.HMAC_CODE);
+    if (hashedCode !== existingUser.token) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Invalid token." });
     }
 
-    return res.status(200).json({success: true, message: "Link verified."})
+    // Removing token after user to handle reuse of token
+    existingUser.token = undefined;
+    existingUser.tokenValidation = undefined;
+    await existingUser.save();
 
+    return res.status(200).json({ success: true, message: "Link verified." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
