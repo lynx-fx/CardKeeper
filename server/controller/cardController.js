@@ -9,32 +9,49 @@ const User = require("../model/userModel");
 // middelwares
 const { cardValidationSchema } = require("../middleware/validator");
 
-// TODO: get cards
+// integrate all API's with the frontend and recheck functionality
+
+// DONE: get cards
 exports.getCard = async (req, res) => {
   try {
-    return res.status(200);
+    const token = tokenExtractor(req);
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided." });
+    }
+    // getting all cards details
+    const decode = jwt.verify(token, process.env.TOKEN_SECRET);
+    const cards = await Card.find({ user: existingUser._id });
+
+    if (!cards) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No cards found." });
+    }
+
+    return res.status(200).json({ success: false, cards });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
 
-// TODO: create cards
+// DONE: create cards
 exports.createCard = async (req, res) => {
-  const {
-    brand,
-    category,
-    purchaseDate,
-    warrantyPeriod,
-    purchasePrice,
-    store,
-    warrantyType,
-    description,
-  } = req.body;
-
-  const imageUri = req.file ? req.file.filename : "default";
-
   try {
+    const {
+      brand,
+      category,
+      purchaseDate,
+      warrantyPeriod,
+      purchasePrice,
+      store,
+      warrantyType,
+      description,
+    } = req.body;
+
+    const imageUri = req.file ? req.file.filename : "default";
     // validating inputs
     const { error, value } = cardValidationSchema.validate(
       brand,

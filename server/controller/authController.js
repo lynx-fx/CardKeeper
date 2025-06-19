@@ -21,8 +21,8 @@ const {
 const tokenExtractor = require("../utils/tokenExtractor.js");
 
 exports.signup = async (req, res) => {
-  const { email, password } = req.body;
   try {
+    const { email, password } = req.body;
     // validating data
     const { error, value } = signUpSchema.validate({ email, password });
     if (error) {
@@ -38,7 +38,7 @@ exports.signup = async (req, res) => {
     // hashing password
     const hashedPassword = await hashPassword(password, 12);
 
-    // creating instanc of user
+    // creating instance of user
     const newuser = new User({
       email,
       password: hashedPassword,
@@ -60,8 +60,8 @@ exports.signup = async (req, res) => {
 
 // DONE: login
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
   try {
+    const { email, password } = req.body;
     const { error, value } = signUpSchema.validate({ email, password });
     if (error) {
       return res
@@ -120,8 +120,8 @@ exports.login = async (req, res) => {
 // DONE: send mail here
 // TODO: Update link to production link and email
 exports.forgotPassword = async (req, res) => {
-  const { email } = req.body;
   try {
+    const { email } = req.body;
     // check if user exists or not
     const existingUser = await User.findOne({ email });
 
@@ -188,9 +188,9 @@ exports.forgotPassword = async (req, res) => {
 
 // DONE: validate token from link
 exports.validateToken = async (req, res) => {
-  const email = req.params.email;
-  const token = req.params.token;
   try {
+    const email = req.params.email;
+    const token = req.params.token;
     // Finding user by email
     const existingUser = await User.findOne({ email }).select(
       "+token +tokenValidation"
@@ -231,8 +231,8 @@ exports.validateToken = async (req, res) => {
 
 // TODO: change password
 exports.changePassword = async (req, res) => {
-  const { newPassword, oldPassword } = req.body;
   try {
+    const { newPassword, oldPassword } = req.body;
     // validating password
     const { error, value } = changePasswordSchema.validate(newPassword);
     if (error) {
@@ -284,28 +284,25 @@ exports.changePassword = async (req, res) => {
 
 // TODO: reset password
 exports.resetPassword = async (req, res) => {
-  const email = req.params.email;
-  const {newPassword} = req.body;
-try {
+  try {
+    const email = req.params.email;
+    const { newPassword } = req.body;
     // validating password
     const { error, value } = changePasswordSchema.validate(newPassword);
     if (error) {
       return res
         .status(400)
         .json({ success: false, message: "Alpha numeric characters only." });
-  }
+    }
 
     // getting user data and changing pass
-    const existingUser = await User.findOne({ email }).select(
-      "+password"
-    );
+    const existingUser = await User.findOne({ email }).select("+password");
 
     if (!existingUser) {
       return res
         .status(404)
         .json({ success: false, message: "User not found." });
-    }
-    else {
+    } else {
       const hashedPassword = await hashPassword(newPassword);
       existingUser.password = hashedPassword;
       await existingUser.save();
