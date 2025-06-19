@@ -22,7 +22,8 @@ exports.signUpSchema = Joi.object({
 });
 
 exports.changePasswordSchema = Joi.object({
-  newPassword: Joi.string().required()
+  newPassword: Joi.string()
+    .required()
     .min(6)
     .max(20)
     .pattern(/^[a-zA-Z0-9]{3,30}$/)
@@ -30,8 +31,7 @@ exports.changePasswordSchema = Joi.object({
       "String.pattern.base":
         "Password must be between 6 and 30 characters long and contain only alphanumeric characters",
     }),
-})
-
+});
 
 exports.cardValidationSchema = Joi.object({
   brand: Joi.string().required(),
@@ -43,4 +43,15 @@ exports.cardValidationSchema = Joi.object({
   warrantyType: Joi.string().required(),
   description: Joi.string().optional().allow("", null),
   imageUri: Joi.string().uri().optional().allow("", null),
+});
+
+exports.cardUpdateValidationSchema = Joi.object({
+  brand: Joi.string(),
+  category: Joi.string(),
+  purchaseDate: Joi.date(),
+  warrantyPeriod: Joi.number(),
+  purchasePrice: Joi.number(),
+  store: Joi.string(),
+  warrantyType: Joi.string(),
+  description: Joi.string().optional().allow("", null),
 });

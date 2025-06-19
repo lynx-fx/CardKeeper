@@ -8,7 +8,7 @@ const User = require("../model/userModel");
 const Image = require("../model/imagesModel");
 
 // middelwares
-const { cardValidationSchema } = require("../middleware/validator");
+const { cardValidationSchema, cardUpdateValidationSchema } = require("../middleware/validator");
 
 // integrate all API's with the frontend and recheck functionality
 
@@ -118,6 +118,69 @@ exports.createCard = async (req, res) => {
 // TODO: update cards
 exports.updateCard = async (req, res) => {
   try {
+    const {
+      brand,
+      category,
+      purchaseDate,
+      warrantyPeriod,
+      purchasePrice,
+      store,
+      warrantyType,
+      description,
+      cardId,
+    } = req.body;
+
+    // validating inputs
+    const { error, value } = cardUpdateValidationSchema.validate(
+      brand,
+      category,
+      purchaseDate,
+      warrantyPeriod,
+      purchasePrice,
+      store,
+      warrantyType,
+      description,
+    );
+
+    // extracting auth token
+    const token = tokenExtractor(req);
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided." });
+    }
+
+    // getting user details via token
+    const decode = jwt.verify(token, process.env.TOKEN_SECRET);
+    const existingUser = await User.findOne({ email: decode.email });
+
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
+    }
+
+    // getting card details
+    const existingCard = await Card.findById(cardId);
+
+    // checking whether card belongs to user or not
+    if (existingUser._id !== existingCard.user) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Card doesn't belong to the user." });
+    }
+
+    //updating card
+    if (brand !== null) existingCard.brand = brand;
+    if (category !== null) existingCard.category = category;
+    if (purchaseDate !== null) existingCard.purchaseDate = purchaseDate;
+    if (warrantyPeriod !== null) existingCard.warrantyPeriod = warrantyPeriod;
+    if (purchasePrice !== null) existingCard.purchasePrice = purchasePrice;
+    if (store !== null) existingCard.store = store;
+    if (warrantyType !== null) existingCard.warrantyType = warrantyType;
+    if (description !== null) existingCard.description = description;
+    await existingCard.save();
     return res
       .status(200)
       .json({ success: true, message: "Card updated successfully" });
