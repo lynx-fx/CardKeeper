@@ -34,13 +34,13 @@ exports.changePasswordSchema = Joi.object({
 
 
 exports.cardValidationSchema = Joi.object({
-  Brand: Joi.string().required(),
-  Category: Joi.string().required(),
+  brand: Joi.string().required(),
+  category: Joi.string().required(),
   purchaseDate: Joi.date().required(),
   warrantyPeriod: Joi.number().required(),
   purchasePrice: Joi.number().required(),
-  Store: Joi.string().required(),
-  WarrantyType: Joi.string().required(),
-  Description: Joi.string().optional().allow("", null),
+  store: Joi.string().required(),
+  warrantyType: Joi.string().required(),
+  description: Joi.string().optional().allow("", null),
   imageUri: Joi.string().uri().optional().allow("", null),
 });

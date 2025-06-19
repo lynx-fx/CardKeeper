@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const cardSchema = new mongoose.Schema({
-  Brand: {
+  brand: {
     type: String,
     required: true,
   },
-  Category: {
+  category: {
     type: String,
     required: true,
   },
@@ -21,15 +21,15 @@ const cardSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  Store: {
+  store: {
     type: String,
     required: true,
   },
-  WarrantyType: {
+  warrantyType: {
     type: String,
     required: true,
   },
-  Description: {
+  description: {
     type: String,
     required: false,
   },

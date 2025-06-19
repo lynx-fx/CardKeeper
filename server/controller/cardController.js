@@ -36,7 +36,7 @@ exports.createCard = async (req, res) => {
 
   try {
     // validating inputs
-    const { error, value } = cardValidationSchema.verify(
+    const { error, value } = cardValidationSchema.validate(
       brand,
       category,
       purchaseDate,
