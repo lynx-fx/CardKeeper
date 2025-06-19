@@ -8,7 +8,10 @@ const User = require("../model/userModel");
 const Image = require("../model/imagesModel");
 
 // middelwares
-const { cardValidationSchema, cardUpdateValidationSchema } = require("../middleware/validator");
+const {
+  cardValidationSchema,
+  cardUpdateValidationSchema,
+} = require("../middleware/validator");
 
 // integrate all API's with the frontend and recheck functionality
 
@@ -97,7 +100,7 @@ exports.createCard = async (req, res) => {
       warrantyType,
       description,
       imageUri,
-      active: true,
+      isActive: true,
       user: existingUser._id,
     });
     const imageHandler = new Image({
@@ -139,7 +142,7 @@ exports.updateCard = async (req, res) => {
       purchasePrice,
       store,
       warrantyType,
-      description,
+      description
     );
 
     // extracting auth token
@@ -193,6 +196,39 @@ exports.updateCard = async (req, res) => {
 // TODO: delete cards
 exports.deleteCard = async (req, res) => {
   try {
+    const { cardId } = req.body;
+
+    // extracting auth token
+    const token = tokenExtractor(req);
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided." });
+    }
+
+    // getting user details via token
+    const decode = jwt.verify(token, process.env.TOKEN_SECRET);
+    const existingUser = await User.findOne({ email: decode.email });
+
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
+    }
+
+    // getting card details
+    const existingCard = await Card.findById(cardId);
+
+    // checking whether card belongs to user or not
+    if (existingUser._id !== existingCard.user) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Card doesn't belong to the user." });
+    }
+
+    existingCard.isActive = false;
+    await existingCard.save();
     return res
       .status(200)
       .json({ success: true, message: "Card deleted successfully" });

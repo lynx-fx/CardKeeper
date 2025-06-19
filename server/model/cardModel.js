@@ -36,7 +36,7 @@ const cardSchema = new mongoose.Schema({
   imageUri: {
     type: String,
   },
-  active: {
+  isActive: {
     type: Boolean,
   },
   user: {
