@@ -7,6 +7,8 @@ router.get("/get", cardController.getCard);
 
 router.post("/create", upload.single("img"),cardController.createCard);
 router.post("/delete", cardController.deleteCard);
+router.post("/get-images", cardController.getImages);
+
 router.put("/update", cardController.updateCard);
 
 module.exports = router;

@@ -193,7 +193,7 @@ exports.updateCard = async (req, res) => {
   }
 };
 
-// TODO: delete cards
+// DONE: delete cards
 exports.deleteCard = async (req, res) => {
   try {
     const { cardId } = req.body;
@@ -238,12 +238,47 @@ exports.deleteCard = async (req, res) => {
   }
 };
 
-// TODO: get images for card
+// DONE: get images for card
 exports.getImages = async (req, res) => {
   try {
-    return res
-      .status(200)
-      .json({ success: true, message: "Card deleted successfully" });
+    const { cardId } = req.body;
+
+    // extracting auth token
+    const token = tokenExtractor(req);
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided." });
+    }
+
+    // getting user details via token
+    const decode = jwt.verify(token, process.env.TOKEN_SECRET);
+    const existingUser = await User.findOne({ email: decode.email });
+
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
+    }
+
+    // getting card details
+    const existingCard = await Card.findById(cardId);
+
+    // checking whether card belongs to user or not
+    if (existingUser._id !== existingCard.user) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Card doesn't belong to the user." });
+    }
+
+    const images = await Image.find({ card: existingCard._id });
+    if (!images) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No images found." });
+    }
+    return res.status(200).json({ success: true, images });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
