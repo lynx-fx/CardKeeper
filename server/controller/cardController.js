@@ -13,7 +13,7 @@ const {
   cardUpdateValidationSchema,
 } = require("../middleware/validator");
 
-// integrate all API's with the frontend and recheck functionality
+// TODO: integrate all API's with the frontend and recheck functionality
 
 // DONE: get cards
 exports.getCard = async (req, res) => {
@@ -42,7 +42,7 @@ exports.getCard = async (req, res) => {
 };
 
 // DONE: create cards
-// TODO: Handle properly saving images
+// DONE: Handle properly saving images
 exports.createCard = async (req, res) => {
   try {
     const {
@@ -103,11 +103,13 @@ exports.createCard = async (req, res) => {
       isActive: true,
       user: existingUser._id,
     });
+    await card.save();
+
+    // saving image to image model for easier retrieval
     const imageHandler = new Image({
       imageUri,
-      card: null,
+      card: card._id,
     });
-    await card.save();
     await imageHandler.save();
     return res
       .status(200)
@@ -118,7 +120,7 @@ exports.createCard = async (req, res) => {
   }
 };
 
-// TODO: update cards
+// DONE: update cards
 exports.updateCard = async (req, res) => {
   try {
     const {

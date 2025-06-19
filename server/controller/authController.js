@@ -229,7 +229,7 @@ exports.validateToken = async (req, res) => {
   }
 };
 
-// TODO: change password
+// DONE: change password
 exports.changePassword = async (req, res) => {
   try {
     const { newPassword, oldPassword } = req.body;
@@ -282,7 +282,7 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-// TODO: reset password
+// DONE: reset password
 exports.resetPassword = async (req, res) => {
   try {
     const email = req.params.email;
