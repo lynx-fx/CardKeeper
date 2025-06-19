@@ -31,3 +31,16 @@ exports.changePasswordSchema = Joi.object({
         "Password must be between 6 and 30 characters long and contain only alphanumeric characters",
     }),
 })
+
+
+exports.cardValidationSchema = Joi.object({
+  Brand: Joi.string().required(),
+  Category: Joi.string().required(),
+  purchaseDate: Joi.date().required(),
+  warrantyPeriod: Joi.number().required(),
+  purchasePrice: Joi.number().required(),
+  Store: Joi.string().required(),
+  WarrantyType: Joi.string().required(),
+  Description: Joi.string().optional().allow("", null),
+  imageUri: Joi.string().uri().optional().allow("", null),
+});
