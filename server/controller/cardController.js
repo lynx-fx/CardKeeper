@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 // models
 const Card = require("../model/cardModel");
 const User = require("../model/userModel");
+const Image = require("../model/imagesModel");
 
 // middelwares
 const { cardValidationSchema } = require("../middleware/validator");
@@ -38,6 +39,7 @@ exports.getCard = async (req, res) => {
 };
 
 // DONE: create cards
+// TODO: Handle properly saving images
 exports.createCard = async (req, res) => {
   try {
     const {
@@ -98,7 +100,12 @@ exports.createCard = async (req, res) => {
       active: true,
       user: existingUser._id,
     });
+    const imageHandler = new Image({
+      imageUri,
+      card: null,
+    });
     await card.save();
+    await imageHandler.save();
     return res
       .status(200)
       .json({ success: true, message: "Card created successfully" });
@@ -122,6 +129,18 @@ exports.updateCard = async (req, res) => {
 
 // TODO: delete cards
 exports.deleteCard = async (req, res) => {
+  try {
+    return res
+      .status(200)
+      .json({ success: true, message: "Card deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+};
+
+// TODO: get images for card
+exports.getImages = async (req, res) => {
   try {
     return res
       .status(200)
