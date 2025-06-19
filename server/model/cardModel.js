@@ -33,6 +33,9 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  imageUri: {
+    type: String,
+  },
   active: {
     type: Boolean,
   },

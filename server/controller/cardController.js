@@ -12,6 +12,8 @@ exports.getCard = async (req, res) => {
 
 // TODO: create cards
 exports.createCard = async (req, res) => {
+  const {} = req.body;
+  
   try {
     return res
       .status(200)
