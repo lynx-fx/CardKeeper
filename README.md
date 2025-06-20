@@ -46,6 +46,5 @@
 ```
 
 ## Usage Notes
-1. Replace placeholder values (like "secret") with actual secure values in production
-2. Never commit actual secrets to version control
-3. Keep this file in your project's root directory and add it to your `.gitignore`
+1. Never commit actual secrets to version control
+2. Keep this file in your project's root directory and add it to your `.gitignore`
