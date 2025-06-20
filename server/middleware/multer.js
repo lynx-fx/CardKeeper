@@ -1,6 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 
+// TODO: Handle multiple images at once
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './images');

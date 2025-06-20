@@ -169,8 +169,14 @@ exports.updateCard = async (req, res) => {
     // getting card details
     const existingCard = await Card.findById(cardId);
 
+    if (!existingCard) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Card not found." });
+    }
+
     // checking whether card belongs to user or not
-    if (existingUser._id !== existingCard.user) {
+    if (existingUser._id.toString() !== existingCard.user.toString()) {
       return res
         .status(403)
         .json({ success: false, message: "Card doesn't belong to the user." });
@@ -222,8 +228,14 @@ exports.deleteCard = async (req, res) => {
     // getting card details
     const existingCard = await Card.findById(cardId);
 
+    if (!existingCard) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Card not found." });
+    }
+
     // checking whether card belongs to user or not
-    if (existingUser._id !== existingCard.user) {
+    if (existingUser._id.toString() !== existingCard.user.toString()) {
       return res
         .status(403)
         .json({ success: false, message: "Card doesn't belong to the user." });
@@ -241,11 +253,19 @@ exports.deleteCard = async (req, res) => {
 };
 
 // DONE:add images to card
+// DONE: handle multiple images
 exports.addImages = async (req, res) => {
   try {
     const { cardId } = req.body;
 
-    const imageUri = req.file ? req.file.filename : "default";
+    // const imageUri = req.file ? req.file.filename : "default";
+    const images = req.files; // array of uploaded files
+
+    if (!images || images.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No image uploaded." });
+    }
 
     // extracting auth token
     const token = tokenExtractor(req);
@@ -269,20 +289,36 @@ exports.addImages = async (req, res) => {
     // getting card details
     const existingCard = await Card.findById(cardId);
 
+    if (!existingCard) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Card not found." });
+    }
+
+    if (!existingCard) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Card not found." });
+    }
+
     // checking whether card belongs to user or not
-    if (existingUser._id !== existingCard.user) {
+    if (existingUser._id.toString() !== existingCard.user.toString()) {
       return res
         .status(403)
         .json({ success: false, message: "Card doesn't belong to the user." });
     }
 
-  const image = new Image({
-    imageUri,
-    card: existingCard._id,
-  })
+    for (const image of images) {
+      const newImage = new Image({
+        imageUri: image.filename,
+        card: existingCard._id,
+      });
+      await newImage.save();
+    }
 
-  await image.save();
-  return res.status(200).json({success: true, message: "Images uploaded successfully."})
+    return res
+      .status(200)
+      .json({ success: true, message: "Images uploaded successfully." });
   } catch (err) {
     console.log(err);
     return res
@@ -318,8 +354,14 @@ exports.getImages = async (req, res) => {
     // getting card details
     const existingCard = await Card.findById(cardId);
 
+    if (!existingCard) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Card not found." });
+    }
+
     // checking whether card belongs to user or not
-    if (existingUser._id !== existingCard.user) {
+    if (existingUser._id.toString() !== existingCard.user.toString()) {
       return res
         .status(403)
         .json({ success: false, message: "Card doesn't belong to the user." });
