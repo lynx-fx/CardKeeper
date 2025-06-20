@@ -240,6 +240,57 @@ exports.deleteCard = async (req, res) => {
   }
 };
 
+// DONE:add images to card
+exports.addImages = async (req, res) => {
+  try {
+    const { cardId } = req.body;
+
+    const imageUri = req.file ? req.file.filename : "default";
+
+    // extracting auth token
+    const token = tokenExtractor(req);
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided." });
+    }
+
+    // getting user details via token
+    const decode = jwt.verify(token, process.env.TOKEN_SECRET);
+    const existingUser = await User.findOne({ email: decode.email });
+
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
+    }
+
+    // getting card details
+    const existingCard = await Card.findById(cardId);
+
+    // checking whether card belongs to user or not
+    if (existingUser._id !== existingCard.user) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Card doesn't belong to the user." });
+    }
+
+  const image = new Image({
+    imageUri,
+    card: existingCard._id,
+  })
+
+  await image.save();
+  return res.status(200).json({success: true, message: "Images uploaded successfully."})
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 // DONE: get images for card
 exports.getImages = async (req, res) => {
   try {
