@@ -32,6 +32,8 @@ export default function Signup() {
   }
 
   const validateForm = () => {
+    console.log(formData);
+    
     const newErrors = {}
 
     if (!formData.name) {
