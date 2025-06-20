@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
+    userName: {
+      type: String,
+      requried: true,
+    },
     email: {
       type: String,
       required: true,
@@ -19,7 +23,7 @@ const userSchema = new mongoose.Schema(
       required: false,
       select: false,
     },
-    tokenValidation:{
+    tokenValidation: {
       type: Date,
       select: false,
     },

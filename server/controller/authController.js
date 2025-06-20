@@ -20,14 +20,16 @@ const {
 } = require("../utils/hashing.js");
 const tokenExtractor = require("../utils/tokenExtractor.js");
 
+// TODO: Remake validation
 exports.signup = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { userName, email, password } = req.body;
+
     // validating data
-    const { error, value } = signUpSchema.validate({ email, password });
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
-    }
+    // const { error, value } = signUpSchema.validate({ email, password });
+    // if (error) {
+    //   return res.status(400).json({ error: error.details[0].message });
+    // }
 
     // checking for exising user
     const existingUser = await User.findOne({ email });
@@ -40,6 +42,7 @@ exports.signup = async (req, res) => {
 
     // creating instance of user
     const newuser = new User({
+      userName,
       email,
       password: hashedPassword,
     });
