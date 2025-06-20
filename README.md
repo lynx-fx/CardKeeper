@@ -36,19 +36,14 @@
 
 # Environment Variables Configuration
 
-## Server Configuration
-- `PORT=8000` - The port number on which the application will run
-
-## Database Configuration
-- `MONGODB_URI=mongodb://localhost:27017/CardKeeper` - MongoDB connection URI pointing to the CardKeeper database
-
-## Security Configuration
-- `HMAC_CODE=` - Secret key used for HMAC operations
-- `TOKEN_SECRET=` - Secret key used for token generation and verification
-
-## Email Configuration
-- `EMAIL=` - Email address for sending emails
-- `EMAIL_PASSWORD=` - Password for the email account
+```bash
+    PORT=
+    MONGODB_URI=
+    HMAC_CODE=
+    TOKEN_SECRET=
+    EMAIL=
+    EMAIL_PASSWORD=
+```
 
 ## Usage Notes
 1. Replace placeholder values (like "secret") with actual secure values in production
