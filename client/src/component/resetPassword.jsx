@@ -102,7 +102,7 @@ export default function ResetPassword() {
 
     setIsLoading(true);
 
-    const response = await fetch(`${VITE_HOST}/api/auth/resetPassword`, {
+    const response = await fetch(`${VITE_HOST}/api/auth/resetPassword?email=${email}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",

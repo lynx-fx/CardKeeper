@@ -1,8 +1,8 @@
 const { hash, compare } = require("bcryptjs");
 const { createHmac } = require("crypto");
 
-exports.hashPassword = (value, saltValue) => {
-  return hash(value, saltValue);
+exports.hashPassword = async (value, saltValue = 12) => {
+  return await hash(value, saltValue);
 };
 
 exports.comparePassword = (value, hashedValue) => {

@@ -274,7 +274,7 @@ exports.changePassword = async (req, res) => {
         .json({ success: false, message: "Incorrect old password." });
     } else {
       // changing password if matches
-      const hashedPassword = await hashPassword(newPassword);
+      const hashedPassword = await hashPassword(newPassword, 12);
       existingUser.password = hashedPassword;
       await existingUser.save();
 
@@ -293,13 +293,14 @@ exports.resetPassword = async (req, res) => {
   try {
     const email = req.query.email;
     const { newPassword } = req.body;
+    
     // validating password
-    const { error, value } = changePasswordSchema.validate(newPassword);
-    if (error) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Alpha numeric characters only." });
-    }
+    // const { error, value } = changePasswordSchema.validate(newPassword);
+    // if (error) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "Alpha numeric characters only." });
+    // }
 
     // getting user data and changing pass
     const existingUser = await User.findOne({ email }).select("+password");
@@ -309,13 +310,13 @@ exports.resetPassword = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found." });
     } else {
-      const hashedPassword = await hashPassword(newPassword);
+      const hashedPassword = await hashPassword(newPassword, 12);
       existingUser.password = hashedPassword;
 
       // Remove token to prevent reuse after verification
       existingUser.token = undefined;
       existingUser.tokenValidation = undefined;
-      
+
       await existingUser.save();
 
       return res
