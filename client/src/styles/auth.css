@@ -130,7 +130,7 @@
   background: none;
   border: none;
   color: #007bff;
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
   font-size: 0.9rem;
   padding: 0;
@@ -139,11 +139,17 @@
 
 .link-button:hover {
   color: #0056b3;
+  text-decoration: underline;
 }
 
 .full-width {
   width: 100%;
   margin-bottom: 1rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-primary:disabled,
@@ -171,6 +177,14 @@
   color: #6c757d;
   font-size: 0.9rem;
   margin: 0 0 0.5rem 0;
+}
+
+.auth-footer .link-button {
+  text-decoration: none;
+}
+
+.auth-footer .link-button:hover {
+  text-decoration: underline;
 }
 
 .info-box {
@@ -213,8 +227,23 @@
   align-items: center;
 }
 
+.form-actions-vertical .btn-primary,
+.form-actions-vertical .btn-secondary {
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .form-actions-vertical .link-button {
   margin-top: 0.5rem;
+  text-decoration: none;
+}
+
+.form-actions-vertical .link-button:hover {
+  text-decoration: underline;
 }
 
 .form-actions-horizontal {
@@ -228,6 +257,11 @@
 .form-actions-horizontal .btn-primary {
   flex: 1;
   max-width: 150px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 480px) {

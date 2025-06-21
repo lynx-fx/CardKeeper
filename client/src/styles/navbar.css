@@ -64,6 +64,18 @@
   justify-content: center;
 }
 
+.dashboard-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.dashboard-actions .btn-secondary {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .user-menu {
   display: flex;
   align-items: center;
@@ -87,16 +99,6 @@
   cursor: pointer;
   padding: 0;
   z-index: 1001;
-}
-
-@media (max-width: 768px) {
-  .desktop-nav {
-    display: none;
-  }
-
-  .hamburger {
-    display: flex;
-  }
 }
 
 .hamburger span {
@@ -168,7 +170,7 @@
 }
 
 .mobile-nav-actions {
-  margin-top: auto;
+  /* Remove margin-top: auto to position at top */
 }
 
 .mobile-auth-buttons {
@@ -179,6 +181,21 @@
 
 .mobile-auth-buttons .btn-secondary,
 .mobile-auth-buttons .btn-primary {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-dashboard-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  /* Add order to position at top */
+  order: -1;
+}
+
+.mobile-dashboard-actions .btn-secondary {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -219,4 +236,55 @@
 
 .full-width {
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .navbar-content {
+    position: relative;
+  }
+
+  /* Ensure proper spacing on mobile */
+  .navbar-content {
+    justify-content: space-between;
+  }
+
+  .logo {
+    flex: 0 0 auto;
+  }
+
+  .hamburger {
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-menu {
+    width: 100%;
+    right: -100%;
+  }
+
+  .mobile-menu.active {
+    right: 0;
+  }
+
+  .mobile-menu-content {
+    padding: 1.5rem;
+  }
+
+  .navbar-content {
+    padding: 0.75rem 0;
+  }
+
+  .logo h2 {
+    font-size: 20px;
+  }
 }

@@ -18,7 +18,7 @@ const {
   hmacProcess,
   hmacProcessVerify,
 } = require("../utils/hashing.js");
-const {tokenExtractor} = require("../utils/tokenExtractor.js");
+const { tokenExtractor } = require("../utils/tokenExtractor.js");
 
 // TODO: Remake validation
 
@@ -114,7 +114,9 @@ exports.login = async (req, res) => {
     // response
     return res
       .cookie("auth", token, {
-        expries: new Date(Date.now() + 86400000),
+        expires: new Date(Date.now() + 86400000),
+        secure: false,
+        sameSite: "Lax",
         httpOnly: process.env.NODE_ENV === "production",
         secure: process.env.NODE_ENV === "production",
       })
