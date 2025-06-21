@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import Navbar from "./navbar.jsx";
 import Loading from "./loading.jsx";
 import "./../styles/auth.css";
@@ -34,8 +35,6 @@ export default function Signup() {
   };
 
   const validateForm = () => {
-    console.log(formData);
-
     const newErrors = {};
 
     if (!formData.name) {
@@ -75,8 +74,6 @@ export default function Signup() {
     }
 
     setIsLoading(true);
-    console.log(formData);
-
     const response = await fetch(`${VITE_HOST}/api/auth/signup`, {
       method: "POST",
       credentials: "include",
@@ -93,13 +90,17 @@ export default function Signup() {
     const data = await response.json();
     setIsLoading(false);
 
-    if (response.ok) {
-      navigate("/dashboard");
+    if (response.ok && data.success) {
+      toast.success(data.message || "User created sucessfully.");
+      navigate("/login");
     } else {
-      // alert here
-      console.log("Fat gayae guru.");
-
-      setFormData([]);
+      toast.error(data.message || "Something went wrong.");
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
     }
   };
 

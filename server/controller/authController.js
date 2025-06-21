@@ -34,7 +34,7 @@ exports.signup = async (req, res) => {
     // checking for exising user
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
+      return res.status(400).json({ success: false, message: "User already exists" });
     }
 
     // hashing password
@@ -57,7 +57,7 @@ exports.signup = async (req, res) => {
     });
   } catch (err) {
     console.error("Signup error:", err);
-    return res.status(500).json({ error: "Error while signing up" });
+    return res.status(500).json({ success: false, message: "Error while signing up" });
   }
 };
 
