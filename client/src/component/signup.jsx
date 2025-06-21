@@ -76,7 +76,7 @@ export default function Signup() {
     setIsLoading(true);
     const response = await fetch(`${VITE_HOST}/api/auth/signup`, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -92,7 +92,9 @@ export default function Signup() {
 
     if (response.ok && data.success) {
       toast.success(data.message || "User created sucessfully.");
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000); 
     } else {
       toast.error(data.message || "Something went wrong.");
       setFormData({

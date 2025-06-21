@@ -68,7 +68,7 @@ exports.login = async (req, res) => {
     const { error, value } = signUpSchema.validate({ email, password });
     if (error) {
       return res
-        .status()
+        .status(400)
         .json({ success: false, message: "Use alpha numeric characters only" });
     }
 
