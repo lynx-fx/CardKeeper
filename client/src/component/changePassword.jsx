@@ -1,101 +1,116 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import Navbar from "./navbar.jsx"
-import "./../styles/auth.css"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import Navbar from "./navbar.jsx";
+import "./../styles/auth.css";
 
 export default function ChangePassword() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-  })
-  const [errors, setErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
+  });
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const VITE_HOST = import.meta.env.VITE_BACKEND;
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
+    }));
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
-      }))
+      }));
     }
-  }
+  };
 
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
     if (!formData.currentPassword) {
-      newErrors.currentPassword = "Current password is required"
+      newErrors.currentPassword = "Current password is required";
     }
 
     if (!formData.newPassword) {
-      newErrors.newPassword = "New password is required"
+      newErrors.newPassword = "New password is required";
     } else if (formData.newPassword.length < 8) {
-      newErrors.newPassword = "Password must be at least 8 characters"
+      newErrors.newPassword = "Password must be at least 8 characters";
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.newPassword)) {
       newErrors.newPassword =
-        "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+        "Password must contain at least one uppercase letter, one lowercase letter, and one number";
     }
 
     if (formData.currentPassword === formData.newPassword) {
-      newErrors.newPassword = "New password must be different from current password"
+      newErrors.newPassword =
+        "New password must be different from current password";
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your new password"
+      newErrors.confirmPassword = "Please confirm your new password";
     } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match"
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
-    return newErrors
-  }
+    return newErrors;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const newErrors = validateForm()
+    e.preventDefault();
+    const newErrors = validateForm();
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+      setErrors(newErrors);
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
-    // Simulate API call to change password
-    setTimeout(() => {
-      // In a real app, you'd verify the current password first
-      const isCurrentPasswordValid = formData.currentPassword.length > 0 // Simple validation for demo
+    const response = await fetch(`${VITE_HOST}/api/auth/changePassword`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        newPassword: formData.newPassword,
+        oldPassword: formData.currentPassword,
+      }),
+    });
 
-      if (!isCurrentPasswordValid) {
-        setErrors({ currentPassword: "Current password is incorrect" })
-        setIsLoading(false)
-        return
-      }
+    const data = await response.json();
+    setIsLoading(false);
 
-      setIsSuccess(true)
-      setIsLoading(false)
-
-      // Redirect to dashboard after 2 seconds
+    if (response.ok && data.success) {
+      setIsSuccess(true);
+      toast.success("Redirecting...");
+      toast.success(data.message || "Changed password successfully");
       setTimeout(() => {
-        navigate("/dashboard")
-      }, 2000)
-    }, 1500)
-  }
+        navigate("/dashboard");
+      }, 2000);
+    } else {
+      setIsSuccess(false);
+      toast.error(data.message || "Something went wrong.");
+      setFormData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    }
+  };
 
   const handleCancel = () => {
-    navigate("/dashboard")
-  }
+    navigate("/dashboard");
+  };
 
   // Success state
   if (isSuccess) {
@@ -113,12 +128,16 @@ export default function ChangePassword() {
             <div className="auth-form">
               <div className="info-box success-box">
                 <p>
-                  Your password has been changed. For security reasons, you may need to sign in again on other devices.
+                  Your password has been changed. For security reasons, you may
+                  need to sign in again on other devices.
                 </p>
               </div>
 
               <div className="form-actions-vertical">
-                <button onClick={() => navigate("/dashboard")} className="btn-primary full-width">
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="btn-primary full-width"
+                >
                   Back to Dashboard
                 </button>
               </div>
@@ -126,7 +145,7 @@ export default function ChangePassword() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   // Change password form
@@ -152,7 +171,9 @@ export default function ChangePassword() {
                 className={errors.currentPassword ? "error" : ""}
                 placeholder="Enter your current password"
               />
-              {errors.currentPassword && <span className="error-message">{errors.currentPassword}</span>}
+              {errors.currentPassword && (
+                <span className="error-message">{errors.currentPassword}</span>
+              )}
             </div>
 
             <div className="info-box">
@@ -176,7 +197,9 @@ export default function ChangePassword() {
                 className={errors.newPassword ? "error" : ""}
                 placeholder="Enter your new password"
               />
-              {errors.newPassword && <span className="error-message">{errors.newPassword}</span>}
+              {errors.newPassword && (
+                <span className="error-message">{errors.newPassword}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -190,14 +213,25 @@ export default function ChangePassword() {
                 className={errors.confirmPassword ? "error" : ""}
                 placeholder="Confirm your new password"
               />
-              {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+              {errors.confirmPassword && (
+                <span className="error-message">{errors.confirmPassword}</span>
+              )}
             </div>
 
             <div className="form-actions-horizontal">
-              <button type="button" className="btn-secondary" onClick={handleCancel} disabled={isLoading}>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleCancel}
+                disabled={isLoading}
+              >
                 Cancel
               </button>
-              <button type="submit" className="btn-primary" disabled={isLoading}>
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={isLoading}
+              >
                 {isLoading ? "Changing Password..." : "Change Password"}
               </button>
             </div>
@@ -206,12 +240,13 @@ export default function ChangePassword() {
           <div className="auth-footer">
             <div className="info-box">
               <p>
-                <strong>Security Tip:</strong> Use a strong, unique password that you don't use for other accounts.
+                <strong>Security Tip:</strong> Use a strong, unique password
+                that you don't use for other accounts.
               </p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

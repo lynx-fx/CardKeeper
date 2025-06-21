@@ -18,7 +18,7 @@ const {
   hmacProcess,
   hmacProcessVerify,
 } = require("../utils/hashing.js");
-const tokenExtractor = require("../utils/tokenExtractor.js");
+const {tokenExtractor} = require("../utils/tokenExtractor.js");
 
 // TODO: Remake validation
 
@@ -240,12 +240,12 @@ exports.changePassword = async (req, res) => {
   try {
     const { newPassword, oldPassword } = req.body;
     // validating password
-    const { error, value } = changePasswordSchema.validate(newPassword);
-    if (error) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Alpha numeric characters only." });
-    }
+    // const { error, value } = changePasswordSchema.validate(newPassword);
+    // if (error) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "Alpha numeric characters only." });
+    // }
     // getting token
     const token = tokenExtractor(req);
     if (!token) {
@@ -264,6 +264,17 @@ exports.changePassword = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "User not found." });
+    }
+
+    // checking if password is same
+    const checkSimilarity = await comparePassword(
+      newPassword,
+      existingUser.password
+    );
+    if (checkSimilarity) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Password can't be same as before" });
     }
 
     // checking password
@@ -293,7 +304,7 @@ exports.resetPassword = async (req, res) => {
   try {
     const email = req.query.email;
     const { newPassword } = req.body;
-    
+
     // validating password
     // const { error, value } = changePasswordSchema.validate(newPassword);
     // if (error) {
@@ -309,20 +320,31 @@ exports.resetPassword = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "User not found." });
-    } else {
-      const hashedPassword = await hashPassword(newPassword, 12);
-      existingUser.password = hashedPassword;
-
-      // Remove token to prevent reuse after verification
-      existingUser.token = undefined;
-      existingUser.tokenValidation = undefined;
-
-      await existingUser.save();
-
-      return res
-        .status(200)
-        .json({ success: true, message: "Password changed successfully." });
     }
+
+    // checking if password is same
+    const checkSimilarity = await comparePassword(
+      newPassword,
+      existingUser.password
+    );
+    if (checkSimilarity) {
+      return res.status(400).json({
+        success: false,
+        message: "Password can't be same as before",
+      });
+    }
+    const hashedPassword = await hashPassword(newPassword, 12);
+    existingUser.password = hashedPassword;
+
+    // Remove token to prevent reuse after verification
+    existingUser.token = undefined;
+    existingUser.tokenValidation = undefined;
+
+    await existingUser.save();
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Password changed successfully." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
