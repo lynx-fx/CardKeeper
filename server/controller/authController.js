@@ -21,6 +21,7 @@ const {
 const tokenExtractor = require("../utils/tokenExtractor.js");
 
 // TODO: Remake validation
+
 exports.signup = async (req, res) => {
   try {
     const { userName, email, password } = req.body;
@@ -65,12 +66,12 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { error, value } = signUpSchema.validate({ email, password });
-    if (error) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Use alpha numeric characters only" });
-    }
+    // const { error, value } = signUpSchema.validate({ email, password });
+    // if (error) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "Use alpha numeric characters only" });
+    // }
 
     // getting user data
     const existingUser = await User.findOne({ email }).select("+password");
