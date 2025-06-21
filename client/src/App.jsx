@@ -9,6 +9,7 @@ import Signup from "./component/signup.jsx";
 import ForgotPassword from "./component/forgotPass.jsx";
 import ResetPassword from "./component/resetPassword.jsx";
 import ChangePassword from "./component/changePassword.jsx";
+import NotFound from "./component/notFound.jsx";
 
 // TODO: use react toastify
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </>

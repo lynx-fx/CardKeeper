@@ -1,99 +1,117 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Link, useNavigate, useSearchParams } from "react-router-dom"
-import Navbar from "./navbar.jsx"
-import "./../styles/auth.css"
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+import Navbar from "./navbar.jsx";
+import "./../styles/auth.css";
 
 export default function ResetPassword() {
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const token = searchParams.get("token")
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const email = searchParams.get("email");
+  const token = searchParams.get("token");
 
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: "",
-  })
-  const [errors, setErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [isValidToken, setIsValidToken] = useState(true)
-  const [isValidating, setIsValidating] = useState(true)
+  });
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isValidToken, setIsValidToken] = useState(true);
+  const [isValidating, setIsValidating] = useState(true);
+  const VITE_HOST = import.meta.env.VITE_BACKEND;
 
   useEffect(() => {
-    // Validate token on component mount
     if (!token) {
-      setIsValidToken(false)
-      setIsValidating(false)
-      return
+      setIsValidToken(false);
+      setIsValidating(false);
+      return;
     }
+    validateToken();
+  }, []);
 
-    // Simulate token validation
-    setTimeout(() => {
-      // In a real app, you'd validate the token with your backend
-      const isValid = token.length > 10 // Simple validation for demo
-      setIsValidToken(isValid)
-      setIsValidating(false)
-    }, 1000)
-  }, [token])
+  const validateToken = async () => {
+    setIsValidating(true);
+    const response = await fetch(
+      `${VITE_HOST}/api/auth/validateToken?email=${email}&token=${token}`,
+      {
+        method: "GET",
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      setIsValidToken(true);
+      setIsValidating(false);
+      toast.success(data.message || "Token verified");
+    } else {
+      setIsValidToken(false);
+      setIsValidating(false);
+      toast.error(data.message || "Something went wrong.");
+    }
+  };
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
+    }));
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
-      }))
+      }));
     }
-  }
+  };
 
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
     if (!formData.password) {
-      newErrors.password = "Password is required"
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters"
+      newErrors.password = "Password must be at least 8 characters";
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+      newErrors.password =
+        "Password must contain at least one uppercase letter, one lowercase letter, and one number";
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password"
+      newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match"
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
-    return newErrors
-  }
+    return newErrors;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const newErrors = validateForm()
+    e.preventDefault();
+    const newErrors = validateForm();
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+      setErrors(newErrors);
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     // Simulate API call to reset password
     setTimeout(() => {
-      setIsSuccess(true)
-      setIsLoading(false)
+      setIsSuccess(true);
+      setIsLoading(false);
 
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        navigate("/login")
-      }, 3000)
-    }, 1500)
-  }
+        navigate("/login");
+      }, 3000);
+    }, 1500);
+  };
 
   // Loading state while validating token
   if (isValidating) {
@@ -110,7 +128,7 @@ export default function ResetPassword() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   // Invalid token state
@@ -128,7 +146,10 @@ export default function ResetPassword() {
 
             <div className="auth-form">
               <div className="info-box error-box">
-                <p>The reset link may have expired or been used already. Please request a new password reset link.</p>
+                <p>
+                  The reset link may have expired or been used already. Please
+                  request a new password reset link.
+                </p>
               </div>
 
               <div className="form-actions-vertical">
@@ -143,7 +164,7 @@ export default function ResetPassword() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   // Success state
@@ -162,7 +183,8 @@ export default function ResetPassword() {
             <div className="auth-form">
               <div className="info-box success-box">
                 <p>
-                  You can now sign in with your new password. You will be redirected to the login page in a few seconds.
+                  You can now sign in with your new password. You will be
+                  redirected to the login page in a few seconds.
                 </p>
               </div>
 
@@ -175,7 +197,7 @@ export default function ResetPassword() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   // Reset password form
@@ -210,7 +232,9 @@ export default function ResetPassword() {
                 className={errors.password ? "error" : ""}
                 placeholder="Enter your new password"
               />
-              {errors.password && <span className="error-message">{errors.password}</span>}
+              {errors.password && (
+                <span className="error-message">{errors.password}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -224,10 +248,16 @@ export default function ResetPassword() {
                 className={errors.confirmPassword ? "error" : ""}
                 placeholder="Confirm your new password"
               />
-              {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+              {errors.confirmPassword && (
+                <span className="error-message">{errors.confirmPassword}</span>
+              )}
             </div>
 
-            <button type="submit" className="btn-primary full-width" disabled={isLoading}>
+            <button
+              type="submit"
+              className="btn-primary full-width"
+              disabled={isLoading}
+            >
               {isLoading ? "Resetting Password..." : "Reset Password"}
             </button>
           </form>
@@ -243,5 +273,5 @@ export default function ResetPassword() {
         </div>
       </div>
     </div>
-  )
+  );
 }

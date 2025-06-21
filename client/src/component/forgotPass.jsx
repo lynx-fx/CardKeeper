@@ -61,6 +61,7 @@ export default function ForgotPassword() {
     if (response.ok && data.success) {
       setIsSubmitted(true);
       setResendCount((prev) => prev + 1);
+      toast.success(data.message || "Mail sent successfully");
     } else {
       toast.error(data.message || "Something went wrong");
       setEmail("");

@@ -35,7 +35,9 @@ exports.signup = async (req, res) => {
     // checking for exising user
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: "User already exists" });
+      return res
+        .status(400)
+        .json({ success: false, message: "User already exists" });
     }
 
     // hashing password
@@ -58,7 +60,9 @@ exports.signup = async (req, res) => {
     });
   } catch (err) {
     console.error("Signup error:", err);
-    return res.status(500).json({ success: false, message: "Error while signing up" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Error while signing up" });
   }
 };
 
@@ -139,9 +143,9 @@ exports.forgotPassword = async (req, res) => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     // generating link
-    const link = `http://localhost:5173/reset?email=${encodeURIComponent(
-      email
-    )}&token=${code}`;
+    const link = `${
+      process.env.FRONT_END
+    }/reset-password?email=${encodeURIComponent(email)}&token=${code}`;
 
     // Sending mail here
     let info = await transport.sendMail({
@@ -193,8 +197,8 @@ exports.forgotPassword = async (req, res) => {
 // DONE: validate token from link
 exports.validateToken = async (req, res) => {
   try {
-    const email = req.params.email;
-    const token = req.params.token;
+    const email = req.query.email;
+    const token = req.query.token;
     // Finding user by email
     const existingUser = await User.findOne({ email }).select(
       "+token +tokenValidation"
@@ -214,7 +218,10 @@ exports.validateToken = async (req, res) => {
     }
 
     // Comparing token
+
     const hashedCode = hmacProcess(token, process.env.HMAC_CODE);
+    console.log(hashedCode);
+    console.log(existingUser);
     if (hashedCode !== existingUser.token) {
       return res
         .status(403)
@@ -226,7 +233,7 @@ exports.validateToken = async (req, res) => {
     existingUser.tokenValidation = undefined;
     await existingUser.save();
 
-    return res.status(200).json({ success: true, message: "Link verified." });
+    return res.status(200).json({ success: true, message: "Token verified." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
