@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import Navbar from "./navbar.jsx";
+import Loading from "./loading.jsx";
 import "./../styles/auth.css";
 
 export default function ResetPassword() {
@@ -101,16 +102,34 @@ export default function ResetPassword() {
 
     setIsLoading(true);
 
-    // Simulate API call to reset password
-    setTimeout(() => {
-      setIsSuccess(true);
-      setIsLoading(false);
+    const response = await fetch(`${VITE_HOST}/api/auth/resetPassword`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        newPassword: formData.password,
+      }),
+    });
 
-      // Redirect to login after 3 seconds
+    const data = await response.json();
+    setIsLoading(false);
+
+    if (response.ok && data.success) {
+      setIsSuccess(true);
+      toast.success(data.message || "Password updated successfully");
+
       setTimeout(() => {
         navigate("/login");
       }, 3000);
-    }, 1500);
+    } else {
+      setIsSuccess(false);
+      toast.error(data.message || "Something went wrong");
+      setFormData({
+        password: "",
+        confirmPassword: "",
+      });
+    }
   };
 
   // Loading state while validating token
@@ -202,76 +221,81 @@ export default function ResetPassword() {
 
   // Reset password form
   return (
-    <div className="auth-page">
-      <Navbar />
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-header">
-            <h1>Reset Your Password</h1>
-            <p>Enter your new password below</p>
-          </div>
+    <>
+      {isLoading && <Loading />}
+      <div className="auth-page">
+        <Navbar />
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-header">
+              <h1>Reset Your Password</h1>
+              <p>Enter your new password below</p>
+            </div>
 
-          <form onSubmit={handleSubmit} className="auth-form">
-            <div className="info-box">
+            <form onSubmit={handleSubmit} className="auth-form">
+              <div className="info-box">
+                <p>
+                  <strong>Password Requirements:</strong>
+                  <br />• At least 8 characters long
+                  <br />• Contains uppercase and lowercase letters
+                  <br />• Contains at least one number
+                </p>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password">New Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={errors.password ? "error" : ""}
+                  placeholder="Enter your new password"
+                />
+                {errors.password && (
+                  <span className="error-message">{errors.password}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm New Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={errors.confirmPassword ? "error" : ""}
+                  placeholder="Confirm your new password"
+                />
+                {errors.confirmPassword && (
+                  <span className="error-message">
+                    {errors.confirmPassword}
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="btn-primary full-width"
+                disabled={isLoading}
+              >
+                {isLoading ? "Resetting Password..." : "Reset Password"}
+              </button>
+            </form>
+
+            <div className="auth-footer">
               <p>
-                <strong>Password Requirements:</strong>
-                <br />• At least 8 characters long
-                <br />• Contains uppercase and lowercase letters
-                <br />• Contains at least one number
+                Remember your password?{" "}
+                <Link to="/login" className="link-button">
+                  Back to Sign In
+                </Link>
               </p>
             </div>
-
-            <div className="form-group">
-              <label htmlFor="password">New Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={errors.password ? "error" : ""}
-                placeholder="Enter your new password"
-              />
-              {errors.password && (
-                <span className="error-message">{errors.password}</span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm New Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className={errors.confirmPassword ? "error" : ""}
-                placeholder="Confirm your new password"
-              />
-              {errors.confirmPassword && (
-                <span className="error-message">{errors.confirmPassword}</span>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              className="btn-primary full-width"
-              disabled={isLoading}
-            >
-              {isLoading ? "Resetting Password..." : "Reset Password"}
-            </button>
-          </form>
-
-          <div className="auth-footer">
-            <p>
-              Remember your password?{" "}
-              <Link to="/login" className="link-button">
-                Back to Sign In
-              </Link>
-            </p>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

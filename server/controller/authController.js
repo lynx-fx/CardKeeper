@@ -228,11 +228,6 @@ exports.validateToken = async (req, res) => {
         .json({ success: false, message: "Invalid token." });
     }
 
-    // Remove token to prevent reuse after verification
-    existingUser.token = undefined;
-    existingUser.tokenValidation = undefined;
-    await existingUser.save();
-
     return res.status(200).json({ success: true, message: "Token verified." });
   } catch (err) {
     console.error(err);
@@ -296,7 +291,7 @@ exports.changePassword = async (req, res) => {
 // DONE: reset password
 exports.resetPassword = async (req, res) => {
   try {
-    const email = req.params.email;
+    const email = req.query.email;
     const { newPassword } = req.body;
     // validating password
     const { error, value } = changePasswordSchema.validate(newPassword);
@@ -316,6 +311,11 @@ exports.resetPassword = async (req, res) => {
     } else {
       const hashedPassword = await hashPassword(newPassword);
       existingUser.password = hashedPassword;
+
+      // Remove token to prevent reuse after verification
+      existingUser.token = undefined;
+      existingUser.tokenValidation = undefined;
+      
       await existingUser.save();
 
       return res
