@@ -1,25 +1,50 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
-import "./../styles/navbar.css"
+import { useState } from "react";
+import { toast } from "sonner";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import "./../styles/navbar.css";
 
 export default function Navbar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const location = useLocation()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const VITE_HOST = import.meta.env.VITE_BACKEND;
+    const navigate = useNavigate();
+
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
-  }
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false)
-  }
+    setIsMobileMenuOpen(false);
+  };
 
   // Determine navbar content based on current route only
-  const isLandingPage = location.pathname === "/"
-  const isAuthPage = ["/login", "/signup", "/forgot-password"].includes(location.pathname)
-  const isDashboardPage = location.pathname === "/dashboard"
+  const isLandingPage = location.pathname === "/";
+  const isAuthPage = ["/login", "/signup", "/forgot-password"].includes(
+    location.pathname
+  );
+  const isDashboardPage = location.pathname === "/dashboard";
+
+  const handleLogout = async () => {
+    const response = await fetch(`${VITE_HOST}/api/auth/logout`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if(response.ok && data.success){
+      navigate("/");
+      toast.success("Logged out successfully")
+    } else{
+      toast.error("Something went wrong.");
+    }
+  }; 
 
   return (
     <header className="navbar">
@@ -62,7 +87,7 @@ export default function Navbar() {
                 <Link to="/change-password" className="btn-secondary">
                   Change Password
                 </Link>
-                <Link to="/" className="btn-secondary">
+                <Link className="btn-secondary" onClick={handleLogout}>
                   Logout
                 </Link>
               </div>
@@ -101,27 +126,47 @@ export default function Navbar() {
             <div className="mobile-nav-actions">
               {isLandingPage && (
                 <div className="mobile-auth-buttons">
-                  <Link to="/login" className="btn-secondary full-width" onClick={closeMobileMenu}>
+                  <Link
+                    to="/login"
+                    className="btn-secondary full-width"
+                    onClick={closeMobileMenu}
+                  >
                     Sign In
                   </Link>
-                  <Link to="/signup" className="btn-primary full-width" onClick={closeMobileMenu}>
+                  <Link
+                    to="/signup"
+                    className="btn-primary full-width"
+                    onClick={closeMobileMenu}
+                  >
                     Sign Up
                   </Link>
                 </div>
               )}
 
               {isAuthPage && (
-                <Link to="/" className="btn-secondary full-width" onClick={closeMobileMenu}>
+                <Link
+                  to="/"
+                  className="btn-secondary full-width"
+                  onClick={closeMobileMenu}
+                >
                   Back to Home
                 </Link>
               )}
 
               {isDashboardPage && (
                 <div className="mobile-dashboard-actions">
-                  <Link to="/change-password" className="btn-secondary full-width" onClick={closeMobileMenu}>
+                  <Link
+                    to="/change-password"
+                    className="btn-secondary full-width"
+                    onClick={closeMobileMenu}
+                  >
                     Change Password
                   </Link>
-                  <Link to="/" className="btn-secondary full-width" onClick={closeMobileMenu}>
+                  <Link
+                    to="/"
+                    className="btn-secondary full-width"
+                    onClick={closeMobileMenu}
+                  >
                     Logout
                   </Link>
                 </div>
@@ -131,8 +176,10 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu Overlay */}
-        {isMobileMenuOpen && <div className="mobile-menu-overlay" onClick={closeMobileMenu}></div>}
+        {isMobileMenuOpen && (
+          <div className="mobile-menu-overlay" onClick={closeMobileMenu}></div>
+        )}
       </div>
     </header>
-  )
+  );
 }

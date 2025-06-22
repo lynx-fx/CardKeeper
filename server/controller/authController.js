@@ -70,6 +70,9 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    
+
+    // Validating user inputs
     // const { error, value } = signUpSchema.validate({ email, password });
     // if (error) {
     //   return res
@@ -125,6 +128,14 @@ exports.login = async (req, res) => {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
+};
+
+// DONE: Logout
+exports.logout = async (req, res) => {
+  res
+    .clearCookie("auth")
+    .status(200)
+    .json({ success: true, message: "Logout successful" });
 };
 
 // DONE: send mail here

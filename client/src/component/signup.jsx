@@ -92,6 +92,12 @@ export default function Signup() {
 
     if (response.ok && data.success) {
       toast.success(data.message || "User created sucessfully.");
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
       setTimeout(() => {
         navigate("/login");
       }, 3000); 
