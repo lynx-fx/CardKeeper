@@ -63,6 +63,7 @@ export default function Login() {
     const response = await fetch(`${VITE_HOST}/api/auth/login`, {
       method: "POST",
       headers: { "content-type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
         email: formData.email,
         password: formData.password,
