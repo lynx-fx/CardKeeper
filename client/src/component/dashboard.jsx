@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Navbar from "./navbar.jsx"
-import "./../styles/dashboard.css"
+import { useState } from "react";
+import Navbar from "./navbar.jsx";
+import "./../styles/dashboard.css";
 
 export default function WarrantyDashboard() {
   const [warranties, setWarranties] = useState([
@@ -18,81 +18,122 @@ export default function WarrantyDashboard() {
       store: "Apple Store",
       serialNumber: "ABC123456789",
       warrantyType: "Limited Warranty",
-      description: "Latest iPhone with advanced camera system and titanium design.",
+      description:
+        "Latest iPhone with advanced camera system and titanium design.",
       images: [
         "https://th.bing.com/th/id/OIP.HBbuY78PlcRT1X9nq2xZ0AHaHa?o=7&cb=thvnextc1rm=3&rs=1&pid=ImgDetMain",
         "https://www.techspot.com/images/products/2023/smartphones/org/2023-09-19-product.jpg",
       ],
     },
-  ])
+  ]);
 
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [showDetailModal, setShowDetailModal] = useState(false)
-  const [selectedWarranty, setSelectedWarranty] = useState(null)
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedWarranty, setSelectedWarranty] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [newWarranty, setNewWarranty] = useState({
     productName: "",
     brand: "",
     purchaseDate: "",
-    warrantyExpiry: "",
+    warrantyValidation: 0,
     category: "Electronics",
     purchasePrice: "",
     store: "",
     serialNumber: "",
     warrantyType: "Limited Warranty",
     description: "",
-  })
+  });
 
-  const handleAddWarranty = (e) => {
-    e.preventDefault()
-    const warranty = {
-      id: Date.now(),
-      ...newWarranty,
-      status: "Active",
-      images: ["/placeholder.svg?height=300&width=400&text=Upload+Warranty+Card"],
+  const handleAddWarranty = async (e) => {
+    e.preventDefault();
+
+    // 1. Calculate expiry date
+    const { purchaseDate, warrantyValidation } = newWarranty;
+    let warrantyExpiry = "";
+
+    if (purchaseDate && warrantyValidation) {
+      const date = new Date(purchaseDate);
+      date.setFullYear(date.getFullYear() + parseInt(warrantyValidation));
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      warrantyExpiry = `${year}-${month}-${day}`;
     }
-    setWarranties([...warranties, warranty])
-    setNewWarranty({
-      productName: "",
-      brand: "",
-      purchaseDate: "",
-      warrantyExpiry: "",
-      category: "Electronics",
-      purchasePrice: "",
-      store: "",
-      serialNumber: "",
-      warrantyType: "Limited Warranty",
-      description: "",
-    })
-    setShowAddForm(false)
-  }
+
+    // 2. Prepare data for API (with calculated expiry)
+    const warrantyData = {
+      ...newWarranty,
+      warrantyExpiry, // Override with calculated expiry
+      // status: "Active",
+      // images: ["/placeholder.svg?height=300&width=400&text=Upload+Warranty+Card"],
+    };
+
+    // 3. API Call (replace with your actual API call)
+    try {
+      const response = await fetch("/api/warranties", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(warrantyData),
+      });
+
+      if (!response.ok) throw new Error("Failed to add warranty");
+
+      // 4. Reset form (no local state update for warranties)
+      setNewWarranty({
+        productName: "",
+        brand: "",
+        purchaseDate: "",
+        warrantyValidation: 0,
+        category: "Electronics",
+        purchasePrice: "",
+        store: "",
+        serialNumber: "",
+        warrantyType: "Limited Warranty",
+        description: "",
+      });
+      setShowAddForm(false);
+
+      // Optional: Show success message
+      alert("Warranty added successfully!");
+    } catch (error) {
+      console.error("Error adding warranty:", error);
+      alert("Failed to add warranty. Please try again.");
+    }
+  };
 
   const handleViewDetails = (warranty) => {
-    setSelectedWarranty(warranty)
-    setSelectedImageIndex(0)
-    setShowDetailModal(true)
-  }
+    setSelectedWarranty(warranty);
+    setSelectedImageIndex(0);
+    setShowDetailModal(true);
+  };
 
   const getStatusColor = (expiry) => {
-    const today = new Date()
-    const expiryDate = new Date(expiry)
-    const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24))
+    const today = new Date();
+    const expiryDate = new Date(expiry);
+    const daysUntilExpiry = Math.ceil(
+      (expiryDate - today) / (1000 * 60 * 60 * 24)
+    );
 
-    if (daysUntilExpiry < 0) return "expired"
-    if (daysUntilExpiry < 30) return "expiring-soon"
-    return "active"
-  }
+    if (daysUntilExpiry < 0) return "expired";
+    if (daysUntilExpiry < 30) return "expiring-soon";
+    return "active";
+  };
 
   const getDaysRemaining = (expiry) => {
-    const today = new Date()
-    const expiryDate = new Date(expiry)
-    const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24))
+    const today = new Date();
+    const expiryDate = new Date(expiry);
+    const daysUntilExpiry = Math.ceil(
+      (expiryDate - today) / (1000 * 60 * 60 * 24)
+    );
 
-    if (daysUntilExpiry < 0) return `Expired ${Math.abs(daysUntilExpiry)} days ago`
-    if (daysUntilExpiry === 0) return "Expires today"
-    if (daysUntilExpiry === 1) return "Expires tomorrow"
-    return `${daysUntilExpiry} days remaining`
-  }
+    if (daysUntilExpiry < 0)
+      return `Expired ${Math.abs(daysUntilExpiry)} days ago`;
+    if (daysUntilExpiry === 0) return "Expires today";
+    if (daysUntilExpiry === 1) return "Expires tomorrow";
+    return `${daysUntilExpiry} days remaining`;
+  };
 
   return (
     <div className="dashboard">
@@ -105,7 +146,10 @@ export default function WarrantyDashboard() {
               <h1>My Warranties</h1>
               <p>Manage and track all your warranty information</p>
             </div>
-            <button className="btn-primary" onClick={() => setShowAddForm(true)}>
+            <button
+              className="btn-primary"
+              onClick={() => setShowAddForm(true)}
+            >
               Add Warranty
             </button>
           </div>
@@ -121,21 +165,40 @@ export default function WarrantyDashboard() {
             <div className="stat-card">
               <div className="stat-icon">✅</div>
               <div className="stat-content">
-                <h3>{warranties.filter((w) => getStatusColor(w.warrantyExpiry) === "active").length}</h3>
+                <h3>
+                  {
+                    warranties.filter(
+                      (w) => getStatusColor(w.warrantyExpiry) === "active"
+                    ).length
+                  }
+                </h3>
                 <p>Active</p>
               </div>
             </div>
             <div className="stat-card">
               <div className="stat-icon">⚠️</div>
               <div className="stat-content">
-                <h3>{warranties.filter((w) => getStatusColor(w.warrantyExpiry) === "expiring-soon").length}</h3>
+                <h3>
+                  {
+                    warranties.filter(
+                      (w) =>
+                        getStatusColor(w.warrantyExpiry) === "expiring-soon"
+                    ).length
+                  }
+                </h3>
                 <p>Expiring Soon</p>
               </div>
             </div>
             <div className="stat-card">
               <div className="stat-icon">❌</div>
               <div className="stat-content">
-                <h3>{warranties.filter((w) => getStatusColor(w.warrantyExpiry) === "expired").length}</h3>
+                <h3>
+                  {
+                    warranties.filter(
+                      (w) => getStatusColor(w.warrantyExpiry) === "expired"
+                    ).length
+                  }
+                </h3>
                 <p>Expired</p>
               </div>
             </div>
@@ -145,7 +208,11 @@ export default function WarrantyDashboard() {
             <div className="section-header">
               <h2>Your Warranties</h2>
               <div className="search-filter">
-                <input type="text" placeholder="Search warranties..." className="search-input" />
+                <input
+                  type="text"
+                  placeholder="Search warranties..."
+                  className="search-input"
+                />
                 <select className="filter-select">
                   <option value="">All Categories</option>
                   <option value="Electronics">Electronics</option>
@@ -159,17 +226,32 @@ export default function WarrantyDashboard() {
 
             <div className="warranties-grid">
               {warranties.map((warranty) => (
-                <div key={warranty.id} className={`warranty-card ${getStatusColor(warranty.warrantyExpiry)}`}>
+                <div
+                  key={warranty.id}
+                  className={`warranty-card ${getStatusColor(
+                    warranty.warrantyExpiry
+                  )}`}
+                >
                   <div className="warranty-header">
                     <h3>{warranty.productName}</h3>
-                    <span className={`status-badge ${getStatusColor(warranty.warrantyExpiry)}`}>
-                      {getStatusColor(warranty.warrantyExpiry).replace("-", " ")}
+                    <span
+                      className={`status-badge ${getStatusColor(
+                        warranty.warrantyExpiry
+                      )}`}
+                    >
+                      {getStatusColor(warranty.warrantyExpiry).replace(
+                        "-",
+                        " "
+                      )}
                     </span>
                   </div>
 
                   <div className="warranty-image">
                     <img
-                      src={warranty.images?.[0] || "/placeholder.svg?height=150&width=200&text=No+Image"}
+                      src={
+                        warranty.images?.[0] ||
+                        "/placeholder.svg?height=150&width=200&text=No+Image"
+                      }
                       alt={`${warranty.productName} warranty`}
                       className="warranty-thumbnail"
                     />
@@ -188,13 +270,22 @@ export default function WarrantyDashboard() {
                     <p>
                       <strong>Expires:</strong> {warranty.warrantyExpiry}
                     </p>
-                    <p className={`warranty-status ${getStatusColor(warranty.warrantyExpiry)}`}>
-                      <strong>{getDaysRemaining(warranty.warrantyExpiry)}</strong>
+                    <p
+                      className={`warranty-status ${getStatusColor(
+                        warranty.warrantyExpiry
+                      )}`}
+                    >
+                      <strong>
+                        {getDaysRemaining(warranty.warrantyExpiry)}
+                      </strong>
                     </p>
                   </div>
 
                   <div className="warranty-actions">
-                    <button className="btn-small btn-primary" onClick={() => handleViewDetails(warranty)}>
+                    <button
+                      className="btn-small btn-primary"
+                      onClick={() => handleViewDetails(warranty)}
+                    >
                       View Details
                     </button>
                     <button className="btn-small">Edit</button>
@@ -213,7 +304,10 @@ export default function WarrantyDashboard() {
           <div className="modal large-modal">
             <div className="modal-header">
               <h2>Add New Warranty</h2>
-              <button className="close-btn" onClick={() => setShowAddForm(false)}>
+              <button
+                className="close-btn"
+                onClick={() => setShowAddForm(false)}
+              >
                 ×
               </button>
             </div>
@@ -224,7 +318,12 @@ export default function WarrantyDashboard() {
                   <input
                     type="text"
                     value={newWarranty.productName}
-                    onChange={(e) => setNewWarranty({ ...newWarranty, productName: e.target.value })}
+                    onChange={(e) =>
+                      setNewWarranty({
+                        ...newWarranty,
+                        productName: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -233,7 +332,9 @@ export default function WarrantyDashboard() {
                   <input
                     type="text"
                     value={newWarranty.brand}
-                    onChange={(e) => setNewWarranty({ ...newWarranty, brand: e.target.value })}
+                    onChange={(e) =>
+                      setNewWarranty({ ...newWarranty, brand: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -244,7 +345,12 @@ export default function WarrantyDashboard() {
                   <label>Category</label>
                   <select
                     value={newWarranty.category}
-                    onChange={(e) => setNewWarranty({ ...newWarranty, category: e.target.value })}
+                    onChange={(e) =>
+                      setNewWarranty({
+                        ...newWarranty,
+                        category: e.target.value,
+                      })
+                    }
                   >
                     <option value="Electronics">Electronics</option>
                     <option value="Appliances">Appliances</option>
@@ -256,9 +362,14 @@ export default function WarrantyDashboard() {
                 <div className="form-group">
                   <label>Purchase Price</label>
                   <input
-                    type="text"
+                    type="number"
                     value={newWarranty.purchasePrice}
-                    onChange={(e) => setNewWarranty({ ...newWarranty, purchasePrice: e.target.value })}
+                    onChange={(e) =>
+                      setNewWarranty({
+                        ...newWarranty,
+                        purchasePrice: e.target.value,
+                      })
+                    }
                     placeholder="$0.00"
                   />
                 </div>
@@ -270,16 +381,28 @@ export default function WarrantyDashboard() {
                   <input
                     type="date"
                     value={newWarranty.purchaseDate}
-                    onChange={(e) => setNewWarranty({ ...newWarranty, purchaseDate: e.target.value })}
+                    onChange={(e) =>
+                      setNewWarranty({
+                        ...newWarranty,
+                        purchaseDate: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label>Warranty Expiry Date</label>
+                  <label>Warranty Validation Period</label>
                   <input
-                    type="date"
-                    value={newWarranty.warrantyExpiry}
-                    onChange={(e) => setNewWarranty({ ...newWarranty, warrantyExpiry: e.target.value })}
+                    type="number"
+                    min="0"
+                    placeholder="In years"
+                    value={newWarranty.warrantyValidation}
+                    onChange={(e) =>
+                      setNewWarranty({
+                        ...newWarranty,
+                        warrantyValidation: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -291,7 +414,9 @@ export default function WarrantyDashboard() {
                   <input
                     type="text"
                     value={newWarranty.store}
-                    onChange={(e) => setNewWarranty({ ...newWarranty, store: e.target.value })}
+                    onChange={(e) =>
+                      setNewWarranty({ ...newWarranty, store: e.target.value })
+                    }
                     placeholder="Where did you buy this?"
                   />
                 </div>
@@ -300,7 +425,12 @@ export default function WarrantyDashboard() {
                   <input
                     type="text"
                     value={newWarranty.serialNumber}
-                    onChange={(e) => setNewWarranty({ ...newWarranty, serialNumber: e.target.value })}
+                    onChange={(e) =>
+                      setNewWarranty({
+                        ...newWarranty,
+                        serialNumber: e.target.value,
+                      })
+                    }
                     placeholder="Product serial number"
                   />
                 </div>
@@ -310,11 +440,18 @@ export default function WarrantyDashboard() {
                 <label>Warranty Type</label>
                 <select
                   value={newWarranty.warrantyType}
-                  onChange={(e) => setNewWarranty({ ...newWarranty, warrantyType: e.target.value })}
+                  onChange={(e) =>
+                    setNewWarranty({
+                      ...newWarranty,
+                      warrantyType: e.target.value,
+                    })
+                  }
                 >
                   <option value="Limited Warranty">Limited Warranty</option>
                   <option value="Extended Warranty">Extended Warranty</option>
-                  <option value="Manufacturer Warranty">Manufacturer Warranty</option>
+                  <option value="Manufacturer Warranty">
+                    Manufacturer Warranty
+                  </option>
                   <option value="Store Warranty">Store Warranty</option>
                 </select>
               </div>
@@ -323,14 +460,23 @@ export default function WarrantyDashboard() {
                 <label>Description</label>
                 <textarea
                   value={newWarranty.description}
-                  onChange={(e) => setNewWarranty({ ...newWarranty, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewWarranty({
+                      ...newWarranty,
+                      description: e.target.value,
+                    })
+                  }
                   placeholder="Additional notes about this product..."
                   rows="3"
                 />
               </div>
 
               <div className="form-actions">
-                <button type="button" className="btn-secondary" onClick={() => setShowAddForm(false)}>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowAddForm(false)}
+                >
                   Cancel
                 </button>
                 <button type="submit" className="btn-primary">
@@ -348,7 +494,10 @@ export default function WarrantyDashboard() {
           <div className="modal detail-modal">
             <div className="modal-header">
               <h2>{selectedWarranty.productName}</h2>
-              <button className="close-btn" onClick={() => setShowDetailModal(false)}>
+              <button
+                className="close-btn"
+                onClick={() => setShowDetailModal(false)}
+              >
                 ×
               </button>
             </div>
@@ -366,21 +515,24 @@ export default function WarrantyDashboard() {
                   />
                 </div>
 
-                {selectedWarranty.images && selectedWarranty.images.length > 1 && (
-                  <div className="image-thumbnails">
-                    {selectedWarranty.images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={image || "/placeholder.svg"}
-                        alt={`Warranty document ${index + 1}`}
-                        className={`thumbnail ${index === selectedImageIndex ? "active" : ""}`}
-                        onClick={() => setSelectedImageIndex(index)}
-                        height={400}
-                        width={300}
-                      />
-                    ))}
-                  </div>
-                )}
+                {selectedWarranty.images &&
+                  selectedWarranty.images.length > 1 && (
+                    <div className="image-thumbnails">
+                      {selectedWarranty.images.map((image, index) => (
+                        <img
+                          key={index}
+                          src={image || "/placeholder.svg"}
+                          alt={`Warranty document ${index + 1}`}
+                          className={`thumbnail ${
+                            index === selectedImageIndex ? "active" : ""
+                          }`}
+                          onClick={() => setSelectedImageIndex(index)}
+                          height={400}
+                          width={300}
+                        />
+                      ))}
+                    </div>
+                  )}
 
                 <div className="image-upload-area">
                   <div className="upload-placeholder">
@@ -393,10 +545,19 @@ export default function WarrantyDashboard() {
 
               <div className="detail-info">
                 <div className="warranty-status-section">
-                  <span className={`status-badge large ${getStatusColor(selectedWarranty.warrantyExpiry)}`}>
-                    {getStatusColor(selectedWarranty.warrantyExpiry).replace("-", " ")}
+                  <span
+                    className={`status-badge large ${getStatusColor(
+                      selectedWarranty.warrantyExpiry
+                    )}`}
+                  >
+                    {getStatusColor(selectedWarranty.warrantyExpiry).replace(
+                      "-",
+                      " "
+                    )}
                   </span>
-                  <p className="status-text">{getDaysRemaining(selectedWarranty.warrantyExpiry)}</p>
+                  <p className="status-text">
+                    {getDaysRemaining(selectedWarranty.warrantyExpiry)}
+                  </p>
                 </div>
 
                 <div className="detail-grid">
@@ -418,7 +579,9 @@ export default function WarrantyDashboard() {
                   </div>
                   <div className="detail-item">
                     <label>Purchase Price</label>
-                    <span>{selectedWarranty.purchasePrice || "Not specified"}</span>
+                    <span>
+                      {selectedWarranty.purchasePrice || "Not specified"}
+                    </span>
                   </div>
                   <div className="detail-item">
                     <label>Store</label>
@@ -426,11 +589,15 @@ export default function WarrantyDashboard() {
                   </div>
                   <div className="detail-item">
                     <label>Serial Number</label>
-                    <span>{selectedWarranty.serialNumber || "Not specified"}</span>
+                    <span>
+                      {selectedWarranty.serialNumber || "Not specified"}
+                    </span>
                   </div>
                   <div className="detail-item">
                     <label>Warranty Type</label>
-                    <span>{selectedWarranty.warrantyType || "Not specified"}</span>
+                    <span>
+                      {selectedWarranty.warrantyType || "Not specified"}
+                    </span>
                   </div>
                 </div>
 
@@ -452,5 +619,5 @@ export default function WarrantyDashboard() {
         </div>
       )}
     </div>
-  )
+  );
 }
