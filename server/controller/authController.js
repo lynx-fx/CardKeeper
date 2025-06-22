@@ -27,17 +27,17 @@ exports.signup = async (req, res) => {
     const { userName, email, password } = req.body;
 
     // validating data
-    // const { error, value } = signUpSchema.validate({ email, password });
-    // if (error) {
-    //   return res.status(400).json({ error: error.details[0].message });
-    // }
+    const { error, value } = signUpSchema.validate({ email, password });
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
 
     // checking for exising user
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res
         .status(400)
-        .json({ success: false, message: "User already exists" });
+        .json({ success: false, message: `User with ${email} already exists` });
     }
 
     // hashing password
@@ -73,12 +73,12 @@ exports.login = async (req, res) => {
     
 
     // Validating user inputs
-    // const { error, value } = signUpSchema.validate({ email, password });
-    // if (error) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: "Use alpha numeric characters only" });
-    // }
+    const { error, value } = signUpSchema.validate({ email, password });
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Use alpha numeric characters only" });
+    }
 
     // getting user data
     const existingUser = await User.findOne({ email }).select("+password");
@@ -250,13 +250,16 @@ exports.validateToken = async (req, res) => {
 exports.changePassword = async (req, res) => {
   try {
     const { newPassword, oldPassword } = req.body;
-    // validating password
-    // const { error, value } = changePasswordSchema.validate(newPassword);
-    // if (error) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: "Alpha numeric characters only." });
-    // }
+    // validating user inputs
+    const { error, value } = changePasswordSchema.validate({newPassword});
+    if (error) {
+      console.log(error);
+      
+      return res
+        .status(400)
+        .json({ success: false, message: "Alpha numeric characters only." });
+    }
+
     // getting token
     const token = tokenExtractor(req);
     if (!token) {
@@ -316,13 +319,13 @@ exports.resetPassword = async (req, res) => {
     const email = req.query.email;
     const { newPassword } = req.body;
 
-    // validating password
-    // const { error, value } = changePasswordSchema.validate(newPassword);
-    // if (error) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: "Alpha numeric characters only." });
-    // }
+    // validating user inputs
+    const { error, value } = changePasswordSchema.validate({newPassword});
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Alpha numeric characters only." });
+    }
 
     // getting user data and changing pass
     const existingUser = await User.findOne({ email }).select("+password");

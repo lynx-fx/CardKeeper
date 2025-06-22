@@ -1,31 +1,31 @@
 const Joi = require("Joi");
 
-exports.signupSchema = Joi.object({
+exports.signUpSchema = Joi.object({
   email: Joi.string()
     .min(6)
     .max(60)
     .required()
     .email({ tlds: { allow: ["com", "net"] } }),
   password: Joi.string()
-    .min(3)
+    .min(6)
     .max(30)
     .required()
-    .pattern(/^[a-zA-Z0-9]{3,30}$/)
+    .pattern(/^[\x20-\x7E]+$/)
     .messages({
       "string.pattern.base":
-        "Password must be between 3 and 30 characters long and contain only alphanumeric characters",
+        "Password must be 8–30 characters long and can include letters, numbers, and special characters.",
     }),
 });
 
 exports.changePasswordSchema = Joi.object({
   newPassword: Joi.string()
     .required()
-    .min(6)
+    .min(8)
     .max(20)
-    .pattern(/^[a-zA-Z0-9]{3,30}$/)
+    .pattern(/^[\x20-\x7E]+$/)
     .messages({
-      "String.pattern.base":
-        "Password must be between 6 and 30 characters long and contain only alphanumeric characters",
+      "string.pattern.base":
+        "Password must be 8–30 characters long and can include letters, numbers, and special characters.",
     }),
 });
 
