@@ -52,7 +52,7 @@ const cardSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-});
+},{timestamps: true});
 
 const Card = mongoose.model("Card", cardSchema);
 module.exports = Card;

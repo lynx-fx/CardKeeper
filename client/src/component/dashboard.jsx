@@ -65,7 +65,6 @@ export default function WarrantyDashboard() {
     const warrantyData = {
       ...newWarranty,
       warrantyExpiry, // Override with calculated expiry
-      // status: "Active",
       // images: ["/placeholder.svg?height=300&width=400&text=Upload+Warranty+Card"],
     };
 
@@ -76,23 +75,25 @@ export default function WarrantyDashboard() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(warrantyData),
+        credentials: "include",
       });
 
       const data = await response.json();
+
       // set default
-      setNewWarranty({
-        productName: "",
-        brand: "",
-        purchaseDate: "",
-        warrantyValidation: 0,
-        category: "Electronics",
-        purchasePrice: "",
-        store: "",
-        serialNumber: "",
-        warrantyType: "Limited Warranty",
-        description: "",
-      });
-      
+      // setNewWarranty({
+      //   productName: "",
+      //   brand: "",
+      //   purchaseDate: "",
+      //   warrantyValidation: 0,
+      //   category: "Electronics",
+      //   purchasePrice: "",
+      //   store: "",
+      //   serialNumber: "",
+      //   warrantyType: "Limited Warranty",
+      //   description: "",
+      // });
+
       if (response.ok && data.success) {
         toast.success(data.message || "Card added successfully");
 

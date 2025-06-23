@@ -40,7 +40,7 @@ exports.cardValidationSchema = Joi.object({
   serialNumber: Joi.string().required(),
   warrantyType: Joi.string().required(),
   description: Joi.string().optional().allow("", null),
-  imageUri: Joi.string().uri().optional().allow("", null),
+  imageUri: Joi.string().optional().allow("", null),
 });
 
 exports.cardUpdateValidationSchema = Joi.object({

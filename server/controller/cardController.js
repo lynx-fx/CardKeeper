@@ -1,5 +1,5 @@
 const express = require("express");
-const tokenExtractor = require("../utils/tokenExtractor");
+const {tokenExtractor} = require("../utils/tokenExtractor");
 const jwt = require("jsonwebtoken");
 
 // models
@@ -58,9 +58,9 @@ exports.createCard = async (req, res) => {
       description,
     } = req.body;
 
-    const imageUri = req.file ? req.file.filename : "default";
+    const imageUri = req.file ? req.file.filename : "default.png";
     // validating inputs
-    const { error, value } = cardValidationSchema.validate(
+    const { error, value } = cardValidationSchema.validate({
       productName,
       brand,
       purchaseDate,
@@ -71,11 +71,15 @@ exports.createCard = async (req, res) => {
       serialNumber,
       warrantyType,
       description,
-      imageUri
-    );
+      imageUri,
+    });
 
-    if(error){
-      return res.status(400).json({success: false, message: "Invalid inputs"})
+    if (error) {
+      console.log(error);
+
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid inputs" });
     }
 
     // extracting auth token
@@ -131,6 +135,7 @@ exports.createCard = async (req, res) => {
 };
 
 // DONE: update cards
+// TODO: recheck parameters
 exports.updateCard = async (req, res) => {
   try {
     const {
