@@ -46,12 +46,14 @@ exports.getCard = async (req, res) => {
 exports.createCard = async (req, res) => {
   try {
     const {
+      productName,
       brand,
-      category,
       purchaseDate,
-      warrantyPeriod,
+      warrantyExpiry,
+      category,
       purchasePrice,
       store,
+      serialNumber,
       warrantyType,
       description,
     } = req.body;
@@ -59,16 +61,22 @@ exports.createCard = async (req, res) => {
     const imageUri = req.file ? req.file.filename : "default";
     // validating inputs
     const { error, value } = cardValidationSchema.validate(
+      productName,
       brand,
-      category,
       purchaseDate,
-      warrantyPeriod,
+      warrantyExpiry,
+      category,
       purchasePrice,
       store,
+      serialNumber,
       warrantyType,
       description,
       imageUri
     );
+
+    if(error){
+      return res.status(400).json({success: false, message: "Invalid inputs"})
+    }
 
     // extracting auth token
     const token = tokenExtractor(req);
@@ -91,12 +99,14 @@ exports.createCard = async (req, res) => {
 
     // creating new card object and saving into database
     const card = new Card({
+      productName,
       brand,
-      category,
       purchaseDate,
-      warrantyPeriod,
+      warrantyExpiry,
+      category,
       purchasePrice,
       store,
+      serialNumber,
       warrantyType,
       description,
       imageUri,
@@ -127,7 +137,7 @@ exports.updateCard = async (req, res) => {
       brand,
       category,
       purchaseDate,
-      warrantyPeriod,
+      warrantyExpiry,
       purchasePrice,
       store,
       warrantyType,
@@ -140,7 +150,7 @@ exports.updateCard = async (req, res) => {
       brand,
       category,
       purchaseDate,
-      warrantyPeriod,
+      warrantyExpiry,
       purchasePrice,
       store,
       warrantyType,
@@ -186,7 +196,7 @@ exports.updateCard = async (req, res) => {
     if (brand !== null) existingCard.brand = brand;
     if (category !== null) existingCard.category = category;
     if (purchaseDate !== null) existingCard.purchaseDate = purchaseDate;
-    if (warrantyPeriod !== null) existingCard.warrantyPeriod = warrantyPeriod;
+    if (warrantyExpiry !== null) existingCard.warrantyExpiry = warrantyExpiry;
     if (purchasePrice !== null) existingCard.purchasePrice = purchasePrice;
     if (store !== null) existingCard.store = store;
     if (warrantyType !== null) existingCard.warrantyType = warrantyType;

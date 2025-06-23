@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const cardSchema = new mongoose.Schema({
+  productName: {
+    type: String,
+    required: true,
+  },
   brand: {
     type: String,
     required: true,
@@ -13,8 +17,8 @@ const cardSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  warrantyPeriod: {
-    type: Number,
+  warrantyExpiry: {
+    type: Date,
     required: true,
   },
   purchasePrice: {
@@ -22,6 +26,10 @@ const cardSchema = new mongoose.Schema({
     required: true,
   },
   store: {
+    type: String,
+    required: true,
+  },
+  serialNumber: {
     type: String,
     required: true,
   },
