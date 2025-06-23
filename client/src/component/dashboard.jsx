@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Navbar from "./navbar.jsx";
 import "./../styles/dashboard.css";
+import { toast } from "sonner";
 
 export default function WarrantyDashboard() {
   const [warranties, setWarranties] = useState([
@@ -43,11 +44,12 @@ export default function WarrantyDashboard() {
     warrantyType: "Limited Warranty",
     description: "",
   });
+  const VITE_HOST = import.meta.env.VITE_BACKEND;
 
   const handleAddWarranty = async (e) => {
     e.preventDefault();
 
-    // 1. Calculate expiry date
+    // Calculating expiry date
     const { purchaseDate, warrantyValidation } = newWarranty;
     let warrantyExpiry = "";
 
@@ -60,7 +62,6 @@ export default function WarrantyDashboard() {
       warrantyExpiry = `${year}-${month}-${day}`;
     }
 
-    // 2. Prepare data for API (with calculated expiry)
     const warrantyData = {
       ...newWarranty,
       warrantyExpiry, // Override with calculated expiry
@@ -68,9 +69,8 @@ export default function WarrantyDashboard() {
       // images: ["/placeholder.svg?height=300&width=400&text=Upload+Warranty+Card"],
     };
 
-    // 3. API Call (replace with your actual API call)
     try {
-      const response = await fetch("/api/warranties", {
+      const response = await fetch(`${VITE_HOST}/api/card/createCard`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,9 +78,8 @@ export default function WarrantyDashboard() {
         body: JSON.stringify(warrantyData),
       });
 
-      if (!response.ok) throw new Error("Failed to add warranty");
-
-      // 4. Reset form (no local state update for warranties)
+      const data = await response.json();
+      // set default
       setNewWarranty({
         productName: "",
         brand: "",
@@ -93,10 +92,14 @@ export default function WarrantyDashboard() {
         warrantyType: "Limited Warranty",
         description: "",
       });
-      setShowAddForm(false);
+      
+      if (response.ok && data.success) {
+        toast.success(data.message || "Card added successfully");
 
-      // Optional: Show success message
-      alert("Warranty added successfully!");
+        setShowAddForm(false);
+      } else {
+        toast.error(data.message || "Something went wrong.");
+      }
     } catch (error) {
       console.error("Error adding warranty:", error);
       alert("Failed to add warranty. Please try again.");
