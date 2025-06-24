@@ -6,7 +6,7 @@ const upload = require("../middleware/multer.js")
 router.get("/getCard", cardController.getCard);
 
 router.post("/createCard", upload.single("img"),cardController.createCard);
-router.post("/deleteCaard", cardController.deleteCard);
+router.delete("/deleteCard", cardController.deleteCard);
 
 router.post("/addImages", upload.array("img", 5),cardController.addImages);
 router.post("/getImages", cardController.getImages);

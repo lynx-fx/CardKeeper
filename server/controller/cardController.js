@@ -221,6 +221,8 @@ exports.updateCard = async (req, res) => {
 exports.deleteCard = async (req, res) => {
   try {
     const { cardId } = req.body;
+    console.log(cardId);
+    
 
     // extracting auth token
     const token = tokenExtractor(req);
