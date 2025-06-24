@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Navbar from "./navbar.jsx";
+import Loading from "./loading.jsx";
 import "./../styles/dashboard.css";
 import { toast } from "sonner";
 import { useEffect } from "react";
@@ -126,7 +127,6 @@ export default function WarrantyDashboard() {
   };
 
   const loadCards = async () => {
-
     try {
       setIsLoading(true);
       const response = await fetch(`${VITE_HOST}/api/card/getCard`, {
@@ -200,219 +200,87 @@ export default function WarrantyDashboard() {
   };
 
   return (
-    <div className="dashboard">
-      <Navbar />
+    <>
+      {isLoading && <Loading />}
+      <div className="dashboard">
+        <Navbar />
 
-      <main className="dashboard-main">
-        <div className="container">
-          <div className="dashboard-header-section">
-            <div className="dashboard-title">
-              <h1>My Warranties</h1>
-              <p>Manage and track all your warranty information</p>
-            </div>
-            <button
-              className="btn-primary"
-              onClick={() => setShowAddForm(true)}
-            >
-              Add Warranty
-            </button>
-          </div>
-
-          <div className="dashboard-stats">
-            <div className="stat-card">
-              <div className="stat-icon">📋</div>
-              <div className="stat-content">
-                <h3>{warranties.length}</h3>
-                <p>Total Warranties</p>
+        <main className="dashboard-main">
+          <div className="container">
+            <div className="dashboard-header-section">
+              <div className="dashboard-title">
+                <h1>My Warranties</h1>
+                <p>Manage and track all your warranty information</p>
               </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">✅</div>
-              <div className="stat-content">
-                <h3>
-                  {
-                    warranties.filter(
-                      (w) => getStatusColor(w.warrantyExpiry) === "active"
-                    ).length
-                  }
-                </h3>
-                <p>Active</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">⚠️</div>
-              <div className="stat-content">
-                <h3>
-                  {
-                    warranties.filter(
-                      (w) =>
-                        getStatusColor(w.warrantyExpiry) === "expiring-soon"
-                    ).length
-                  }
-                </h3>
-                <p>Expiring Soon</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">❌</div>
-              <div className="stat-content">
-                <h3>
-                  {
-                    warranties.filter(
-                      (w) => getStatusColor(w.warrantyExpiry) === "expired"
-                    ).length
-                  }
-                </h3>
-                <p>Expired</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="warranties-section">
-            <div className="section-header">
-              <h2>Your Warranties</h2>
-              <div className="search-filter">
-                <input
-                  type="text"
-                  placeholder="Search warranties..."
-                  className="search-input"
-                />
-                <select className="filter-select">
-                  <option value="">All Categories</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Appliances">Appliances</option>
-                  <option value="Automotive">Automotive</option>
-                  <option value="Home & Garden">Home & Garden</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="warranties-grid">
-              {warranties.map((warranty) => (
-                <div
-                  key={warranty.id}
-                  className={`warranty-card ${getStatusColor(
-                    warranty.warrantyExpiry
-                  )}`}
-                >
-                  <div className="warranty-header">
-                    <h3>{warranty.productName}</h3>
-                    <span
-                      className={`status-badge ${getStatusColor(
-                        warranty.warrantyExpiry
-                      )}`}
-                    >
-                      {getStatusColor(warranty.warrantyExpiry).replace(
-                        "-",
-                        " "
-                      )}
-                    </span>
-                  </div>
-
-                  <div className="warranty-image">
-                    <img
-                      src={`${VITE_HOST}/images/${warranty.images?.[0]}`}
-                      alt={`${warranty.productName} warranty`}
-                      className="warranty-thumbnail"
-                    />
-                  </div>
-
-                  <div className="warranty-details">
-                    <p>
-                      <strong>Brand:</strong> {warranty.brand}
-                    </p>
-                    <p>
-                      <strong>Category:</strong> {warranty.category}
-                    </p>
-                    <p>
-                      <strong>Purchase Date:</strong> {warranty.purchaseDate}
-                    </p>
-                    <p>
-                      <strong>Expires:</strong> {warranty.warrantyExpiry}
-                    </p>
-                    <p
-                      className={`warranty-status ${getStatusColor(
-                        warranty.warrantyExpiry
-                      )}`}
-                    >
-                      <strong>
-                        {getDaysRemaining(warranty.warrantyExpiry)}
-                      </strong>
-                    </p>
-                  </div>
-
-                  <div className="warranty-actions">
-                    <button
-                      className="btn-small btn-primary"
-                      onClick={() => handleViewDetails(warranty)}
-                    >
-                      View Details
-                    </button>
-                    <button className="btn-small">Edit</button>
-                    <button className="btn-small btn-danger">Delete</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* Add Warranty Modal */}
-      {showAddForm && (
-        <div className="modal-overlay">
-          <div className="modal large-modal">
-            <div className="modal-header">
-              <h2>Add New Warranty</h2>
               <button
-                className="close-btn"
-                onClick={() => setShowAddForm(false)}
+                className="btn-primary"
+                onClick={() => setShowAddForm(true)}
               >
-                ×
+                Add Warranty
               </button>
             </div>
-            <form onSubmit={handleAddWarranty} className="warranty-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Product Name</label>
-                  <input
-                    type="text"
-                    value={newWarranty.productName}
-                    onChange={(e) =>
-                      setNewWarranty({
-                        ...newWarranty,
-                        productName: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Brand</label>
-                  <input
-                    type="text"
-                    value={newWarranty.brand}
-                    onChange={(e) =>
-                      setNewWarranty({ ...newWarranty, brand: e.target.value })
-                    }
-                    required
-                  />
+
+            <div className="dashboard-stats">
+              <div className="stat-card">
+                <div className="stat-icon">📋</div>
+                <div className="stat-content">
+                  <h3>{warranties.length}</h3>
+                  <p>Total Warranties</p>
                 </div>
               </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Category</label>
-                  <select
-                    value={newWarranty.category}
-                    onChange={(e) =>
-                      setNewWarranty({
-                        ...newWarranty,
-                        category: e.target.value,
-                      })
+              <div className="stat-card">
+                <div className="stat-icon">✅</div>
+                <div className="stat-content">
+                  <h3>
+                    {
+                      warranties.filter(
+                        (w) => getStatusColor(w.warrantyExpiry) === "active"
+                      ).length
                     }
-                  >
+                  </h3>
+                  <p>Active</p>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">⚠️</div>
+                <div className="stat-content">
+                  <h3>
+                    {
+                      warranties.filter(
+                        (w) =>
+                          getStatusColor(w.warrantyExpiry) === "expiring-soon"
+                      ).length
+                    }
+                  </h3>
+                  <p>Expiring Soon</p>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">❌</div>
+                <div className="stat-content">
+                  <h3>
+                    {
+                      warranties.filter(
+                        (w) => getStatusColor(w.warrantyExpiry) === "expired"
+                      ).length
+                    }
+                  </h3>
+                  <p>Expired</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="warranties-section">
+              <div className="section-header">
+                <h2>Your Warranties</h2>
+                <div className="search-filter">
+                  <input
+                    type="text"
+                    placeholder="Search warranties..."
+                    className="search-input"
+                  />
+                  <select className="filter-select">
+                    <option value="">All Categories</option>
                     <option value="Electronics">Electronics</option>
                     <option value="Appliances">Appliances</option>
                     <option value="Automotive">Automotive</option>
@@ -420,266 +288,407 @@ export default function WarrantyDashboard() {
                     <option value="Other">Other</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Purchase Price</label>
-                  <input
-                    type="number"
-                    value={newWarranty.purchasePrice}
-                    onChange={(e) =>
-                      setNewWarranty({
-                        ...newWarranty,
-                        purchasePrice: e.target.value,
-                      })
-                    }
-                    placeholder="$0.00"
-                  />
-                </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Purchase Date</label>
-                  <input
-                    type="date"
-                    value={newWarranty.purchaseDate}
-                    onChange={(e) =>
-                      setNewWarranty({
-                        ...newWarranty,
-                        purchaseDate: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Warranty Validation Period</label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="In years"
-                    value={newWarranty.warrantyValidation}
-                    onChange={(e) =>
-                      setNewWarranty({
-                        ...newWarranty,
-                        warrantyValidation: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-              </div>
+              <div className="warranties-grid">
+                {warranties.map((warranty) => (
+                  <div
+                    key={warranty.id}
+                    className={`warranty-card ${getStatusColor(
+                      warranty.warrantyExpiry
+                    )}`}
+                  >
+                    <div className="warranty-header">
+                      <h3>{warranty.productName}</h3>
+                      <span
+                        className={`status-badge ${getStatusColor(
+                          warranty.warrantyExpiry
+                        )}`}
+                      >
+                        {getStatusColor(warranty.warrantyExpiry).replace(
+                          "-",
+                          " "
+                        )}
+                      </span>
+                    </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Store/Retailer</label>
-                  <input
-                    type="text"
-                    value={newWarranty.store}
-                    onChange={(e) =>
-                      setNewWarranty({ ...newWarranty, store: e.target.value })
-                    }
-                    placeholder="Where did you buy this?"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Serial Number</label>
-                  <input
-                    type="text"
-                    value={newWarranty.serialNumber}
-                    onChange={(e) =>
-                      setNewWarranty({
-                        ...newWarranty,
-                        serialNumber: e.target.value,
-                      })
-                    }
-                    placeholder="Product serial number"
-                  />
-                </div>
-              </div>
+                    <div className="warranty-image">
+                      <img
+                        src={`${VITE_HOST}/images/${warranty.images?.[0]}`}
+                        alt={`${warranty.productName} warranty`}
+                        className="warranty-thumbnail"
+                      />
+                    </div>
 
-              <div className="form-group">
-                <label>Warranty Type</label>
-                <select
-                  value={newWarranty.warrantyType}
-                  onChange={(e) =>
-                    setNewWarranty({
-                      ...newWarranty,
-                      warrantyType: e.target.value,
-                    })
-                  }
-                >
-                  <option value="Limited Warranty">Limited Warranty</option>
-                  <option value="Extended Warranty">Extended Warranty</option>
-                  <option value="Manufacturer Warranty">
-                    Manufacturer Warranty
-                  </option>
-                  <option value="Store Warranty">Store Warranty</option>
-                </select>
-              </div>
+                    <div className="warranty-details">
+                      <p>
+                        <strong>Brand:</strong> {warranty.brand}
+                      </p>
+                      <p>
+                        <strong>Category:</strong> {warranty.category}
+                      </p>
+                      <p>
+                        <strong>Purchase Date:</strong> {warranty.purchaseDate}
+                      </p>
+                      <p>
+                        <strong>Expires:</strong> {warranty.warrantyExpiry}
+                      </p>
+                      <p
+                        className={`warranty-status ${getStatusColor(
+                          warranty.warrantyExpiry
+                        )}`}
+                      >
+                        <strong>
+                          {getDaysRemaining(warranty.warrantyExpiry)}
+                        </strong>
+                      </p>
+                    </div>
 
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  value={newWarranty.description}
-                  onChange={(e) =>
-                    setNewWarranty({
-                      ...newWarranty,
-                      description: e.target.value,
-                    })
-                  }
-                  placeholder="Additional notes about this product..."
-                  rows="3"
-                />
+                    <div className="warranty-actions">
+                      <button
+                        className="btn-small btn-primary"
+                        onClick={() => handleViewDetails(warranty)}
+                      >
+                        View Details
+                      </button>
+                      <button className="btn-small">Edit</button>
+                      <button className="btn-small btn-danger">Delete</button>
+                    </div>
+                  </div>
+                ))}
               </div>
+            </div>
+          </div>
+        </main>
 
-              <div className="form-actions">
+        {/* Add Warranty Modal */}
+        {showAddForm && (
+          <div className="modal-overlay">
+            <div className="modal large-modal">
+              <div className="modal-header">
+                <h2>Add New Warranty</h2>
                 <button
-                  type="button"
-                  className="btn-secondary"
+                  className="close-btn"
                   onClick={() => setShowAddForm(false)}
                 >
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary">
-                  Add Warranty
+                  ×
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+              <form onSubmit={handleAddWarranty} className="warranty-form">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Product Name</label>
+                    <input
+                      type="text"
+                      value={newWarranty.productName}
+                      onChange={(e) =>
+                        setNewWarranty({
+                          ...newWarranty,
+                          productName: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Brand</label>
+                    <input
+                      type="text"
+                      value={newWarranty.brand}
+                      onChange={(e) =>
+                        setNewWarranty({
+                          ...newWarranty,
+                          brand: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                </div>
 
-      {/* Warranty Details Modal */}
-      {showDetailModal && selectedWarranty && (
-        <div className="modal-overlay">
-          <div className="modal detail-modal">
-            <div className="modal-header">
-              <h2>{selectedWarranty.productName}</h2>
-              <button
-                className="close-btn"
-                onClick={() => setShowDetailModal(false)}
-              >
-                ×
-              </button>
-            </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Category</label>
+                    <select
+                      value={newWarranty.category}
+                      onChange={(e) =>
+                        setNewWarranty({
+                          ...newWarranty,
+                          category: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="Electronics">Electronics</option>
+                      <option value="Appliances">Appliances</option>
+                      <option value="Automotive">Automotive</option>
+                      <option value="Home & Garden">Home & Garden</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Purchase Price</label>
+                    <input
+                      type="number"
+                      value={newWarranty.purchasePrice}
+                      onChange={(e) =>
+                        setNewWarranty({
+                          ...newWarranty,
+                          purchasePrice: e.target.value,
+                        })
+                      }
+                      placeholder="$0.00"
+                    />
+                  </div>
+                </div>
 
-            <div className="detail-content">
-              <div className="detail-images">
-                <div className="main-image">
-                  <img
-                    // src={
-                    //   selectedWarranty.images?.[selectedImageIndex] ||
-                    //   "/placeholder.svg?height=400&width=500&text=No+Image"
-                    // }
-                    src={`${VITE_HOST}/images/${selectedWarranty.images?.[selectedImageIndex]}`}
-                    alt={`${selectedWarranty.productName} warranty document`}
-                    className="detail-main-image"
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Purchase Date</label>
+                    <input
+                      type="date"
+                      value={newWarranty.purchaseDate}
+                      onChange={(e) =>
+                        setNewWarranty({
+                          ...newWarranty,
+                          purchaseDate: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Warranty Validation Period</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="In years"
+                      value={newWarranty.warrantyValidation}
+                      onChange={(e) =>
+                        setNewWarranty({
+                          ...newWarranty,
+                          warrantyValidation: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Store/Retailer</label>
+                    <input
+                      type="text"
+                      value={newWarranty.store}
+                      onChange={(e) =>
+                        setNewWarranty({
+                          ...newWarranty,
+                          store: e.target.value,
+                        })
+                      }
+                      placeholder="Where did you buy this?"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Serial Number</label>
+                    <input
+                      type="text"
+                      value={newWarranty.serialNumber}
+                      onChange={(e) =>
+                        setNewWarranty({
+                          ...newWarranty,
+                          serialNumber: e.target.value,
+                        })
+                      }
+                      placeholder="Product serial number"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Warranty Type</label>
+                  <select
+                    value={newWarranty.warrantyType}
+                    onChange={(e) =>
+                      setNewWarranty({
+                        ...newWarranty,
+                        warrantyType: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="Limited Warranty">Limited Warranty</option>
+                    <option value="Extended Warranty">Extended Warranty</option>
+                    <option value="Manufacturer Warranty">
+                      Manufacturer Warranty
+                    </option>
+                    <option value="Store Warranty">Store Warranty</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    value={newWarranty.description}
+                    onChange={(e) =>
+                      setNewWarranty({
+                        ...newWarranty,
+                        description: e.target.value,
+                      })
+                    }
+                    placeholder="Additional notes about this product..."
+                    rows="3"
                   />
                 </div>
 
-                {selectedWarranty.images &&
-                  selectedWarranty.images.length > 1 && (
-                    <div className="image-thumbnails">
-                      {selectedWarranty.images.map((image, index) => (
-                        <img
-                          key={index}
-                          src={image || "/placeholder.svg"}
-                          alt={`Warranty document ${index + 1}`}
-                          className={`thumbnail ${
-                            index === selectedImageIndex ? "active" : ""
-                          }`}
-                          onClick={() => setSelectedImageIndex(index)}
-                          height={400}
-                          width={300}
-                        />
-                      ))}
+                <div className="form-actions">
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setShowAddForm(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn-primary">
+                    Add Warranty
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Warranty Details Modal */}
+        {showDetailModal && selectedWarranty && (
+          <div className="modal-overlay">
+            <div className="modal detail-modal">
+              <div className="modal-header">
+                <h2>{selectedWarranty.productName}</h2>
+                <button
+                  className="close-btn"
+                  onClick={() => setShowDetailModal(false)}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="detail-content">
+                <div className="detail-images">
+                  <div className="main-image">
+                    <img
+                      // src={
+                      //   selectedWarranty.images?.[selectedImageIndex] ||
+                      //   "/placeholder.svg?height=400&width=500&text=No+Image"
+                      // }
+                      src={`${VITE_HOST}/images/${selectedWarranty.images?.[selectedImageIndex]}`}
+                      alt={`${selectedWarranty.productName} warranty document`}
+                      className="detail-main-image"
+                    />
+                  </div>
+
+                  {selectedWarranty.images &&
+                    selectedWarranty.images.length > 1 && (
+                      <div className="image-thumbnails">
+                        {selectedWarranty.images.map((image, index) => (
+                          <img
+                            key={index}
+                            src={image || "/placeholder.svg"}
+                            alt={`Warranty document ${index + 1}`}
+                            className={`thumbnail ${
+                              index === selectedImageIndex ? "active" : ""
+                            }`}
+                            onClick={() => setSelectedImageIndex(index)}
+                            height={400}
+                            width={300}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                  <div className="image-upload-area">
+                    <div className="upload-placeholder">
+                      <span>📷</span>
+                      <p>Click to upload warranty images</p>
+                      <small>Drag & drop or click to browse</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="detail-info">
+                  <div className="warranty-status-section">
+                    <span
+                      className={`status-badge large ${getStatusColor(
+                        selectedWarranty.warrantyExpiry
+                      )}`}
+                    >
+                      {getStatusColor(selectedWarranty.warrantyExpiry).replace(
+                        "-",
+                        " "
+                      )}
+                    </span>
+                    <p className="status-text">
+                      {getDaysRemaining(selectedWarranty.warrantyExpiry)}
+                    </p>
+                  </div>
+
+                  <div className="detail-grid">
+                    <div className="detail-item">
+                      <label>Brand</label>
+                      <span>{selectedWarranty.brand}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Category</label>
+                      <span>{selectedWarranty.category}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Purchase Date</label>
+                      <span>{selectedWarranty.purchaseDate}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Warranty Expires</label>
+                      <span>{selectedWarranty.warrantyExpiry}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Purchase Price</label>
+                      <span>
+                        {selectedWarranty.purchasePrice || "Not specified"}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Store</label>
+                      <span>{selectedWarranty.store || "Not specified"}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Serial Number</label>
+                      <span>
+                        {selectedWarranty.serialNumber || "Not specified"}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Warranty Type</label>
+                      <span>
+                        {selectedWarranty.warrantyType || "Not specified"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {selectedWarranty.description && (
+                    <div className="description-section">
+                      <label>Description</label>
+                      <p>{selectedWarranty.description}</p>
                     </div>
                   )}
 
-                <div className="image-upload-area">
-                  <div className="upload-placeholder">
-                    <span>📷</span>
-                    <p>Click to upload warranty images</p>
-                    <small>Drag & drop or click to browse</small>
+                  <div className="detail-actions">
+                    <button className="btn-primary">Edit Warranty</button>
+                    <button className="btn-secondary">Download PDF</button>
+                    <button className="btn-danger">Delete Warranty</button>
                   </div>
-                </div>
-              </div>
-
-              <div className="detail-info">
-                <div className="warranty-status-section">
-                  <span
-                    className={`status-badge large ${getStatusColor(
-                      selectedWarranty.warrantyExpiry
-                    )}`}
-                  >
-                    {getStatusColor(selectedWarranty.warrantyExpiry).replace(
-                      "-",
-                      " "
-                    )}
-                  </span>
-                  <p className="status-text">
-                    {getDaysRemaining(selectedWarranty.warrantyExpiry)}
-                  </p>
-                </div>
-
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <label>Brand</label>
-                    <span>{selectedWarranty.brand}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Category</label>
-                    <span>{selectedWarranty.category}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Purchase Date</label>
-                    <span>{selectedWarranty.purchaseDate}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Warranty Expires</label>
-                    <span>{selectedWarranty.warrantyExpiry}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Purchase Price</label>
-                    <span>
-                      {selectedWarranty.purchasePrice || "Not specified"}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Store</label>
-                    <span>{selectedWarranty.store || "Not specified"}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Serial Number</label>
-                    <span>
-                      {selectedWarranty.serialNumber || "Not specified"}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Warranty Type</label>
-                    <span>
-                      {selectedWarranty.warrantyType || "Not specified"}
-                    </span>
-                  </div>
-                </div>
-
-                {selectedWarranty.description && (
-                  <div className="description-section">
-                    <label>Description</label>
-                    <p>{selectedWarranty.description}</p>
-                  </div>
-                )}
-
-                <div className="detail-actions">
-                  <button className="btn-primary">Edit Warranty</button>
-                  <button className="btn-secondary">Download PDF</button>
-                  <button className="btn-danger">Delete Warranty</button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

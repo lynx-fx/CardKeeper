@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Navbar from "./navbar.jsx";
+import Loading from "./loading.jsx";
 import "./../styles/auth.css";
 
 export default function ChangePassword() {
@@ -118,138 +119,150 @@ export default function ChangePassword() {
   // Success state
   if (isSuccess) {
     return (
-      <div className="auth-page">
-        <Navbar />
-        <div className="auth-container">
-          <div className="auth-card">
-            <div className="auth-header">
-              <div className="success-icon">✅</div>
-              <h1>Password Changed Successfully</h1>
-              <p>Your password has been updated successfully.</p>
-            </div>
+      <>
+        {isLoading && <Loading />}
 
-            <div className="auth-form">
-              <div className="info-box success-box">
-                <p>
-                  Your password has been changed. For security reasons, you may
-                  need to sign in again on other devices.
-                </p>
+        <div className="auth-page">
+          <Navbar />
+          <div className="auth-container">
+            <div className="auth-card">
+              <div className="auth-header">
+                <div className="success-icon">✅</div>
+                <h1>Password Changed Successfully</h1>
+                <p>Your password has been updated successfully.</p>
               </div>
 
-              <div className="form-actions-vertical">
-                <button
-                  onClick={() => navigate("/dashboard")}
-                  className="btn-primary full-width"
-                >
-                  Back to Dashboard
-                </button>
+              <div className="auth-form">
+                <div className="info-box success-box">
+                  <p>
+                    Your password has been changed. For security reasons, you
+                    may need to sign in again on other devices.
+                  </p>
+                </div>
+
+                <div className="form-actions-vertical">
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="btn-primary full-width"
+                  >
+                    Back to Dashboard
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   // Change password form
   return (
-    <div className="auth-page">
-      <Navbar />
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-header">
-            <h1>Change Password</h1>
-            <p>Update your account password</p>
-          </div>
+    <>
+      {isLoading && <Loading />}
 
-          <form onSubmit={handleSubmit} className="auth-form">
-            <div className="form-group">
-              <label htmlFor="currentPassword">Current Password</label>
-              <input
-                type="password"
-                id="currentPassword"
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleChange}
-                className={errors.currentPassword ? "error" : ""}
-                placeholder="Enter your current password"
-              />
-              {errors.currentPassword && (
-                <span className="error-message">{errors.currentPassword}</span>
-              )}
+      <div className="auth-page">
+        <Navbar />
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-header">
+              <h1>Change Password</h1>
+              <p>Update your account password</p>
             </div>
 
-            <div className="info-box">
-              <p>
-                <strong>New Password Requirements:</strong>
-                <br />• At least 8 characters long
-                <br />• Contains uppercase and lowercase letters
-                <br />• Contains at least one number
-                <br />• Must be different from current password
-              </p>
-            </div>
+            <form onSubmit={handleSubmit} className="auth-form">
+              <div className="form-group">
+                <label htmlFor="currentPassword">Current Password</label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  name="currentPassword"
+                  value={formData.currentPassword}
+                  onChange={handleChange}
+                  className={errors.currentPassword ? "error" : ""}
+                  placeholder="Enter your current password"
+                />
+                {errors.currentPassword && (
+                  <span className="error-message">
+                    {errors.currentPassword}
+                  </span>
+                )}
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="newPassword">New Password</label>
-              <input
-                type="password"
-                id="newPassword"
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleChange}
-                className={errors.newPassword ? "error" : ""}
-                placeholder="Enter your new password"
-              />
-              {errors.newPassword && (
-                <span className="error-message">{errors.newPassword}</span>
-              )}
-            </div>
+              <div className="info-box">
+                <p>
+                  <strong>New Password Requirements:</strong>
+                  <br />• At least 8 characters long
+                  <br />• Contains uppercase and lowercase letters
+                  <br />• Contains at least one number
+                  <br />• Must be different from current password
+                </p>
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm New Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className={errors.confirmPassword ? "error" : ""}
-                placeholder="Confirm your new password"
-              />
-              {errors.confirmPassword && (
-                <span className="error-message">{errors.confirmPassword}</span>
-              )}
-            </div>
+              <div className="form-group">
+                <label htmlFor="newPassword">New Password</label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  name="newPassword"
+                  value={formData.newPassword}
+                  onChange={handleChange}
+                  className={errors.newPassword ? "error" : ""}
+                  placeholder="Enter your new password"
+                />
+                {errors.newPassword && (
+                  <span className="error-message">{errors.newPassword}</span>
+                )}
+              </div>
 
-            <div className="form-actions-horizontal">
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={handleCancel}
-                disabled={isLoading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={isLoading}
-              >
-                {isLoading ? "Changing Password..." : "Change Password"}
-              </button>
-            </div>
-          </form>
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm New Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={errors.confirmPassword ? "error" : ""}
+                  placeholder="Confirm your new password"
+                />
+                {errors.confirmPassword && (
+                  <span className="error-message">
+                    {errors.confirmPassword}
+                  </span>
+                )}
+              </div>
 
-          <div className="auth-footer">
-            <div className="info-box">
-              <p>
-                <strong>Security Tip:</strong> Use a strong, unique password
-                that you don't use for other accounts.
-              </p>
+              <div className="form-actions-horizontal">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Changing Password..." : "Change Password"}
+                </button>
+              </div>
+            </form>
+
+            <div className="auth-footer">
+              <div className="info-box">
+                <p>
+                  <strong>Security Tip:</strong> Use a strong, unique password
+                  that you don't use for other accounts.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

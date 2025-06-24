@@ -1,37 +1,37 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import Navbar from "./navbar.jsx"
-import "./../styles/not-found.css"
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Navbar from "./navbar.jsx";
+import "./../styles/not-found.css";
 
 export default function NotFound() {
-  const navigate = useNavigate()
-  const [countdown, setCountdown] = useState(10)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const navigate = useNavigate();
+  const [countdown, setCountdown] = useState(10);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     // Start animation after component mounts
-    setTimeout(() => setIsAnimating(true), 100)
+    setTimeout(() => setIsAnimating(true), 100);
 
     // Countdown timer for auto-redirect
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          navigate("/")
-          return 0
+          navigate("/");
+          return 0;
         }
-        return prev - 1
-      })
-    }, 1000)
+        return prev - 1;
+      });
+    }, 1000);
 
-    return () => clearInterval(timer)
-  }, [navigate])
+    return () => clearInterval(timer);
+  }, [navigate]);
 
   const handleGoHome = () => {
-    setIsAnimating(false)
-    setTimeout(() => navigate("/"), 300)
-  }
+    setIsAnimating(false);
+    setTimeout(() => navigate("/"), 300);
+  };
 
   return (
     <div className="not-found-page">
@@ -59,9 +59,12 @@ export default function NotFound() {
           <div className="error-content">
             <h1 className="error-title slide-up">Oops! Page Not Found</h1>
             <p className="error-description slide-up-delay">
-              The warranty you're looking for seems to have expired... or maybe it never existed!
+              The warranty you're looking for seems to have expired... or maybe
+              it never existed!
             </p>
-            <p className="error-subtitle slide-up-delay-2">Don't worry, we'll help you find what you need.</p>
+            <p className="error-subtitle slide-up-delay-2">
+              Don't worry, we'll help you find what you need.
+            </p>
 
             {/* Action buttons */}
             <div className="error-actions slide-up-delay-3">
@@ -99,7 +102,8 @@ export default function NotFound() {
             {/* Auto-redirect countdown */}
             <div className="countdown slide-up-delay-5">
               <p>
-                Automatically redirecting to homepage in <span className="countdown-number">{countdown}</span> seconds
+                Automatically redirecting to homepage in{" "}
+                <span className="countdown-number">{countdown}</span> seconds
               </p>
               <div className="progress-bar">
                 <div
@@ -122,5 +126,5 @@ export default function NotFound() {
         </div>
       </div>
     </div>
-  )
+  );
 }
