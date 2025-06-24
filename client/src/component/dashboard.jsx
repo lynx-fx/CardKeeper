@@ -8,25 +8,26 @@ import { useEffect } from "react";
 
 export default function WarrantyDashboard() {
   const [warranties, setWarranties] = useState([
-    {
-      id: 1,
-      productName: "iPhone 15 Pro",
-      brand: "Apple",
-      purchaseDate: "2024-01-15",
-      warrantyExpiry: "2025-01-15",
-      category: "Electronics",
-      status: "Active",
-      purchasePrice: "$999.00",
-      store: "Apple Store",
-      serialNumber: "ABC123456789",
-      warrantyType: "Limited Warranty",
-      description:
-        "Latest iPhone with advanced camera system and titanium design.",
-      images: [
-        "https://th.bing.com/th/id/OIP.HBbuY78PlcRT1X9nq2xZ0AHaHa?o=7&cb=thvnextc1rm=3&rs=1&pid=ImgDetMain",
-        "https://www.techspot.com/images/products/2023/smartphones/org/2023-09-19-product.jpg",
-      ],
-    },
+    // Dummy data
+    // {
+    //   id: 1,
+    //   productName: "iPhone 15 Pro",
+    //   brand: "Apple",
+    //   purchaseDate: "2024-01-15",
+    //   warrantyExpiry: "2025-01-15",
+    //   category: "Electronics",
+    //   status: "Active",
+    //   purchasePrice: "$999.00",
+    //   store: "Apple Store",
+    //   serialNumber: "ABC123456789",
+    //   warrantyType: "Limited Warranty",
+    //   description:
+    //     "Latest iPhone with advanced camera system and titanium design.",
+    //   images: [
+    //     "https://th.bing.com/th/id/OIP.HBbuY78PlcRT1X9nq2xZ0AHaHa?o=7&cb=thvnextc1rm=3&rs=1&pid=ImgDetMain",
+    //     "https://www.techspot.com/images/products/2023/smartphones/org/2023-09-19-product.jpg",
+    //   ],
+    // },
   ]);
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -304,10 +305,7 @@ export default function WarrantyDashboard() {
 
                   <div className="warranty-image">
                     <img
-                      src={
-                        warranty.images?.[0] ||
-                        "/placeholder.svg?height=150&width=200&text=No+Image"
-                      }
+                      src={`${VITE_HOST}/images/${warranty.images?.[0]}`}
                       alt={`${warranty.productName} warranty`}
                       className="warranty-thumbnail"
                     />

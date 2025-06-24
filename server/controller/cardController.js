@@ -29,7 +29,6 @@ exports.getCard = async (req, res) => {
     const decode = jwt.verify(token, process.env.TOKEN_SECRET);
     const cards = await Card.find({ user: decode.id });
 
-    console.log(cards);
     if (cards.length === 0) {
       return res
         .status(404)

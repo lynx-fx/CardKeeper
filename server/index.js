@@ -21,11 +21,12 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.use("/images", express.static("images"));
 
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log("Database Connected");
+    console.log("Database Connected");  
   })
   .catch((err) => {
     console.error("Database connection error:", err);
