@@ -8,29 +8,7 @@ import { toast } from "sonner";
 import { useEffect } from "react";
 
 export default function WarrantyDashboard() {
-  const [warranties, setWarranties] = useState([
-    // Dummy data
-    // {
-    //   id: 1,
-    //   productName: "iPhone 15 Pro",
-    //   brand: "Apple",
-    //   purchaseDate: "2024-01-15",
-    //   warrantyExpiry: "2025-01-15",
-    //   category: "Electronics",
-    //   status: "Active",
-    //   purchasePrice: "$999.00",
-    //   store: "Apple Store",
-    //   serialNumber: "ABC123456789",
-    //   warrantyType: "Limited Warranty",
-    //   description:
-    //     "Latest iPhone with advanced camera system and titanium design.",
-    //   images: [
-    //     "https://th.bing.com/th/id/OIP.HBbuY78PlcRT1X9nq2xZ0AHaHa?o=7&cb=thvnextc1rm=3&rs=1&pid=ImgDetMain",
-    //     "https://www.techspot.com/images/products/2023/smartphones/org/2023-09-19-product.jpg",
-    //   ],
-    // },
-  ]);
-
+  const [warranties, setWarranties] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -234,22 +212,30 @@ export default function WarrantyDashboard() {
     const warrantyData = {
       ...newWarranty,
       warrantyExpiry,
-      
     };
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `${VITE_HOST}/api/card/updateCard`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(warrantyData),
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${VITE_HOST}/api/card/updateCard`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productName: warrantyData.productName,
+          brand: warrantyData.brand,
+          purchaseDate: warrantyData.purchaseDate,
+          warrantyExpiry: warrantyData.warrantyExpiry,
+          category: warrantyData.category,
+          purchasePrice: warrantyData.purchasePrice,
+          store: warrantyData.store,
+          serialNumber: warrantyData.serialNumber,
+          warrantyType: warrantyData.warrantyType,
+          description: warrantyData.description,
+          cardId: editingWarranty.id,
+        }),
+        credentials: "include",
+      });
 
       const data = await response.json();
       setIsLoading(false);
@@ -1108,9 +1094,19 @@ export default function WarrantyDashboard() {
                   )}
 
                   <div className="detail-actions">
-                    <button className="btn-primary" onClick={() => handleEditWarranty(selectedWarranty)}>Edit Warranty</button>
+                    <button
+                      className="btn-primary"
+                      onClick={() => handleEditWarranty(selectedWarranty)}
+                    >
+                      Edit Warranty
+                    </button>
                     <button className="btn-secondary">Download PDF</button>
-                    <button className="btn-danger" onClick={() => handleDeleteWarranty(selectedWarranty)}>Delete Warranty</button>
+                    <button
+                      className="btn-danger"
+                      onClick={() => handleDeleteWarranty(selectedWarranty)}
+                    >
+                      Delete Warranty
+                    </button>
                   </div>
                 </div>
               </div>

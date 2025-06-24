@@ -140,28 +140,42 @@ exports.createCard = async (req, res) => {
 exports.updateCard = async (req, res) => {
   try {
     const {
+      productName,
       brand,
-      category,
       purchaseDate,
       warrantyExpiry,
+      category,
       purchasePrice,
       store,
+      serialNumber,
       warrantyType,
       description,
-      cardId,
+      cardId
     } = req.body;
 
     // validating inputs
-    const { error, value } = cardUpdateValidationSchema.validate(
+    const { error, value } = cardUpdateValidationSchema.validate({
+      productName,
       brand,
-      category,
       purchaseDate,
       warrantyExpiry,
+      category,
       purchasePrice,
       store,
+      serialNumber,
       warrantyType,
-      description
-    );
+      description,
+    });
+
+    if (error) {
+      console.log(error);
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid inputs" });
+    }
+
+    console.log(cardId);
+    
 
     // extracting auth token
     const token = tokenExtractor(req);
@@ -222,7 +236,6 @@ exports.deleteCard = async (req, res) => {
   try {
     const { cardId } = req.body;
     console.log(cardId);
-    
 
     // extracting auth token
     const token = tokenExtractor(req);

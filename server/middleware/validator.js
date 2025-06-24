@@ -44,9 +44,12 @@ exports.cardValidationSchema = Joi.object({
 });
 
 exports.cardUpdateValidationSchema = Joi.object({
+  productName: Joi.string().required(),
   brand: Joi.string(),
   category: Joi.string(),
+  warrantyExpiry: Joi.date().required(),
   purchaseDate: Joi.date(),
+  serialNumber: Joi.string().required(),
   warrantyPeriod: Joi.number(),
   purchasePrice: Joi.number(),
   store: Joi.string(),
