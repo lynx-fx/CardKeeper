@@ -20,8 +20,6 @@ const {
 } = require("../utils/hashing.js");
 const { tokenExtractor } = require("../utils/tokenExtractor.js");
 
-// TODO: Remake validation
-
 exports.signup = async (req, res) => {
   try {
     const { userName, email, password } = req.body;

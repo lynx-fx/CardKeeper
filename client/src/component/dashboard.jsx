@@ -4,6 +4,7 @@ import { useState } from "react";
 import Navbar from "./navbar.jsx";
 import "./../styles/dashboard.css";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 export default function WarrantyDashboard() {
   const [warranties, setWarranties] = useState([
@@ -29,6 +30,7 @@ export default function WarrantyDashboard() {
   ]);
 
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedWarranty, setSelectedWarranty] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -59,16 +61,17 @@ export default function WarrantyDashboard() {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, "0");
       const day = String(date.getDate()).padStart(2, "0");
-      warrantyExpiry = `${year}-${month}-${day}`;
+      warrantyExpiry = new Date(`${year}-${month}-${day}`);
     }
 
     const warrantyData = {
       ...newWarranty,
-      warrantyExpiry, // Override with calculated expiry
+      warrantyExpiry,
       // images: ["/placeholder.svg?height=300&width=400&text=Upload+Warranty+Card"],
     };
 
     try {
+      setIsLoading(true);
       const response = await fetch(`${VITE_HOST}/api/card/createCard`, {
         method: "POST",
         headers: {
@@ -79,24 +82,25 @@ export default function WarrantyDashboard() {
       });
 
       const data = await response.json();
+      setIsLoading(false);
 
       // set default
-      // setNewWarranty({
-      //   productName: "",
-      //   brand: "",
-      //   purchaseDate: "",
-      //   warrantyValidation: 0,
-      //   category: "Electronics",
-      //   purchasePrice: "",
-      //   store: "",
-      //   serialNumber: "",
-      //   warrantyType: "Limited Warranty",
-      //   description: "",
-      // });
+      setNewWarranty({
+        productName: "",
+        brand: "",
+        purchaseDate: "",
+        warrantyValidation: 0,
+        category: "Electronics",
+        purchasePrice: "",
+        store: "",
+        serialNumber: "",
+        warrantyType: "Limited Warranty",
+        description: "",
+      });
 
       if (response.ok && data.success) {
         toast.success(data.message || "Card added successfully");
-
+        loadCards();
         setShowAddForm(false);
       } else {
         toast.error(data.message || "Something went wrong.");
@@ -104,6 +108,54 @@ export default function WarrantyDashboard() {
     } catch (error) {
       console.error("Error adding warranty:", error);
       alert("Failed to add warranty. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    loadCards();
+  }, []);
+
+  const loadCards = async () => {
+    console.log("loading cards");
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${VITE_HOST}/api/card/getCard`, {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+      });
+      setIsLoading(false);
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        const formattedWarranties = data.cards.map((card) => ({
+          id: card._id,
+          productName: card.productName,
+          brand: card.brand,
+          purchaseDate: card.purchaseDate.split("T")[0],
+          warrantyExpiry: card.warrantyExpiry.split("T")[0],
+          category: card.category,
+          status: card.isActive ? "Active" : "Expired",
+          purchasePrice: `$${card.purchasePrice}`,
+          store: card.store,
+          serialNumber: card.serialNumber,
+          warrantyType: card.warrantyType,
+          description: card.description,
+          images: [card.imageUri],
+        }));
+        console.log(formattedWarranties);
+
+        setWarranties((prev) => [...prev, ...formattedWarranties]);
+      } else {
+        setTimeout(() => {
+          toast.error(data.message || "Something went wrong");
+        }, 1000);
+      }
+    } catch (err) {
+      toast.error("Something went wrong.");
     }
   };
 

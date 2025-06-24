@@ -11,7 +11,6 @@ import ResetPassword from "./component/resetPassword.jsx";
 import ChangePassword from "./component/changePassword.jsx";
 import NotFound from "./component/notFound.jsx";
 
-// TODO: use react toastify
 function App() {
   return (
     <>

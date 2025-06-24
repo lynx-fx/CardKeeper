@@ -50,11 +50,10 @@ export default function ChangePassword() {
         "Password must contain at least one uppercase letter, one lowercase letter, and one number";
     }
 
-    // TODO: Remove this later
-    // if (formData.currentPassword === formData.newPassword) {
-    //   newErrors.newPassword =
-    //     "New password must be different from current password";
-    // }
+    if (formData.currentPassword === formData.newPassword) {
+      newErrors.newPassword =
+        "New password must be different from current password";
+    }
 
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your new password";
@@ -101,12 +100,11 @@ export default function ChangePassword() {
     } else {
       setIsSuccess(false);
       toast.error(data.message || "Something went wrong.");
-      // TODO: Remove this later
-      // setFormData({
-      //   currentPassword: "",
-      //   newPassword: "",
-      //   confirmPassword: "",
-      // });
+      setFormData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
     }
   };
 

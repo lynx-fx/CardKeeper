@@ -1,6 +1,7 @@
 const express = require("express");
-const {tokenExtractor} = require("../utils/tokenExtractor");
+const { tokenExtractor } = require("../utils/tokenExtractor");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 // models
 const Card = require("../model/cardModel");
@@ -26,15 +27,16 @@ exports.getCard = async (req, res) => {
     }
     // getting all cards details
     const decode = jwt.verify(token, process.env.TOKEN_SECRET);
-    const cards = await Card.find({ user: existingUser._id });
+    const cards = await Card.find({ user: decode.id });
 
-    if (!cards) {
+    console.log(cards);
+    if (cards.length === 0) {
       return res
         .status(404)
         .json({ success: false, message: "No cards found." });
     }
 
-    return res.status(200).json({ success: false, cards });
+    return res.status(200).json({ success: true, cards });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
