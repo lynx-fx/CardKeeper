@@ -560,10 +560,11 @@ export default function WarrantyDashboard() {
               <div className="detail-images">
                 <div className="main-image">
                   <img
-                    src={
-                      selectedWarranty.images?.[selectedImageIndex] ||
-                      "/placeholder.svg?height=400&width=500&text=No+Image"
-                    }
+                    // src={
+                    //   selectedWarranty.images?.[selectedImageIndex] ||
+                    //   "/placeholder.svg?height=400&width=500&text=No+Image"
+                    // }
+                    src={`${VITE_HOST}/images/${selectedWarranty.images?.[selectedImageIndex]}`}
                     alt={`${selectedWarranty.productName} warranty document`}
                     className="detail-main-image"
                   />
