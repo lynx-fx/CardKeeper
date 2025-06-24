@@ -57,9 +57,6 @@ export default function WarrantyDashboard() {
 
   useEffect(() => {
     loadCards();
-  }, []);
-
-  useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
     setNewWarranty((prev) => ({
       ...prev,
@@ -155,7 +152,10 @@ export default function WarrantyDashboard() {
             purchaseDate: card.purchaseDate.split("T")[0],
             warrantyExpiry: card.warrantyExpiry.split("T")[0],
             category: card.category,
-            status: card.isActive ? "Active" : "Expired",
+            status:
+              new Date(card.warrantyExpiry) >= new Date().setHours(0, 0, 0, 0)
+                ? "Active"
+                : "Expired",
             purchasePrice: `$${card.purchasePrice}`,
             store: card.store,
             serialNumber: card.serialNumber,
@@ -188,6 +188,7 @@ export default function WarrantyDashboard() {
   };
 
   const handleEditWarranty = (warranty) => {
+    setShowDetailModal(false);
     setEditingWarranty(warranty);
     setNewWarranty({
       productName: warranty.productName,
@@ -208,6 +209,7 @@ export default function WarrantyDashboard() {
   };
 
   const handleDeleteWarranty = (warranty) => {
+    setShowDetailModal(false);
     setDeletingWarranty(warranty);
     setShowDeleteModal(true);
   };
@@ -232,12 +234,13 @@ export default function WarrantyDashboard() {
     const warrantyData = {
       ...newWarranty,
       warrantyExpiry,
+      
     };
 
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${VITE_HOST}/api/card/updateCard/${editingWarranty.id}`,
+        `${VITE_HOST}/api/card/updateCard`,
         {
           method: "PUT",
           headers: {
@@ -1105,9 +1108,9 @@ export default function WarrantyDashboard() {
                   )}
 
                   <div className="detail-actions">
-                    <button className="btn-primary">Edit Warranty</button>
+                    <button className="btn-primary" onClick={() => handleEditWarranty(selectedWarranty)}>Edit Warranty</button>
                     <button className="btn-secondary">Download PDF</button>
-                    <button className="btn-danger">Delete Warranty</button>
+                    <button className="btn-danger" onClick={() => handleDeleteWarranty(selectedWarranty)}>Delete Warranty</button>
                   </div>
                 </div>
               </div>
