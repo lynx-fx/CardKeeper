@@ -9,8 +9,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const VITE_HOST = import.meta.env.VITE_BACKEND;
-    const navigate = useNavigate();
-
+  const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -28,23 +27,27 @@ export default function Navbar() {
   const isDashboardPage = location.pathname === "/dashboard";
 
   const handleLogout = async () => {
-    const response = await fetch(`${VITE_HOST}/api/auth/logout`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      credentials: "include",
-    });
+    try {
+      const response = await fetch(`${VITE_HOST}/api/auth/logout`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if(response.ok && data.success){
-      navigate("/");
-      toast.success("Logged out successfully")
-    } else{
-      toast.error("Something went wrong.");
+      if (response.ok && data.success) {
+        navigate("/");
+        toast.success("Logged out successfully");
+      } else {
+        toast.error("Something went wrong.");
+      }
+    } catch (err) {
+      console.log(err);
     }
-  }; 
+  };
 
   return (
     <header className="navbar">

@@ -74,41 +74,46 @@ export default function Signup() {
     }
 
     setIsLoading(true);
-    const response = await fetch(`${VITE_HOST}/api/auth/signup`, {
-      method: "POST",
-      // credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userName: formData.name,
-        email: formData.email,
-        password: formData.password,
-      }),
-    });
-
-    const data = await response.json();
-    setIsLoading(false);
-
-    if (response.ok && data.success) {
-      toast.success(data.message || "User created sucessfully.");
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
+    try {
+      const response = await fetch(`${VITE_HOST}/api/auth/signup`, {
+        method: "POST",
+        // credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userName: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
       });
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000); 
-    } else {
-      toast.error(data.message || "Something went wrong.");
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
+
+      const data = await response.json();
+      setIsLoading(false);
+
+      if (response.ok && data.success) {
+        toast.success("Redirecting...");
+        toast.success(data.message || "User created sucessfully");
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
+      } else {
+        toast.error(data.message || "Something went wrong");
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 

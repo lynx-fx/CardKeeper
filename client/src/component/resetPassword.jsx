@@ -35,23 +35,27 @@ export default function ResetPassword() {
 
   const validateToken = async () => {
     setIsValidating(true);
-    const response = await fetch(
-      `${VITE_HOST}/api/auth/validateToken?email=${email}&token=${token}`,
-      {
-        method: "GET",
+    try {
+      const response = await fetch(
+        `${VITE_HOST}/api/auth/validateToken?email=${email}&token=${token}`,
+        {
+          method: "GET",
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setIsValidToken(true);
+        setIsValidating(false);
+        toast.success(data.message || "Token verified");
+      } else {
+        setIsValidToken(false);
+        setIsValidating(false);
+        toast.error(data.message || "Something went wrong.");
       }
-    );
-
-    const data = await response.json();
-
-    if (response.ok && data.success) {
-      setIsValidToken(true);
-      setIsValidating(false);
-      toast.success(data.message || "Token verified");
-    } else {
-      setIsValidToken(false);
-      setIsValidating(false);
-      toast.error(data.message || "Something went wrong.");
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -101,16 +105,22 @@ export default function ResetPassword() {
     }
 
     setIsLoading(true);
-
-    const response = await fetch(`${VITE_HOST}/api/auth/resetPassword?email=${email}`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        newPassword: formData.password,
-      }),
-    });
+    try {
+      const response = await fetch(
+        `${VITE_HOST}/api/auth/resetPassword?email=${email}`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            newPassword: formData.password,
+          }),
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
 
     const data = await response.json();
     setIsLoading(false);

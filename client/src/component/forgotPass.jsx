@@ -45,26 +45,30 @@ export default function ForgotPassword() {
     }
 
     setIsLoading(true);
-    const response = await fetch(`${VITE_HOST}/api/auth/forgot`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-      }),
-    });
+    try {
+      const response = await fetch(`${VITE_HOST}/api/auth/forgot`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+        }),
+      });
 
-    const data = await response.json();
-    setIsLoading(false);
+      const data = await response.json();
+      setIsLoading(false);
 
-    if (response.ok && data.success) {
-      setIsSubmitted(true);
-      setResendCount((prev) => prev + 1);
-      toast.success(data.message || "Mail sent successfully");
-    } else {
-      toast.error(data.message || "Something went wrong");
-      setEmail("");
+      if (response.ok && data.success) {
+        setIsSubmitted(true);
+        setResendCount((prev) => prev + 1);
+        toast.success(data.message || "Mail sent successfully");
+      } else {
+        toast.error(data.message || "Something went wrong");
+        setEmail("");
+      }
+    } catch (err) {
+      console.log(err);
     }
 
     // Disable resend for 60 seconds

@@ -74,37 +74,40 @@ export default function ChangePassword() {
     }
 
     setIsLoading(true);
-
-    const response = await fetch(`${VITE_HOST}/api/auth/changePassword`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        newPassword: formData.newPassword,
-        oldPassword: formData.currentPassword,
-      }),
-    });
-
-    const data = await response.json();
-    setIsLoading(false);
-
-    if (response.ok && data.success) {
-      setIsSuccess(true);
-      toast.success("Redirecting...");
-      toast.success(data.message || "Changed password successfully");
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
-    } else {
-      setIsSuccess(false);
-      toast.error(data.message || "Something went wrong.");
-      setFormData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
+    try {
+      const response = await fetch(`${VITE_HOST}/api/auth/changePassword`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          newPassword: formData.newPassword,
+          oldPassword: formData.currentPassword,
+        }),
       });
+
+      const data = await response.json();
+      setIsLoading(false);
+
+      if (response.ok && data.success) {
+        setIsSuccess(true);
+        toast.success("Redirecting...");
+        toast.success(data.message || "Changed password successfully");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 2000);
+      } else {
+        setIsSuccess(false);
+        toast.error(data.message || "Something went wrong.");
+        setFormData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 

@@ -49,6 +49,18 @@ export default function WarrantyDashboard() {
   });
   const VITE_HOST = import.meta.env.VITE_BACKEND;
 
+  useEffect(() => {
+    loadCards();
+  }, []);
+
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    setNewWarranty((prev) => ({
+      ...prev,
+      purchaseDate: today,
+    }));
+  }, []);
+
   const handleAddWarranty = async (e) => {
     e.preventDefault();
 
@@ -101,6 +113,7 @@ export default function WarrantyDashboard() {
 
       if (response.ok && data.success) {
         toast.success(data.message || "Card added successfully");
+        setWarranties([]);
         loadCards();
         setShowAddForm(false);
       } else {
@@ -112,12 +125,7 @@ export default function WarrantyDashboard() {
     }
   };
 
-  useEffect(() => {
-    loadCards();
-  }, []);
-
   const loadCards = async () => {
-    console.log("loading cards");
 
     try {
       setIsLoading(true);
@@ -147,13 +155,12 @@ export default function WarrantyDashboard() {
           description: card.description,
           images: [card.imageUri],
         }));
-        console.log(formattedWarranties);
 
         setWarranties((prev) => [...prev, ...formattedWarranties]);
       } else {
         setTimeout(() => {
           toast.error(data.message || "Something went wrong");
-        }, 1000);
+        }, 3000);
       }
     } catch (err) {
       toast.error("Something went wrong.");

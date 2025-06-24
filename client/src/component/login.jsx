@@ -60,29 +60,33 @@ export default function Login() {
     }
 
     setIsLoading(true);
-    const response = await fetch(`${VITE_HOST}/api/auth/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-      }),
-    });
-
-    const data = await response.json();
-    
-    setIsLoading(false);
-
-    if (response.ok && data.success) {
-      toast.success(data.message || "User logged in successfully.");
-      navigate("/dashboard");
-    } else {
-      toast.error(data.message || "Something went wrong.");
-      setFormData({
-        email: "",
-        password: "",
+    try {
+      const response = await fetch(`${VITE_HOST}/api/auth/login`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
+
+      const data = await response.json();
+
+      setIsLoading(false);
+
+      if (response.ok && data.success) {
+        toast.success(data.message || "User logged in successfully.");
+        navigate("/dashboard");
+      } else {
+        toast.error(data.message || "Something went wrong.");
+        setFormData({
+          email: "",
+          password: "",
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
