@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import Navbar from "./navbar.jsx"
-import Loading from "./loading.jsx"
-import "./../styles/dashboard.css"
-import { toast } from "sonner"
-import { useEffect } from "react"
+import { useState, useRef } from "react";
+import Navbar from "./navbar.jsx";
+import Loading from "./loading.jsx";
+import "./../styles/dashboard.css";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 export default function WarrantyDashboard() {
-  const [warranties, setWarranties] = useState([])
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [showDetailModal, setShowDetailModal] = useState(false)
-  const [selectedWarranty, setSelectedWarranty] = useState(null)
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [warranties, setWarranties] = useState([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedWarranty, setSelectedWarranty] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [newWarranty, setNewWarranty] = useState({
     productName: "",
     brand: "",
@@ -25,128 +25,136 @@ export default function WarrantyDashboard() {
     serialNumber: "",
     warrantyType: "Limited Warranty",
     description: "",
-  })
+  });
 
   // Image handling states
-  const [selectedImages, setSelectedImages] = useState([])
-  const [imagePreviewUrls, setImagePreviewUrls] = useState([])
-  const [uploadingImages, setUploadingImages] = useState(false)
-  const fileInputRef = useRef(null)
-  const detailFileInputRef = useRef(null)
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const fileInputRef = useRef(null);
+  const detailFileInputRef = useRef(null);
 
-  const VITE_HOST = import.meta.env.VITE_BACKEND
-  const MAX_IMAGES = 5
-  const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+  const VITE_HOST = import.meta.env.VITE_BACKEND;
+  const MAX_IMAGES = 5;
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-  const [showEditForm, setShowEditForm] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [editingWarranty, setEditingWarranty] = useState(null)
-  const [deletingWarranty, setDeletingWarranty] = useState(null)
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [editingWarranty, setEditingWarranty] = useState(null);
+  const [deletingWarranty, setDeletingWarranty] = useState(null);
 
   useEffect(() => {
-    loadCards()
-    const today = new Date().toISOString().split("T")[0]
+    loadCards();
+    const today = new Date().toISOString().split("T")[0];
     setNewWarranty((prev) => ({
       ...prev,
       purchaseDate: today,
-    }))
-  }, [])
+    }));
+  }, []);
 
   // Image handling functions
   const handleImageSelect = (event, isDetailModal = false) => {
-    const files = Array.from(event.target.files)
-    const currentImages = isDetailModal ? selectedWarranty?.images?.length || 0 : selectedImages.length
+    const files = Array.from(event.target.files);
+    const currentImages = isDetailModal
+      ? selectedWarranty?.images?.length || 0
+      : selectedImages.length;
 
     if (currentImages + files.length > MAX_IMAGES) {
-      toast.error(`You can only upload up to ${MAX_IMAGES} images per warranty`)
-      return
+      toast.error(
+        `You can only upload up to ${MAX_IMAGES} images per warranty`
+      );
+      return;
     }
 
-    const validFiles = []
-    const newPreviewUrls = []
+    const validFiles = [];
+    const newPreviewUrls = [];
 
     files.forEach((file) => {
       if (file.size > MAX_FILE_SIZE) {
-        toast.error(`File ${file.name} is too large. Maximum size is 5MB.`)
-        return
+        toast.error(`File ${file.name} is too large. Maximum size is 5MB.`);
+        return;
       }
 
       if (!file.type.startsWith("image/")) {
-        toast.error(`File ${file.name} is not an image.`)
-        return
+        toast.error(`File ${file.name} is not an image.`);
+        return;
       }
 
-      validFiles.push(file)
-      newPreviewUrls.push(URL.createObjectURL(file))
-    })
+      validFiles.push(file);
+      newPreviewUrls.push(URL.createObjectURL(file));
+    });
 
     if (validFiles.length > 0) {
       if (isDetailModal) {
-        handleDetailImageUpload(validFiles)
+        handleDetailImageUpload(validFiles);
       } else {
-        setSelectedImages((prev) => [...prev, ...validFiles])
-        setImagePreviewUrls((prev) => [...prev, ...newPreviewUrls])
+        setSelectedImages((prev) => [...prev, ...validFiles]);
+        setImagePreviewUrls((prev) => [...prev, ...newPreviewUrls]);
       }
     }
 
     // Reset file input
-    event.target.value = ""
-  }
+    event.target.value = "";
+  };
 
   const removeImage = (index, isDetailModal = false) => {
     if (isDetailModal) {
       // Handle removing images from existing warranty
-      handleRemoveDetailImage(index)
+      handleRemoveDetailImage(index);
     } else {
       // Handle removing images from form
-      URL.revokeObjectURL(imagePreviewUrls[index])
-      setSelectedImages((prev) => prev.filter((_, i) => i !== index))
-      setImagePreviewUrls((prev) => prev.filter((_, i) => i !== index))
+      URL.revokeObjectURL(imagePreviewUrls[index]);
+      setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+      setImagePreviewUrls((prev) => prev.filter((_, i) => i !== index));
     }
-  }
+  };
 
   const handleDetailImageUpload = async (files) => {
-    if (!selectedWarranty) return
+    if (!selectedWarranty) return;
 
-    setUploadingImages(true)
-    const formData = new FormData()
+    setUploadingImages(true);
+    const formData = new FormData();
 
     files.forEach((file) => {
-      formData.append("img", file)
-    })
-    formData.append("cardId", selectedWarranty.id)
+      formData.append("img", file);
+    });
+    formData.append("cardId", selectedWarranty.id);
 
     try {
       const response = await fetch(`${VITE_HOST}/api/card/addImages`, {
         method: "POST",
         body: formData,
         credentials: "include",
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success("Images uploaded successfully")
+        toast.success("Images uploaded successfully");
         // Refresh the warranty data
-        await loadCards()
+        setWarranties([]);
+        await loadCards();
+        setShowDetailModal(false);
         // Update the selected warranty with new images
-        const updatedWarranty = warranties.find((w) => w.id === selectedWarranty.id)
+        const updatedWarranty = warranties.find(
+          (w) => w.id === selectedWarranty.id
+        );
         if (updatedWarranty) {
-          setSelectedWarranty(updatedWarranty)
+          setSelectedWarranty(updatedWarranty);
         }
       } else {
-        toast.error(data.message || "Failed to upload images")
+        toast.error(data.message || "Failed to upload images");
       }
     } catch (error) {
-      console.error("Error uploading images:", error)
-      toast.error("Failed to upload images")
+      console.error("Error uploading images:", error);
+      toast.error("Failed to upload images");
     } finally {
-      setUploadingImages(false)
+      setUploadingImages(false);
     }
-  }
+  };
 
   const handleRemoveDetailImage = async (imageIndex) => {
-    if (!selectedWarranty || !selectedWarranty.images[imageIndex]) return
+    if (!selectedWarranty || !selectedWarranty.images[imageIndex]) return;
 
     try {
       const response = await fetch(`${VITE_HOST}/api/card/removeImage`, {
@@ -159,87 +167,95 @@ export default function WarrantyDashboard() {
           imageIndex: imageIndex,
         }),
         credentials: "include",
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success("Image removed successfully")
+        toast.success("Image removed successfully");
         // Update the selected warranty
-        const updatedImages = selectedWarranty.images.filter((_, i) => i !== imageIndex)
+        const updatedImages = selectedWarranty.images.filter(
+          (_, i) => i !== imageIndex
+        );
         setSelectedWarranty((prev) => ({
           ...prev,
           images: updatedImages,
-        }))
+        }));
 
         // Adjust selected image index if necessary
-        if (selectedImageIndex >= updatedImages.length && updatedImages.length > 0) {
-          setSelectedImageIndex(updatedImages.length - 1)
+        if (
+          selectedImageIndex >= updatedImages.length &&
+          updatedImages.length > 0
+        ) {
+          setSelectedImageIndex(updatedImages.length - 1);
         } else if (updatedImages.length === 0) {
-          setSelectedImageIndex(0)
+          setSelectedImageIndex(0);
         }
 
         // Refresh warranties list
-        await loadCards()
+        setWarranties([]);
+        await loadCards();
       } else {
-        toast.error(data.message || "Failed to remove image")
+        toast.error(data.message || "Failed to remove image");
       }
     } catch (error) {
-      console.error("Error removing image:", error)
-      toast.error("Failed to remove image")
+      console.error("Error removing image:", error);
+      toast.error("Failed to remove image");
     }
-  }
+  };
 
   const clearImages = () => {
-    imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url))
-    setSelectedImages([])
-    setImagePreviewUrls([])
-  }
+    imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    setSelectedImages([]);
+    setImagePreviewUrls([]);
+  };
 
   const handleAddWarranty = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // Calculating expiry date
-    const { purchaseDate, warrantyValidation } = newWarranty
-    let warrantyExpiry = ""
+    const { purchaseDate, warrantyValidation } = newWarranty;
+    let warrantyExpiry = "";
 
     if (purchaseDate && warrantyValidation) {
-      const date = new Date(purchaseDate)
-      date.setFullYear(date.getFullYear() + Number.parseInt(warrantyValidation))
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, "0")
-      const day = String(date.getDate()).padStart(2, "0")
-      warrantyExpiry = new Date(`${year}-${month}-${day}`)
+      const date = new Date(purchaseDate);
+      date.setFullYear(
+        date.getFullYear() + Number.parseInt(warrantyValidation)
+      );
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      warrantyExpiry = new Date(`${year}-${month}-${day}`);
     }
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
 
       // Create FormData for warranty with images
-      const formData = new FormData()
+      const formData = new FormData();
 
       // Add warranty data
       Object.keys(newWarranty).forEach((key) => {
-        formData.append(key, newWarranty[key])
-      })
-      formData.append("warrantyExpiry", warrantyExpiry)
+        formData.append(key, newWarranty[key]);
+      });
+      formData.append("warrantyExpiry", warrantyExpiry);
 
       // Add images
       selectedImages.forEach((image) => {
-        formData.append("images", image)
-      })
+        formData.append("images", image);
+      });
 
       const response = await fetch(`${VITE_HOST}/api/card/createCard`, {
         method: "POST",
         body: formData,
         credentials: "include",
-      })
+      });
 
-      const data = await response.json()
-      setIsLoading(false)
+      const data = await response.json();
+      setIsLoading(false);
 
       if (response.ok && data.success) {
-        toast.success(data.message || "Card added successfully")
+        toast.success(data.message || "Card added successfully");
 
         // Reset form and images
         setNewWarranty({
@@ -253,35 +269,35 @@ export default function WarrantyDashboard() {
           serialNumber: "",
           warrantyType: "Limited Warranty",
           description: "",
-        })
-        clearImages()
+        });
+        clearImages();
 
-        setWarranties([])
-        loadCards()
-        setShowAddForm(false)
+        setWarranties([]);
+        loadCards();
+        setShowAddForm(false);
       } else {
-        toast.error(data.message || "Something went wrong.")
+        toast.error(data.message || "Something went wrong.");
       }
     } catch (error) {
-      console.error("Error adding warranty:", error)
-      toast.error("Failed to add warranty. Please try again.")
-      setIsLoading(false)
+      console.error("Error adding warranty:", error);
+      toast.error("Failed to add warranty. Please try again.");
+      setIsLoading(false);
     }
-  }
+  };
 
   const loadCards = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await fetch(`${VITE_HOST}/api/card/getCard`, {
         method: "GET",
         headers: {
           "content-type": "application/json",
         },
         credentials: "include",
-      })
-      setIsLoading(false)
+      });
+      setIsLoading(false);
 
-      const data = await response.json()
+      const data = await response.json();
       if (response.ok && data.success) {
         const formattedWarranties = data.cards
           .map((card) => ({
@@ -291,7 +307,10 @@ export default function WarrantyDashboard() {
             purchaseDate: card.purchaseDate.split("T")[0],
             warrantyExpiry: card.warrantyExpiry.split("T")[0],
             category: card.category,
-            status: new Date(card.warrantyExpiry) >= new Date().setHours(0, 0, 0, 0) ? "Active" : "Expired",
+            status:
+              new Date(card.warrantyExpiry) >= new Date().setHours(0, 0, 0, 0)
+                ? "Active"
+                : "Expired",
             purchasePrice: `$${card.purchasePrice}`,
             store: card.store,
             serialNumber: card.serialNumber,
@@ -300,34 +319,35 @@ export default function WarrantyDashboard() {
             isActive: card.isActive,
             images: card.images || [],
           }))
-          .filter((warranty) => warranty.isActive)
+          .filter((warranty) => warranty.isActive);
 
-        setWarranties((prev) => [...prev, ...formattedWarranties])
+        setWarranties((prev) => [...prev, ...formattedWarranties]);
       } else {
         setTimeout(() => {
-          toast.error(data.message || "Something went wrong")
-        }, 3000)
+          toast.error(data.message || "Something went wrong");
+        }, 3000);
       }
     } catch (err) {
-      toast.error("Something went wrong.")
+      toast.error("Something went wrong.");
     }
-  }
+  };
 
   const handleViewDetails = (warranty) => {
-    setSelectedWarranty(warranty)
-    setSelectedImageIndex(0)
-    setShowDetailModal(true)
-  }
+    setSelectedWarranty(warranty);
+    setSelectedImageIndex(0);
+    setShowDetailModal(true);
+  };
 
   const handleEditWarranty = (warranty) => {
-    setShowDetailModal(false)
-    setEditingWarranty(warranty)
+    setShowDetailModal(false);
+    setEditingWarranty(warranty);
     setNewWarranty({
       productName: warranty.productName,
       brand: warranty.brand,
       purchaseDate: warranty.purchaseDate,
       warrantyValidation: Math.ceil(
-        (new Date(warranty.warrantyExpiry) - new Date(warranty.purchaseDate)) / (365.25 * 24 * 60 * 60 * 1000),
+        (new Date(warranty.warrantyExpiry) - new Date(warranty.purchaseDate)) /
+          (365.25 * 24 * 60 * 60 * 1000)
       ),
       category: warranty.category,
       purchasePrice: warranty.purchasePrice.replace("$", ""),
@@ -335,38 +355,40 @@ export default function WarrantyDashboard() {
       serialNumber: warranty.serialNumber,
       warrantyType: warranty.warrantyType,
       description: warranty.description,
-    })
-    setShowEditForm(true)
-  }
+    });
+    setShowEditForm(true);
+  };
 
   const handleDeleteWarranty = (warranty) => {
-    setShowDetailModal(false)
-    setDeletingWarranty(warranty)
-    setShowDeleteModal(true)
-  }
+    setShowDetailModal(false);
+    setDeletingWarranty(warranty);
+    setShowDeleteModal(true);
+  };
 
   const handleUpdateWarranty = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const { purchaseDate, warrantyValidation } = newWarranty
-    let warrantyExpiry = ""
+    const { purchaseDate, warrantyValidation } = newWarranty;
+    let warrantyExpiry = "";
 
     if (purchaseDate && warrantyValidation) {
-      const date = new Date(purchaseDate)
-      date.setFullYear(date.getFullYear() + Number.parseInt(warrantyValidation))
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, "0")
-      const day = String(date.getDate()).padStart(2, "0")
-      warrantyExpiry = new Date(`${year}-${month}-${day}`)
+      const date = new Date(purchaseDate);
+      date.setFullYear(
+        date.getFullYear() + Number.parseInt(warrantyValidation)
+      );
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      warrantyExpiry = new Date(`${year}-${month}-${day}`);
     }
 
     const warrantyData = {
       ...newWarranty,
       warrantyExpiry,
-    }
+    };
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await fetch(`${VITE_HOST}/api/card/updateCard`, {
         method: "PUT",
         headers: {
@@ -386,17 +408,17 @@ export default function WarrantyDashboard() {
           cardId: editingWarranty.id,
         }),
         credentials: "include",
-      })
+      });
 
-      const data = await response.json()
-      setIsLoading(false)
+      const data = await response.json();
+      setIsLoading(false);
 
       if (response.ok && data.success) {
-        toast.success(data.message || "Card updated successfully")
-        setWarranties([])
-        loadCards()
-        setShowEditForm(false)
-        setEditingWarranty(null)
+        toast.success(data.message || "Card updated successfully");
+        setWarranties([]);
+        loadCards();
+        setShowEditForm(false);
+        setEditingWarranty(null);
         setNewWarranty({
           productName: "",
           brand: "",
@@ -408,20 +430,20 @@ export default function WarrantyDashboard() {
           serialNumber: "",
           warrantyType: "Limited Warranty",
           description: "",
-        })
+        });
       } else {
-        toast.error(data.message || "Something went wrong.")
+        toast.error(data.message || "Something went wrong.");
       }
     } catch (error) {
-      console.error("Error updating warranty:", error)
-      toast.error("Failed to update warranty. Please try again.")
-      setIsLoading(false)
+      console.error("Error updating warranty:", error);
+      toast.error("Failed to update warranty. Please try again.");
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleConfirmDelete = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await fetch(`${VITE_HOST}/api/card/deleteCard`, {
         method: "DELETE",
         headers: {
@@ -431,47 +453,52 @@ export default function WarrantyDashboard() {
         body: JSON.stringify({
           cardId: selectedWarranty.id,
         }),
-      })
+      });
 
-      const data = await response.json()
-      setIsLoading(false)
+      const data = await response.json();
+      setIsLoading(false);
 
       if (response.ok && data.success) {
-        toast.success(data.message || "Card deleted successfully")
-        setWarranties([])
-        loadCards()
-        setShowDeleteModal(false)
-        setDeletingWarranty(null)
+        toast.success(data.message || "Card deleted successfully");
+        setWarranties([]);
+        loadCards();
+        setShowDeleteModal(false);
+        setDeletingWarranty(null);
       } else {
-        toast.error(data.message || "Something went wrong.")
+        toast.error(data.message || "Something went wrong.");
       }
     } catch (error) {
-      console.error("Error deleting warranty:", error)
-      toast.error("Failed to delete warranty. Please try again.")
-      setIsLoading(false)
+      console.error("Error deleting warranty:", error);
+      toast.error("Failed to delete warranty. Please try again.");
+      setIsLoading(false);
     }
-  }
+  };
 
   const getStatusColor = (expiry) => {
-    const today = new Date()
-    const expiryDate = new Date(expiry)
-    const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24))
+    const today = new Date();
+    const expiryDate = new Date(expiry);
+    const daysUntilExpiry = Math.ceil(
+      (expiryDate - today) / (1000 * 60 * 60 * 24)
+    );
 
-    if (daysUntilExpiry < 0) return "expired"
-    if (daysUntilExpiry < 30) return "expiring-soon"
-    return "active"
-  }
+    if (daysUntilExpiry < 0) return "expired";
+    if (daysUntilExpiry < 30) return "expiring-soon";
+    return "active";
+  };
 
   const getDaysRemaining = (expiry) => {
-    const today = new Date()
-    const expiryDate = new Date(expiry)
-    const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24))
+    const today = new Date();
+    const expiryDate = new Date(expiry);
+    const daysUntilExpiry = Math.ceil(
+      (expiryDate - today) / (1000 * 60 * 60 * 24)
+    );
 
-    if (daysUntilExpiry < 0) return `Expired ${Math.abs(daysUntilExpiry)} days ago`
-    if (daysUntilExpiry === 0) return "Expires today"
-    if (daysUntilExpiry === 1) return "Expires tomorrow"
-    return `${daysUntilExpiry} days remaining`
-  }
+    if (daysUntilExpiry < 0)
+      return `Expired ${Math.abs(daysUntilExpiry)} days ago`;
+    if (daysUntilExpiry === 0) return "Expires today";
+    if (daysUntilExpiry === 1) return "Expires tomorrow";
+    return `${daysUntilExpiry} days remaining`;
+  };
 
   return (
     <>
@@ -486,7 +513,10 @@ export default function WarrantyDashboard() {
                 <h1>My Warranties</h1>
                 <p>Manage and track all your warranty information</p>
               </div>
-              <button className="btn-primary" onClick={() => setShowAddForm(true)}>
+              <button
+                className="btn-primary"
+                onClick={() => setShowAddForm(true)}
+              >
                 Add Warranty
               </button>
             </div>
@@ -502,21 +532,40 @@ export default function WarrantyDashboard() {
               <div className="stat-card">
                 <div className="stat-icon">✅</div>
                 <div className="stat-content">
-                  <h3>{warranties.filter((w) => getStatusColor(w.warrantyExpiry) === "active").length}</h3>
+                  <h3>
+                    {
+                      warranties.filter(
+                        (w) => getStatusColor(w.warrantyExpiry) === "active"
+                      ).length
+                    }
+                  </h3>
                   <p>Active</p>
                 </div>
               </div>
               <div className="stat-card">
                 <div className="stat-icon">⚠️</div>
                 <div className="stat-content">
-                  <h3>{warranties.filter((w) => getStatusColor(w.warrantyExpiry) === "expiring-soon").length}</h3>
+                  <h3>
+                    {
+                      warranties.filter(
+                        (w) =>
+                          getStatusColor(w.warrantyExpiry) === "expiring-soon"
+                      ).length
+                    }
+                  </h3>
                   <p>Expiring Soon</p>
                 </div>
               </div>
               <div className="stat-card">
                 <div className="stat-icon">❌</div>
                 <div className="stat-content">
-                  <h3>{warranties.filter((w) => getStatusColor(w.warrantyExpiry) === "expired").length}</h3>
+                  <h3>
+                    {
+                      warranties.filter(
+                        (w) => getStatusColor(w.warrantyExpiry) === "expired"
+                      ).length
+                    }
+                  </h3>
                   <p>Expired</p>
                 </div>
               </div>
@@ -526,7 +575,11 @@ export default function WarrantyDashboard() {
               <div className="section-header">
                 <h2>Your Warranties</h2>
                 <div className="search-filter">
-                  <input type="text" placeholder="Search warranties..." className="search-input" />
+                  <input
+                    type="text"
+                    placeholder="Search warranties..."
+                    className="search-input"
+                  />
                   <select className="filter-select">
                     <option value="">All Categories</option>
                     <option value="Electronics">Electronics</option>
@@ -545,21 +598,37 @@ export default function WarrantyDashboard() {
                       <div className="empty-state-icon">📋</div>
                       <h3>No Warranties Found</h3>
                       <p>
-                        You haven't added any warranty cards yet. Start by adding your first warranty to keep track of
-                        your products.
+                        You haven't added any warranty cards yet. Start by
+                        adding your first warranty to keep track of your
+                        products.
                       </p>
-                      <button className="btn-primary" onClick={() => setShowAddForm(true)}>
+                      <button
+                        className="btn-primary"
+                        onClick={() => setShowAddForm(true)}
+                      >
                         Add Your First Warranty
                       </button>
                     </div>
                   </div>
                 ) : (
                   warranties.map((warranty) => (
-                    <div key={warranty.id} className={`warranty-card ${getStatusColor(warranty.warrantyExpiry)}`}>
+                    <div
+                      key={warranty.id}
+                      className={`warranty-card ${getStatusColor(
+                        warranty.warrantyExpiry
+                      )}`}
+                    >
                       <div className="warranty-header">
                         <h3>{warranty.productName}</h3>
-                        <span className={`status-badge ${getStatusColor(warranty.warrantyExpiry)}`}>
-                          {getStatusColor(warranty.warrantyExpiry).replace("-", " ")}
+                        <span
+                          className={`status-badge ${getStatusColor(
+                            warranty.warrantyExpiry
+                          )}`}
+                        >
+                          {getStatusColor(warranty.warrantyExpiry).replace(
+                            "-",
+                            " "
+                          )}
                         </span>
                       </div>
 
@@ -577,7 +646,9 @@ export default function WarrantyDashboard() {
                           </div>
                         )}
                         {warranty.images && warranty.images.length > 1 && (
-                          <div className="image-count-badge">+{warranty.images.length - 1}</div>
+                          <div className="image-count-badge">
+                            +{warranty.images.length - 1}
+                          </div>
                         )}
                       </div>
 
@@ -589,24 +660,40 @@ export default function WarrantyDashboard() {
                           <strong>Category:</strong> {warranty.category}
                         </p>
                         <p>
-                          <strong>Purchase Date:</strong> {warranty.purchaseDate}
+                          <strong>Purchase Date:</strong>{" "}
+                          {warranty.purchaseDate}
                         </p>
                         <p>
                           <strong>Expires:</strong> {warranty.warrantyExpiry}
                         </p>
-                        <p className={`warranty-status ${getStatusColor(warranty.warrantyExpiry)}`}>
-                          <strong>{getDaysRemaining(warranty.warrantyExpiry)}</strong>
+                        <p
+                          className={`warranty-status ${getStatusColor(
+                            warranty.warrantyExpiry
+                          )}`}
+                        >
+                          <strong>
+                            {getDaysRemaining(warranty.warrantyExpiry)}
+                          </strong>
                         </p>
                       </div>
 
                       <div className="warranty-actions">
-                        <button className="btn-small btn-primary" onClick={() => handleViewDetails(warranty)}>
+                        <button
+                          className="btn-small btn-primary"
+                          onClick={() => handleViewDetails(warranty)}
+                        >
                           View Details
                         </button>
-                        <button className="btn-small" onClick={() => handleEditWarranty(warranty)}>
+                        <button
+                          className="btn-small"
+                          onClick={() => handleEditWarranty(warranty)}
+                        >
                           Edit
                         </button>
-                        <button className="btn-small btn-danger" onClick={() => handleDeleteWarranty(warranty)}>
+                        <button
+                          className="btn-small btn-danger"
+                          onClick={() => handleDeleteWarranty(warranty)}
+                        >
                           Delete
                         </button>
                       </div>
@@ -627,8 +714,8 @@ export default function WarrantyDashboard() {
                 <button
                   className="close-btn"
                   onClick={() => {
-                    setShowAddForm(false)
-                    clearImages()
+                    setShowAddForm(false);
+                    clearImages();
                   }}
                 >
                   ×
@@ -778,7 +865,9 @@ export default function WarrantyDashboard() {
                   >
                     <option value="Limited Warranty">Limited Warranty</option>
                     <option value="Extended Warranty">Extended Warranty</option>
-                    <option value="Manufacturer Warranty">Manufacturer Warranty</option>
+                    <option value="Manufacturer Warranty">
+                      Manufacturer Warranty
+                    </option>
                     <option value="Store Warranty">Store Warranty</option>
                   </select>
                 </div>
@@ -814,11 +903,17 @@ export default function WarrantyDashboard() {
                     />
 
                     {selectedImages.length < MAX_IMAGES && (
-                      <div className="image-upload-area" onClick={() => fileInputRef.current?.click()}>
+                      <div
+                        className="image-upload-area"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
                         <div className="upload-placeholder">
                           <span>📷</span>
                           <p>Click to upload warranty images</p>
-                          <small>Drag & drop or click to browse (Max {MAX_IMAGES} images, 5MB each)</small>
+                          <small>
+                            Drag & drop or click to browse (Max {MAX_IMAGES}{" "}
+                            images, 5MB each)
+                          </small>
                         </div>
                       </div>
                     )}
@@ -827,7 +922,10 @@ export default function WarrantyDashboard() {
                       <div className="image-preview-grid">
                         {imagePreviewUrls.map((url, index) => (
                           <div key={index} className="image-preview-item">
-                            <img src={url || "/placeholder.svg"} alt={`Preview ${index + 1}`} />
+                            <img
+                              src={url || "/placeholder.svg"}
+                              alt={`Preview ${index + 1}`}
+                            />
                             <button
                               type="button"
                               className="remove-image-btn"
@@ -847,8 +945,8 @@ export default function WarrantyDashboard() {
                     type="button"
                     className="btn-secondary"
                     onClick={() => {
-                      setShowAddForm(false)
-                      clearImages()
+                      setShowAddForm(false);
+                      clearImages();
                     }}
                   >
                     Cancel
@@ -871,8 +969,8 @@ export default function WarrantyDashboard() {
                 <button
                   className="close-btn"
                   onClick={() => {
-                    setShowEditForm(false)
-                    setEditingWarranty(null)
+                    setShowEditForm(false);
+                    setEditingWarranty(null);
                   }}
                 >
                   ×
@@ -1022,7 +1120,9 @@ export default function WarrantyDashboard() {
                   >
                     <option value="Limited Warranty">Limited Warranty</option>
                     <option value="Extended Warranty">Extended Warranty</option>
-                    <option value="Manufacturer Warranty">Manufacturer Warranty</option>
+                    <option value="Manufacturer Warranty">
+                      Manufacturer Warranty
+                    </option>
                     <option value="Store Warranty">Store Warranty</option>
                   </select>
                 </div>
@@ -1047,8 +1147,8 @@ export default function WarrantyDashboard() {
                     type="button"
                     className="btn-secondary"
                     onClick={() => {
-                      setShowEditForm(false)
-                      setEditingWarranty(null)
+                      setShowEditForm(false);
+                      setEditingWarranty(null);
                     }}
                   >
                     Cancel
@@ -1071,8 +1171,8 @@ export default function WarrantyDashboard() {
                 <button
                   className="close-btn"
                   onClick={() => {
-                    setShowDeleteModal(false)
-                    setDeletingWarranty(null)
+                    setShowDeleteModal(false);
+                    setDeletingWarranty(null);
                   }}
                 >
                   ×
@@ -1083,11 +1183,13 @@ export default function WarrantyDashboard() {
                   <div className="warning-icon">⚠️</div>
                   <h3>Are you sure you want to delete this warranty?</h3>
                   <p>
-                    You are about to permanently delete the warranty for <strong>{deletingWarranty.productName}</strong>{" "}
-                    by <strong>{deletingWarranty.brand}</strong>.
+                    You are about to permanently delete the warranty for{" "}
+                    <strong>{deletingWarranty.productName}</strong> by{" "}
+                    <strong>{deletingWarranty.brand}</strong>.
                   </p>
                   <p className="warning-text">
-                    This action cannot be undone. All warranty information will be permanently removed.
+                    This action cannot be undone. All warranty information will
+                    be permanently removed.
                   </p>
                 </div>
                 <div className="form-actions">
@@ -1095,13 +1197,17 @@ export default function WarrantyDashboard() {
                     type="button"
                     className="btn-secondary"
                     onClick={() => {
-                      setShowDeleteModal(false)
-                      setDeletingWarranty(null)
+                      setShowDeleteModal(false);
+                      setDeletingWarranty(null);
                     }}
                   >
                     Cancel
                   </button>
-                  <button type="button" className="btn-danger" onClick={handleConfirmDelete}>
+                  <button
+                    type="button"
+                    className="btn-danger"
+                    onClick={handleConfirmDelete}
+                  >
                     Delete Warranty
                   </button>
                 </div>
@@ -1116,7 +1222,10 @@ export default function WarrantyDashboard() {
             <div className="modal detail-modal">
               <div className="modal-header">
                 <h2>{selectedWarranty.productName}</h2>
-                <button className="close-btn" onClick={() => setShowDetailModal(false)}>
+                <button
+                  className="close-btn"
+                  onClick={() => setShowDetailModal(false)}
+                >
                   ×
                 </button>
               </div>
@@ -1124,7 +1233,8 @@ export default function WarrantyDashboard() {
               <div className="detail-content">
                 <div className="detail-images">
                   <div className="main-image">
-                    {selectedWarranty.images && selectedWarranty.images.length > 0 ? (
+                    {selectedWarranty.images &&
+                    selectedWarranty.images.length > 0 ? (
                       <img
                         src={`${VITE_HOST}/images/${selectedWarranty.images[selectedImageIndex]}`}
                         alt={`${selectedWarranty.productName} warranty document`}
@@ -1138,37 +1248,45 @@ export default function WarrantyDashboard() {
                     )}
                   </div>
 
-                  {selectedWarranty.images && selectedWarranty.images.length > 1 && (
-                    <div className="image-thumbnails">
-                      {selectedWarranty.images.map((image, index) => (
-                        <div key={index} className="thumbnail-container">
-                          <img
-                            src={`${VITE_HOST}/images/${image}`}
-                            alt={`Warranty document ${index + 1}`}
-                            className={`thumbnail ${index === selectedImageIndex ? "active" : ""}`}
-                            onClick={() => setSelectedImageIndex(index)}
-                          />
-                          <button
-                            className="remove-thumbnail-btn"
-                            onClick={() => handleRemoveDetailImage(index)}
-                            title="Remove image"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {selectedWarranty.images &&
+                    selectedWarranty.images.length > 1 && (
+                      <div className="image-thumbnails">
+                        {selectedWarranty.images.map((image, index) => (
+                          <div key={index} className="thumbnail-container">
+                            <img
+                              src={`${VITE_HOST}/images/${image}`}
+                              alt={`Warranty document ${index + 1}`}
+                              className={`thumbnail ${
+                                index === selectedImageIndex ? "active" : ""
+                              }`}
+                              onClick={() => setSelectedImageIndex(index)}
+                            />
+                            <button
+                              className="remove-thumbnail-btn"
+                              onClick={() => handleRemoveDetailImage(index)}
+                              title="Remove image"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-                  {selectedWarranty.images && selectedWarranty.images.length === 1 && (
-                    <div className="single-image-actions">
-                      <button className="btn-danger btn-small" onClick={() => handleRemoveDetailImage(0)}>
-                        Remove Image
-                      </button>
-                    </div>
-                  )}
+                  {selectedWarranty.images &&
+                    selectedWarranty.images.length === 1 && (
+                      <div className="single-image-actions">
+                        <button
+                          className="btn-danger btn-small"
+                          onClick={() => handleRemoveDetailImage(0)}
+                        >
+                          Remove Image
+                        </button>
+                      </div>
+                    )}
 
-                  {(!selectedWarranty.images || selectedWarranty.images.length < MAX_IMAGES) && (
+                  {(!selectedWarranty.images ||
+                    selectedWarranty.images.length < MAX_IMAGES) && (
                     <div className="image-upload-area">
                       <input
                         type="file"
@@ -1178,7 +1296,10 @@ export default function WarrantyDashboard() {
                         multiple
                         style={{ display: "none" }}
                       />
-                      <div className="upload-placeholder" onClick={() => detailFileInputRef.current?.click()}>
+                      <div
+                        className="upload-placeholder"
+                        onClick={() => detailFileInputRef.current?.click()}
+                      >
                         {uploadingImages ? (
                           <div className="uploading-indicator">
                             <span>⏳</span>
@@ -1190,7 +1311,9 @@ export default function WarrantyDashboard() {
                             <p>Click to upload warranty images</p>
                             <small>
                               {selectedWarranty.images
-                                ? `${MAX_IMAGES - selectedWarranty.images.length} more images allowed`
+                                ? `${
+                                    MAX_IMAGES - selectedWarranty.images.length
+                                  } more images allowed`
                                 : `Up to ${MAX_IMAGES} images allowed`}
                             </small>
                           </>
@@ -1202,10 +1325,19 @@ export default function WarrantyDashboard() {
 
                 <div className="detail-info">
                   <div className="warranty-status-section">
-                    <span className={`status-badge large ${getStatusColor(selectedWarranty.warrantyExpiry)}`}>
-                      {getStatusColor(selectedWarranty.warrantyExpiry).replace("-", " ")}
+                    <span
+                      className={`status-badge large ${getStatusColor(
+                        selectedWarranty.warrantyExpiry
+                      )}`}
+                    >
+                      {getStatusColor(selectedWarranty.warrantyExpiry).replace(
+                        "-",
+                        " "
+                      )}
                     </span>
-                    <p className="status-text">{getDaysRemaining(selectedWarranty.warrantyExpiry)}</p>
+                    <p className="status-text">
+                      {getDaysRemaining(selectedWarranty.warrantyExpiry)}
+                    </p>
                   </div>
 
                   <div className="detail-grid">
@@ -1227,7 +1359,9 @@ export default function WarrantyDashboard() {
                     </div>
                     <div className="detail-item">
                       <label>Purchase Price</label>
-                      <span>{selectedWarranty.purchasePrice || "Not specified"}</span>
+                      <span>
+                        {selectedWarranty.purchasePrice || "Not specified"}
+                      </span>
                     </div>
                     <div className="detail-item">
                       <label>Store</label>
@@ -1235,11 +1369,15 @@ export default function WarrantyDashboard() {
                     </div>
                     <div className="detail-item">
                       <label>Serial Number</label>
-                      <span>{selectedWarranty.serialNumber || "Not specified"}</span>
+                      <span>
+                        {selectedWarranty.serialNumber || "Not specified"}
+                      </span>
                     </div>
                     <div className="detail-item">
                       <label>Warranty Type</label>
-                      <span>{selectedWarranty.warrantyType || "Not specified"}</span>
+                      <span>
+                        {selectedWarranty.warrantyType || "Not specified"}
+                      </span>
                     </div>
                   </div>
 
@@ -1251,11 +1389,17 @@ export default function WarrantyDashboard() {
                   )}
 
                   <div className="detail-actions">
-                    <button className="btn-primary" onClick={() => handleEditWarranty(selectedWarranty)}>
+                    <button
+                      className="btn-primary"
+                      onClick={() => handleEditWarranty(selectedWarranty)}
+                    >
                       Edit Warranty
                     </button>
                     <button className="btn-secondary">Download PDF</button>
-                    <button className="btn-danger" onClick={() => handleDeleteWarranty(selectedWarranty)}>
+                    <button
+                      className="btn-danger"
+                      onClick={() => handleDeleteWarranty(selectedWarranty)}
+                    >
                       Delete Warranty
                     </button>
                   </div>
@@ -1266,5 +1410,5 @@ export default function WarrantyDashboard() {
         )}
       </div>
     </>
-  )
+  );
 }
