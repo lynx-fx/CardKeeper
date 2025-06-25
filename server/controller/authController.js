@@ -87,8 +87,6 @@ exports.login = async (req, res) => {
         .json({ success: false, message: "User doesn't exists" });
     }
 
-    console.log(existingUser.password);
-
     // comparing password
     const result = await comparePassword(password, existingUser.password);
 

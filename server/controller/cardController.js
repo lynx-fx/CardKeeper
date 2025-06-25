@@ -150,7 +150,7 @@ exports.updateCard = async (req, res) => {
       serialNumber,
       warrantyType,
       description,
-      cardId
+      cardId,
     } = req.body;
 
     // validating inputs
@@ -175,7 +175,6 @@ exports.updateCard = async (req, res) => {
     }
 
     console.log(cardId);
-    
 
     // extracting auth token
     const token = tokenExtractor(req);
@@ -361,7 +360,7 @@ exports.addImages = async (req, res) => {
 // DONE: get images for card
 exports.getImages = async (req, res) => {
   try {
-    const { cardId } = req.body;
+    const { cardId } = req.query;
 
     // extracting auth token
     const token = tokenExtractor(req);
