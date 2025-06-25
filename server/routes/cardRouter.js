@@ -10,6 +10,7 @@ router.post("/createCard", upload.single("img"), cardController.createCard);
 router.delete("/deleteCard", cardController.deleteCard);
 
 router.post("/addImages", upload.array("img", 5), cardController.addImages);
+router.delete("/removeImage",  cardController.deleteImage);
 
 router.put("/updateCard", cardController.updateCard);
 

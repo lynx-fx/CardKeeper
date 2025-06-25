@@ -23,7 +23,7 @@ exports.getCard = async (req, res) => {
     if (!token) {
       return res
         .status(401)
-        .json({ success: false, message: "No token provided." });
+        .json({ success: false, message: "Unauthorized user" });
     }
     // getting all cards details
     const decode = jwt.verify(token, process.env.TOKEN_SECRET);
@@ -89,7 +89,7 @@ exports.createCard = async (req, res) => {
     if (!token) {
       return res
         .status(401)
-        .json({ success: false, message: "No token provided." });
+        .json({ success: false, message: "Unauthorized user" });
     }
 
     // getting user details
@@ -174,15 +174,13 @@ exports.updateCard = async (req, res) => {
         .json({ success: false, message: "Invalid inputs" });
     }
 
-    console.log(cardId);
-
     // extracting auth token
     const token = tokenExtractor(req);
 
     if (!token) {
       return res
         .status(401)
-        .json({ success: false, message: "No token provided." });
+        .json({ success: false, message: "Unauthorized user" });
     }
 
     // getting user details via token
@@ -234,7 +232,6 @@ exports.updateCard = async (req, res) => {
 exports.deleteCard = async (req, res) => {
   try {
     const { cardId } = req.body;
-    console.log(cardId);
 
     // extracting auth token
     const token = tokenExtractor(req);
@@ -242,7 +239,7 @@ exports.deleteCard = async (req, res) => {
     if (!token) {
       return res
         .status(401)
-        .json({ success: false, message: "No token provided." });
+        .json({ success: false, message: "Unauthorized user" });
     }
 
     // getting user details via token
@@ -303,7 +300,7 @@ exports.addImages = async (req, res) => {
     if (!token) {
       return res
         .status(401)
-        .json({ success: false, message: "No token provided." });
+        .json({ success: false, message: "Unauthorized user" });
     }
 
     // getting user details via token
@@ -368,7 +365,7 @@ exports.getImages = async (req, res) => {
     if (!token) {
       return res
         .status(401)
-        .json({ success: false, message: "No token provided." });
+        .json({ success: false, message: "Unauthorized user" });
     }
 
     // getting user details via token
@@ -407,5 +404,53 @@ exports.getImages = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+};
+
+exports.deleteImage = async (req, res) => {
+  try {
+    const { imageId } = req.body;
+
+    const token = tokenExtractor(req);
+    if (!token) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Unauthorized user" });
+    }
+
+    const decode = jwt.verify(token, process.env.TOKEN_SECRET);
+    const existingUser = await User.findOne({ email: decode.email });
+
+    const existingImage = await Image.findById(imageId);
+    if (!existingImage) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Image not found" });
+    }
+
+    const existingCard = await Card.findById(existingImage.card);
+    if (!existingCard) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Card not found" });
+    }
+
+    const cardUser = await User.findById(existingCard.user);
+    if (cardUser.id !== existingUser.id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Unauthorized user" });
+    }
+
+    await Image.findByIdAndDelete(imageId);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Image deleted successfully" });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
   }
 };
