@@ -336,11 +336,13 @@ export default function WarrantyDashboard() {
             warrantyType: card.warrantyType,
             description: card.description,
             isActive: card.isActive,
-            images: card.images || [],
+            placeholderImage: card.imageUri || "default.png",
           }))
           .filter((warranty) => warranty.isActive)
 
         setWarranties((prev) => [...prev, ...formattedWarranties])
+        console.log(formattedWarranties);
+        
       } else {
         setTimeout(() => {
           toast.error(data.message || "Something went wrong")
@@ -602,9 +604,9 @@ export default function WarrantyDashboard() {
                       </div>
 
                       <div className="warranty-image">
-                        {warranty.images && warranty.images.length > 0 ? (
+                        {warranty.placeholderImage ? (
                           <img
-                            src={`${VITE_HOST}/images/${warranty.images[0]}`}
+                            src={`${VITE_HOST}/images/${warranty.placeholderImage}`}
                             alt={`${warranty.productName} warranty`}
                             className="warranty-thumbnail"
                             onError={(e) => {
