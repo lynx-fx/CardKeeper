@@ -234,7 +234,7 @@ export default function WarrantyDashboard() {
 
       // Add images
       selectedImages.forEach((image) => {
-        formData.append("images", image)
+        formData.append("img", image)
       })
 
       const response = await fetch(`${VITE_HOST}/api/card/createCard`, {
@@ -467,7 +467,7 @@ export default function WarrantyDashboard() {
         },
         credentials: "include",
         body: JSON.stringify({
-          cardId: selectedWarranty.id,
+          cardId: deletingWarranty.id,
         }),
       })
 
