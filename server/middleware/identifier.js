@@ -1,6 +1,5 @@
-require("dotenv").config("../.env");
 const jwt = require("jsonwebtoken");
-const tokenExtractor = require("../utils/tokenExtractor");
+const {tokenExtractor} = require("../utils/tokenExtractor");
 
 exports.identifier = (req, res, next) => {
   const token = tokenExtractor(req);
@@ -15,7 +14,6 @@ exports.identifier = (req, res, next) => {
   try {
     const decode = jwt.verify(token, process.env.TOKEN_SECRET);
     if (decode) {
-      req.user = jwtVerified;
       next();
     } else {
       return res
@@ -23,7 +21,7 @@ exports.identifier = (req, res, next) => {
         .json({ success: false, message: "Idenfitication failed." });
     }
   } catch (err) {
-    console.console.log(err);
+    console.log(err);
     return res
       .status(500)
       .json({ success: false, message: "Identification error." });

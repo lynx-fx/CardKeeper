@@ -25,7 +25,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="hero-image">
-            <img src="https://th.bing.com/th/id/OIF.juGAioCXPNeQc3Nr8TVI3w?cb=thvnextc1&rs=1&pid=ImgDetMain" alt="Warranty management dashboard" />
+            <img src="warranty-blog-header.png" alt="Warranty management dashboard" />
           </div>
         </div>
       </section>
@@ -96,12 +96,16 @@ export default function Landing() {
             <div className="footer-section">
               <h4>Contact</h4>
               <p>support@warrantykeeper.com</p>
-              <p>1-800-WARRANTY</p>
+              {/* <p>1-800-WARRANTY</p> */}
             </div>
             <div className="footer-section">
               <h4>Legal</h4>
               <a href="#">Privacy Policy</a>
               <a href="#">Terms of Service</a>
+            </div>
+            <div className="footer-section">
+              <h4>Location</h4>
+              <a href="#">Nepal</a>
             </div>
           </div>
           <div className="footer-bottom">
