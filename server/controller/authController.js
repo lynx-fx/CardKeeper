@@ -117,7 +117,7 @@ exports.login = async (req, res) => {
         httpOnly: process.env.NODE_ENV === "production",
         secure: process.env.NODE_ENV === "production",
       })
-      .json({ success: true, message: "Logged in" });
+      .json({ success: true, message: "Logged in", redirect: "/dashboard" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Internal Server Error" });
@@ -129,7 +129,7 @@ exports.logout = async (req, res) => {
   res
     .clearCookie("auth")
     .status(200)
-    .json({ success: true, message: "Logout successful" });
+    .json({ success: true, message: "Logout successful", redirect: "/login" });
 };
 
 // DONE: send mail here

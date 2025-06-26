@@ -40,12 +40,13 @@ export default function Navbar() {
       });
 
       const data = await response.json();
-      setIsLoading(false);
-
+      
       if (response.ok && data.success) {
-        navigate("/login");
-        toast.success("Logged out successfully");
+          toast.success("Logged out successfully");
+          setIsLoading(false);
+          window.location.href = data.redirect;
       } else {
+        setIsLoading(false);
         toast.error("Something went wrong.");
       }
     } catch (err) {

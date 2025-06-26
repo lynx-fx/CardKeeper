@@ -72,12 +72,11 @@ export default function Login() {
       });
 
       const data = await response.json();
-
       setIsLoading(false);
 
       if (response.ok && data.success) {
         toast.success(data.message || "User logged in successfully.");
-        navigate("/dashboard");
+          window.location.href = data.redirect;
       } else {
         toast.error(data.message || "Something went wrong.");
         setFormData({

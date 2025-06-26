@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import Landing from "./component/landing.jsx";
@@ -19,14 +19,14 @@ function App() {
     return match ? match[2] : null;
   };
 
-  const isLoggedIn = !!getCookie("auth");
+  const [isLoggedIn, setIsLoggedIn] = useState(!!getCookie("auth"));
 
   return (
     <>
       <Toaster richColors />
       <BrowserRouter>
         <Routes>
-          {/* <Route
+          <Route
             path="/"
             element={
               isLoggedIn ? <Navigate to="/dashboard" replace /> : <Landing />
@@ -41,10 +41,19 @@ function App() {
                 <WarrantyDashboard />
               )
             }
-          /> */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/dashboard" element={<WarrantyDashboard />} />
-          <Route path="/login" element={<Login />} />
+          />
+          {/* <Route path="/" element={<Landing />} />
+          <Route path="/dashboard" element={<WarrantyDashboard />} /> */}
+          <Route
+            path="/login"
+            element={
+              isLoggedIn ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Login />
+              )
+            }
+          />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
