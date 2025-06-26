@@ -26,7 +26,7 @@ function App() {
       <Toaster richColors />
       <BrowserRouter>
         <Routes>
-          <Route
+          {/* <Route
             path="/"
             element={
               isLoggedIn ? <Navigate to="/dashboard" replace /> : <Landing />
@@ -41,7 +41,9 @@ function App() {
                 <WarrantyDashboard />
               )
             }
-          />
+          /> */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/dashboard" element={<WarrantyDashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

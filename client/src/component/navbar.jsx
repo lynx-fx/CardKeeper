@@ -43,7 +43,7 @@ export default function Navbar() {
       setIsLoading(false);
 
       if (response.ok && data.success) {
-        navigate("/");
+        navigate("/login");
         toast.success("Logged out successfully");
       } else {
         toast.error("Something went wrong.");

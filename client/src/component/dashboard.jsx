@@ -44,9 +44,14 @@ export default function WarrantyDashboard() {
   const [editingWarranty, setEditingWarranty] = useState(null);
   const [deletingWarranty, setDeletingWarranty] = useState(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [todayDate, setTodayDate] = useState("");
+
   useEffect(() => {
     loadCards();
     const today = new Date().toISOString().split("T")[0];
+    setTodayDate(today);
     setNewWarranty((prev) => ({
       ...prev,
       purchaseDate: today,
@@ -267,7 +272,7 @@ export default function WarrantyDashboard() {
         setNewWarranty({
           productName: "",
           brand: "",
-          purchaseDate: "",
+          purchaseDate: todayDate,
           warrantyValidation: 0,
           category: "Electronics",
           purchasePrice: "",
@@ -461,7 +466,7 @@ export default function WarrantyDashboard() {
         setNewWarranty({
           productName: "",
           brand: "",
-          purchaseDate: "",
+          purchaseDate: todayDate,
           warrantyValidation: 0,
           category: "Electronics",
           purchasePrice: "",
@@ -538,6 +543,21 @@ export default function WarrantyDashboard() {
     if (daysUntilExpiry === 1) return "Expires tomorrow";
     return `${daysUntilExpiry} days remaining`;
   };
+
+  // Filter warranties based on search term and category
+  const filteredWarranties = warranties.filter((warranty) => {
+    const matchesSearch =
+      searchTerm === "" ||
+      warranty.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warranty.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warranty.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warranty.serialNumber.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === "" || warranty.category === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <>
@@ -618,8 +638,14 @@ export default function WarrantyDashboard() {
                     type="text"
                     placeholder="Search warranties..."
                     className="search-input"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                   />
-                  <select className="filter-select">
+                  <select
+                    className="filter-select"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                  >
                     <option value="">All Categories</option>
                     <option value="Electronics">Electronics</option>
                     <option value="Appliances">Appliances</option>
@@ -631,26 +657,32 @@ export default function WarrantyDashboard() {
               </div>
 
               <div className="warranties-grid">
-                {warranties.length === 0 ? (
+                {filteredWarranties.length === 0 ? (
                   <div className="empty-state">
                     <div className="empty-state-content">
                       <div className="empty-state-icon">📋</div>
-                      <h3>No Warranties Found</h3>
+                      <h3>
+                        {warranties.length === 0
+                          ? "No Warranties Found"
+                          : "No Matching Warranties"}
+                      </h3>
                       <p>
-                        You haven't added any warranty cards yet. Start by
-                        adding your first warranty to keep track of your
-                        products.
+                        {warranties.length === 0
+                          ? "You haven't added any warranty cards yet. Start by adding your first warranty to keep track of your products."
+                          : "No warranties match your current search criteria. Try adjusting your search terms or category filter."}
                       </p>
-                      <button
-                        className="btn-primary"
-                        onClick={() => setShowAddForm(true)}
-                      >
-                        Add Your First Warranty
-                      </button>
+                      {warranties.length === 0 && (
+                        <button
+                          className="btn-primary"
+                          onClick={() => setShowAddForm(true)}
+                        >
+                          Add Your First Warranty
+                        </button>
+                      )}
                     </div>
                   </div>
                 ) : (
-                  warranties.map((warranty) => (
+                  filteredWarranties.map((warranty) => (
                     <div
                       key={warranty.id}
                       className={`warranty-card ${getStatusColor(
@@ -851,7 +883,7 @@ export default function WarrantyDashboard() {
                     <label>Warranty Validation Period</label>
                     <input
                       type="number"
-                      min="0"
+                      min="1"
                       placeholder="In years"
                       value={newWarranty.warrantyValidation}
                       onChange={(e) =>
