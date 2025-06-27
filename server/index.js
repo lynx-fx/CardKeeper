@@ -1,4 +1,5 @@
 const express = require("express");
+require('dotenv').config();
 const helmet = require("helmet");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -36,7 +37,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Hie :3" });
 });
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 3000, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
 });
 
