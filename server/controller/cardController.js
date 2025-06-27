@@ -32,7 +32,7 @@ exports.getCard = async (req, res) => {
     if (cards.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "No cards found." });
+        .json({ success: false, message: "Add cards to view" });
     }
 
     return res.status(200).json({ success: true, cards });

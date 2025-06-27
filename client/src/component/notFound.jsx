@@ -29,8 +29,8 @@ export default function NotFound() {
   }, [navigate]);
 
   const handleGoHome = () => {
-    setIsAnimating(false);
     setTimeout(() => navigate("/"), 300);
+    setIsAnimating(false);
   };
 
   return (
