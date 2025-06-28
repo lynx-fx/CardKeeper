@@ -108,7 +108,6 @@ exports.login = async (req, res) => {
     );
     existingUser.lastLogin = Date.now();
     await existingUser.save();
-    console.log("NODE_ENV:", process.env.NODE_ENV);
 
     // response
     return res

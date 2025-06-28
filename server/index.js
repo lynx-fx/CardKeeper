@@ -10,7 +10,7 @@ const mongoose = require("mongoose");
 const app = express();
 app.use(
   cors({
-    origin: true,
+    origin: "https://cardkeeper-lynx.netlify.app",
     credentials: true,
   })
 );
