@@ -68,7 +68,6 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
 
     // Validating user inputs
     const { error, value } = signUpSchema.validate({ email, password });
@@ -109,13 +108,15 @@ exports.login = async (req, res) => {
     );
     existingUser.lastLogin = Date.now();
     await existingUser.save();
+    console.log("NODE_ENV:", process.env.NODE_ENV);
 
     // response
     return res
       .cookie("auth", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
         expires: new Date(Date.now() + 86400000),
-        httpOnly: process.env.NODE_ENV === "production",
-        secure: process.env.NODE_ENV === "production",
       })
       .json({ success: true, message: "Logged in", redirect: "/dashboard" });
   } catch (err) {
@@ -247,10 +248,10 @@ exports.changePassword = async (req, res) => {
   try {
     const { newPassword, oldPassword } = req.body;
     // validating user inputs
-    const { error, value } = changePasswordSchema.validate({newPassword});
+    const { error, value } = changePasswordSchema.validate({ newPassword });
     if (error) {
       console.log(error);
-      
+
       return res
         .status(400)
         .json({ success: false, message: "Alpha numeric characters only." });
@@ -316,7 +317,7 @@ exports.resetPassword = async (req, res) => {
     const { newPassword } = req.body;
 
     // validating user inputs
-    const { error, value } = changePasswordSchema.validate({newPassword});
+    const { error, value } = changePasswordSchema.validate({ newPassword });
     if (error) {
       return res
         .status(400)
