@@ -1,4 +1,4 @@
-// require("dotenv").config("../.env");
+require("dotenv").config("../.env");
 const jwt = require("jsonwebtoken");
 
 // middleware

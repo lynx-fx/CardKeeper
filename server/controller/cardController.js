@@ -1,3 +1,4 @@
+require("dotenv").config("../.env");
 const express = require("express");
 const { tokenExtractor } = require("../utils/tokenExtractor");
 const jwt = require("jsonwebtoken");
