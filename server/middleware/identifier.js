@@ -5,7 +5,7 @@ exports.identifier = (req, res, next) => {
   const token = tokenExtractor(req);
   if (!token) {
     return res
-      .status()
+      .status(400)
       .json({
         success: false,
         message: "No token provided for identification.",
