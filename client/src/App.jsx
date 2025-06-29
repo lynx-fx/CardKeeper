@@ -32,7 +32,7 @@ function App() {
               isLoggedIn ? <Navigate to="/dashboard" replace /> : <Landing />
             }
           />
-          <Route
+          {/* <Route
             path="/dashboard"
             element={
               !isLoggedIn ? (
@@ -41,9 +41,9 @@ function App() {
                 <WarrantyDashboard />
               )
             }
-          />
-          {/* <Route path="/" element={<Landing />} />
-          <Route path="/dashboard" element={<WarrantyDashboard />} /> */}
+          /> */}
+          {/* <Route path="/" element={<Landing />} /> */}
+          <Route path="/dashboard" element={<WarrantyDashboard />} />
           <Route
             path="/login"
             element={
