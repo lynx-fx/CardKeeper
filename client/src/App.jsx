@@ -40,7 +40,7 @@ function App() {
               ) : (
                 <WarrantyDashboard />
               )
-            }
+            }`
           /> */}
           {/* <Route path="/" element={<Landing />} /> */}
           <Route path="/dashboard" element={<WarrantyDashboard />} />
