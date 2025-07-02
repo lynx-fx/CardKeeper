@@ -393,7 +393,7 @@
 
 .form-row {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1rem;
 }
@@ -1126,10 +1126,6 @@
 @media (min-width: 769px) and (max-width: 1024px) {
   .warranties-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .form-row {
-    grid-template-columns: 1fr 1fr;
   }
 
   .detail-content {

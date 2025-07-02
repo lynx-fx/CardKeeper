@@ -161,7 +161,6 @@ export default function WarrantyDashboard() {
 
   const handleRemoveDetailImage = async (imageIndex) => {
     const imageId = loadedImages.images[imageIndex]._id || loadedImages.images[imageIndex].id
-    console.log(imageId)
 
     try {
       const response = await fetch(`${VITE_HOST}/api/card/removeImage`, {
