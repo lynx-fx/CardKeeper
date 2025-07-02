@@ -10,7 +10,7 @@ export default function Navbar() {
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const VITE_HOST = import.meta.env.VITE_BACKEND;
+  const VITE_HOST = import.meta.env.VITE_NODE_ENV == "production" ? import.meta.env.VITE_BACKEND_HOSTED : import.meta.env.VITE_BACKEND_LOCAL;
   const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
