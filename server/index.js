@@ -7,10 +7,12 @@ const authRouter = require("./routes/authRouter");
 const cardRouter = require("./routes/cardRouter");
 const mongoose = require("mongoose");
 
+const frontend = process.env.NODE_ENV === "production" ? process.env.FRONT_END_HOSTED : process.env.FRONT_END_LOCAL;
+
 const app = express();
 app.use(
   cors({
-    origin: "https://cardkeeper-lynx.netlify.app",
+    origin:  frontend,
     credentials: true,
   })
 );

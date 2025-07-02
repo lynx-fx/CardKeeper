@@ -62,7 +62,7 @@ export default function Navbar() {
         <div className="container">
           <div className="navbar-content">
             <Link to="/" className="logo">
-              <h2>WarrantyKeeper</h2>
+              <h2>CardKeeper</h2>
             </Link>
 
             {/* Desktop Navigation */}

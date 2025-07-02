@@ -112,9 +112,9 @@ exports.login = async (req, res) => {
     // response
     return res
       .cookie("auth", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
+        httpOnly: process.env.NODE_ENV == "production" ? true : false,
+        secure: process.env.NODE_ENV == "production" ? true : false,
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
         expires: new Date(Date.now() + 86400000),
       })
       .json({ success: true, message: "Logged in", redirect: "/dashboard" });
@@ -133,7 +133,7 @@ exports.logout = async (req, res) => {
 };
 
 // DONE: send mail here
-// TODO: Update link to production link and email
+// DONE: Update link to production link and email
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -149,10 +149,14 @@ exports.forgotPassword = async (req, res) => {
     // Random 6 digit value
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
+    const frontend =
+      process.env.NODE_ENV === "production"
+        ? "FRONT_END_HOSTED"
+        : "FRONT_END_LOCAL";
     // generating link
-    const link = `${
-      process.env.FRONT_END
-    }/reset-password?email=${encodeURIComponent(email)}&token=${code}`;
+    const link = `${frontend}/reset-password?email=${encodeURIComponent(
+      email
+    )}&token=${code}`;
 
     // Sending mail here
     let info = await transport.sendMail({
