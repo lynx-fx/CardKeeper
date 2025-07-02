@@ -151,8 +151,8 @@ exports.forgotPassword = async (req, res) => {
 
     const frontend =
       process.env.NODE_ENV === "production"
-        ? "FRONT_END_HOSTED"
-        : "FRONT_END_LOCAL";
+        ? process.env.FRONT_END_HOSTED
+        : process.env.FRONT_END_LOCAL;
     // generating link
     const link = `${frontend}/reset-password?email=${encodeURIComponent(
       email
