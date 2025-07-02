@@ -15,11 +15,9 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-const VITE_HOST = import.meta.env.PROD
+ const VITE_HOST = import.meta.env.PROD
   ? import.meta.env.VITE_BACKEND_HOSTED
-  : import.meta.env.VITE_BACKEND_LOCAL || import.meta.env.VITE_BACKEND_HOSTED;
-  console.log(VITE_HOST);
-  
+  : import.meta.env.VITE_BACKEND_LOCAL;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,7 +78,7 @@ const VITE_HOST = import.meta.env.PROD
 
       if (response.ok && data.success) {
         toast.success(data.message || "User logged in successfully.");
-          window.location.href = data.redirect;
+        window.location.href = data.redirect;
       } else {
         toast.error(data.message || "Something went wrong.");
         setFormData({

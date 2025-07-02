@@ -17,8 +17,10 @@ export default function Signup() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const VITE_HOST = import.meta.env.VITE_NODE_ENV == "production" ? import.meta.env.VITE_BACKEND_HOSTED : import.meta.env.VITE_BACKEND_LOCAL;
-
+const VITE_HOST = import.meta.env.PROD
+  ? import.meta.env.VITE_BACKEND_HOSTED
+  : import.meta.env.VITE_BACKEND_LOCAL;
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
