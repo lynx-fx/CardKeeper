@@ -15,7 +15,7 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const VITE_HOST = import.meta.env.VITE_NODE_ENV == "production" ? import.meta.env.VITE_BACKEND_HOSTED : import.meta.env.VITE_BACKEND_LOCAL;
+  const VITE_HOST = import.meta.env.VITE_NODE_ENV == "production" ? import.meta.env.VITE_BACKEND_HOSTED : import.meta.env.VITE_BACKEND_LOCAL || import.meta.env.VITE_BACKEND_HOSTED;
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -99,7 +99,7 @@ export default function Login() {
           <div className="auth-card">
             <div className="auth-header">
               <h1>Welcome Back</h1>
-              <p>Sign in to your WarrantyKeeper account</p>
+              <p>Sign in to your CardKeeper account</p>
             </div>
 
             <form onSubmit={handleSubmit} className="auth-form">
