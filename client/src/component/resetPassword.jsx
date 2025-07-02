@@ -22,7 +22,7 @@ export default function ResetPassword() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isValidToken, setIsValidToken] = useState(true);
   const [isValidating, setIsValidating] = useState(true);
-  const VITE_HOST = import.meta.env.VITE_BACKEND;
+  const VITE_HOST = import.meta.env.VITE_NODE_ENV == "production" ? import.meta.env.VITE_BACKEND_HOSTED : import.meta.env.VITE_BACKEND_LOCAL;
 
   useEffect(() => {
     if (!token) {

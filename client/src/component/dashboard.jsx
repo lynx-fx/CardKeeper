@@ -35,7 +35,7 @@ export default function WarrantyDashboard() {
   const fileInputRef = useRef(null);
   const detailFileInputRef = useRef(null);
 
-  const VITE_HOST = import.meta.env.VITE_BACKEND;
+  const VITE_HOST = import.meta.env.VITE_NODE_ENV == "production" ? import.meta.env.VITE_BACKEND_HOSTED : import.meta.env.VITE_BACKEND_LOCAL;
   const MAX_IMAGES = 5;
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
