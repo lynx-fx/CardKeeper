@@ -399,7 +399,7 @@
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 0.25rem;
 }
 
 .form-group label {
@@ -556,9 +556,22 @@
 /* Detail Modal Styles */
 .detail-content {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   padding: 1rem;
+  min-height: 400px;
+}
+
+.detail-images-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detail-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .detail-images {
@@ -682,8 +695,8 @@
 
 .detail-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
 }
 
 .detail-item {
@@ -949,7 +962,16 @@
 
   .detail-content {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
     padding: 0.75rem;
+  }
+
+  .detail-images-column {
+    order: 1;
+  }
+
+  .detail-info-column {
+    order: 2;
   }
 
   .main-image {
