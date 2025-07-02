@@ -16,7 +16,9 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const VITE_HOST = import.meta.env.VITE_NODE_ENV == "production" ? import.meta.env.VITE_BACKEND_HOSTED : import.meta.env.VITE_BACKEND_LOCAL || import.meta.env.VITE_BACKEND_HOSTED;
+  console.log(VITE_HOST);
   
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
