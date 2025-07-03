@@ -32,7 +32,7 @@ export default function Landing() {
 
       <section id="features" className="features">
         <div className="container">
-          <h2>Why Choose WarrantyKeeper?</h2>
+          <h2>Why Choose CardKeeper?</h2>
           <div className="features-grid">
             <div className="feature-card">
               <div className="feature-icon">📱</div>
@@ -90,12 +90,12 @@ export default function Landing() {
         <div className="container">
           <div className="footer-content">
             <div className="footer-section">
-              <h3>WarrantyKeeper</h3>
+              <h3>CardKeeper</h3>
               <p>Your digital warranty management solution</p>
             </div>
             <div className="footer-section">
               <h4>Contact</h4>
-              <p>support@warrantykeeper.com</p>
+              <p>support@CardKeeper.com</p>
               {/* <p>1-800-WARRANTY</p> */}
             </div>
             <div className="footer-section">
@@ -109,7 +109,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2024 WarrantyKeeper. All rights reserved.</p>
+            <p>&copy; 2024 CardKeeper. All rights reserved.</p>
           </div>
         </div>
       </footer>
