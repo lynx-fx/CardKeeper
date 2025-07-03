@@ -422,7 +422,7 @@ export default function WarrantyDashboard() {
           purchaseDate: warrantyData.purchaseDate,
           warrantyExpiry: warrantyData.warrantyExpiry,
           category: warrantyData.category,
-          purchasePrice: warrantyData.purchasePrice,
+        purchasePrice: warrantyData.purchasePrice,
           store: warrantyData.store,
           serialNumber: warrantyData.serialNumber,
           warrantyType: warrantyData.warrantyType,

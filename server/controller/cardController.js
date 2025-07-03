@@ -60,7 +60,9 @@ exports.createCard = async (req, res) => {
       description,
     } = req.body;
 
-    const imageUri = req.file ? req.file.filename : "default.png";
+    const images = req.files; // array of uploaded files
+    const imageUri = images[0] ? images[0].filename : "default.png";
+
     // validating inputs
     const { error, value } = cardValidationSchema.validate({
       productName,
@@ -127,6 +129,19 @@ exports.createCard = async (req, res) => {
       card: card._id,
     });
     await imageHandler.save();
+    let i = 0;
+    for (const image of images) {
+      // skip the first image
+      if (i === 0){
+        i++;
+        continue;
+      }
+      const newImage = new Image({
+        imageUri: image.filename,
+        card: card._id,
+      });
+      await newImage.save();
+    }
     return res
       .status(200)
       .json({ success: true, message: "Card created successfully" });
@@ -137,7 +152,7 @@ exports.createCard = async (req, res) => {
 };
 
 // DONE: update cards
-// TODO: recheck parameters
+// DONE: recheck parameters
 exports.updateCard = async (req, res) => {
   try {
     const {
@@ -152,7 +167,7 @@ exports.updateCard = async (req, res) => {
       warrantyType,
       description,
       cardId,
-    } = req.body;
+    } = req.body;    
 
     // validating inputs
     const { error, value } = cardUpdateValidationSchema.validate({
@@ -211,6 +226,8 @@ exports.updateCard = async (req, res) => {
     }
 
     //updating card
+    if (productName !== null) existingCard.productName = productName;
+    if (serialNumber !== null) existingCard.serialNumber = serialNumber;
     if (brand !== null) existingCard.brand = brand;
     if (category !== null) existingCard.category = category;
     if (purchaseDate !== null) existingCard.purchaseDate = purchaseDate;

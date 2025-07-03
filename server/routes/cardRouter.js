@@ -9,7 +9,7 @@ router.get("/getImages", identifier, cardController.getImages);
 
 router.post(
   "/createCard",
-  upload.single("img"),
+  upload.array("img", 5),
   identifier,
   cardController.createCard
 );
