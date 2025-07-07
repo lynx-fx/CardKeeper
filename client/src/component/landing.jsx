@@ -1,10 +1,20 @@
-"use client"
+"use client";
 
-import { Link } from "react-router-dom"
-import Navbar from "./navbar.jsx"
-import "./../styles/landing.css"
+import { Link } from "react-router-dom";
+import Navbar from "./navbar.jsx";
+import "./../styles/landing.css";
+import { useEffect } from "react";
 
 export default function Landing() {
+  const VITE_HOST = import.meta.env.PROD
+    ? import.meta.env.VITE_BACKEND_HOSTED
+    : import.meta.env.VITE_BACKEND_LOCAL;
+
+  // waking up the server
+  useEffect(() => {
+    fetch(`${VITE_HOST}/ping`).catch(console.error);
+  }, []);
+
   return (
     <div className="landing">
       <Navbar />
@@ -14,8 +24,9 @@ export default function Landing() {
           <div className="hero-content">
             <h1>Never Lose a Warranty Again</h1>
             <p>
-              Store, organize, and track all your warranty cards in one secure digital place. Get reminders before they
-              expire and access them anywhere, anytime.
+              Store, organize, and track all your warranty cards in one secure
+              digital place. Get reminders before they expire and access them
+              anywhere, anytime.
             </p>
             <div className="hero-buttons">
               <Link to="/signup" className="btn-primary">
@@ -25,7 +36,10 @@ export default function Landing() {
             </div>
           </div>
           <div className="hero-image">
-            <img src="warranty-blog-header.png" alt="Warranty management dashboard" />
+            <img
+              src="warranty-blog-header.png"
+              alt="Warranty management dashboard"
+            />
           </div>
         </div>
       </section>
@@ -37,22 +51,34 @@ export default function Landing() {
             <div className="feature-card">
               <div className="feature-icon">📱</div>
               <h3>Digital Storage</h3>
-              <p>Scan and store warranty cards digitally. No more lost papers or forgotten receipts.</p>
+              <p>
+                Scan and store warranty cards digitally. No more lost papers or
+                forgotten receipts.
+              </p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">🔔</div>
               <h3>Smart Reminders</h3>
-              <p>Get notified before your warranties expire so you never miss a claim opportunity.</p>
+              <p>
+                Get notified before your warranties expire so you never miss a
+                claim opportunity.
+              </p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">🔒</div>
               <h3>Secure & Private</h3>
-              <p>Your warranty information is encrypted and stored securely in the cloud.</p>
+              <p>
+                Your warranty information is encrypted and stored securely in
+                the cloud.
+              </p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">📊</div>
               <h3>Easy Organization</h3>
-              <p>Categorize by product type, purchase date, or warranty status for quick access.</p>
+              <p>
+                Categorize by product type, purchase date, or warranty status
+                for quick access.
+              </p>
             </div>
           </div>
         </div>
@@ -65,7 +91,10 @@ export default function Landing() {
             <div className="step">
               <div className="step-number">1</div>
               <h3>Add Your Warranties</h3>
-              <p>Upload photos of warranty cards or manually enter warranty details</p>
+              <p>
+                Upload photos of warranty cards or manually enter warranty
+                details
+              </p>
             </div>
             <div className="step">
               <div className="step-number">2</div>
@@ -80,7 +109,9 @@ export default function Landing() {
             <div className="step">
               <div className="step-number">4</div>
               <h3>Make Claims</h3>
-              <p>Access warranty details instantly when you need to make a claim</p>
+              <p>
+                Access warranty details instantly when you need to make a claim
+              </p>
             </div>
           </div>
         </div>
@@ -114,5 +145,5 @@ export default function Landing() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

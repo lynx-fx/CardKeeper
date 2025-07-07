@@ -42,6 +42,11 @@ app.get("/", (req, res) => {
   res.json({ message: "Hie :3" });
 });
 
+// Pinging server to wake up
+app.get("/ping", (req, res) => {
+  res.status(200).send("pong");
+});
+
 app.listen(process.env.PORT || 3000, () => {
   console.log(frontend);
 
