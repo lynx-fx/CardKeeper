@@ -6,6 +6,7 @@
   "homepage": "https://lynx-fx.github.io/CardKeeper",
   "scripts": {
     "dev": "vite",
+    "start": "next start -p 3006",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",

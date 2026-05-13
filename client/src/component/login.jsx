@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import Navbar from "./navbar.jsx";
 import Loading from "./loading.jsx";
@@ -14,7 +14,7 @@ export default function Login() {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
  const VITE_HOST = import.meta.env.PROD
   ? import.meta.env.VITE_BACKEND_HOSTED
   : import.meta.env.VITE_BACKEND_LOCAL;
