@@ -10,5 +10,13 @@ export class UserService {
         return this.prisma.user.findMany({
             // select: {isActive: true},
         })
-}
+    }
+
+    async findUserById(id: number) {
+        return this.prisma.user.findUnique({
+            where: {
+                user_id: id
+            },
+        })
+    }
 }
