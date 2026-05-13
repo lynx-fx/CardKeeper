@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum WarrantyType {
+  BRAND
+  STORE
+  EXTENDED
+  OHTER
+}
+
+model User {
+  user_id         Int       @id @default(autoincrement())
+  userName        String
+  email           String    @unique
+  password        String
+  token           String?
+  tokenValidation DateTime?
+
+  cards Card[]
+}
+
+model Card {
+  card_id        Int          @id @default(autoincrement())
+  productName    String
+  brand          String
+  category       String
+  purchaseDate   DateTime
+  warrantyExpiry DateTime
+  purchsePrice   Int
+  store          String
+  serialNumber   String
+  warrantyType   WarrantyType
+  description    String?
+  imageUri       String? // banner image
+  isActive       Boolean      @default(true)
+
+  user    User @relation(fields: [user_id], references: [user_id])
+  user_id Int
+
+  images Image[]
+}
+
+model Image {
+  image_id Int    @id @default(autoincrement())
+  imageUri String
+
+  card    Card @relation(fields: [card_id], references: [card_id])
+  card_id Int
+}
