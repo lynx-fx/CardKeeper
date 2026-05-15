@@ -7,10 +7,12 @@ import { ImageModule } from './image/image.module';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
+import { MailService } from './mail/mail.service';
+import { MailModule } from './mail/mail.module';
 
 @Module({
-  imports: [UserModule, CardModule, ImageModule, PrismaModule, AuthModule],
+  imports: [UserModule, CardModule, ImageModule, PrismaModule, AuthModule, MailModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MailService],
 })
 export class AppModule {}

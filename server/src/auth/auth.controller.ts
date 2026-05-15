@@ -1,27 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query,  } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login.dto';
-import { RegisterUserDto } from './dto/register.dto';
+import { RegisterUserDto, RegisterUserResponse } from './dto/register.dto';
+import { changePasswordDto, forgotPasswordDto, forgotPasswordResponse, resetPasswordDto, resetPasswordResponse, validateResetTokenDto, validateResetTokenResponse } from './dto/password.dto';
+import { JwtGuard } from '../../guard/jwtVerifyGuard';
+
+type loginResponse = {
+  success: boolean;
+  message: string;
+};
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  // TODO: login
-  @Post()
-  async login(@Body('email') email: string,
-    @Body('password') password: string) {
-    return this.login(email, password);
+  // DONE: login
+  @Post("login")
+  async login(@Body() dto: LoginUserDto): Promise<loginResponse> {
+    return this.authService.login(dto);
   }
 
-  // TODO: register
+  // DONE: register
+  @Post("register")
+  async register(@Body() dto: RegisterUserDto): Promise<RegisterUserResponse> {
+    return this.authService.register(dto);
+  }
 
-  // TODO: change pass
+  // DONE: change pass
+  @Post("change-password")
+  @UseGuards(JwtGuard)
+  async changePassword(@Request() req, @Body() dto: changePasswordDto) {
+    return this.authService.changePassword(+req.user.user_id, dto);
+  }
 
-  // TODO: reset pass
+  // DONE: reset pass
+  @Post("reset-password")
+  async resetPassword(@Body() dto: resetPasswordDto): Promise<resetPasswordResponse> {
+    return this.authService.resetPassword(dto);
+  }
 
-  // TODO: forgot password
+  // DONE: forgot password
+  @Post("forgot-password")
+  async forgotPassword(@Body() dto: forgotPasswordDto): Promise<forgotPasswordResponse> {
+    return this.authService.forgotPassword(dto);
+  }
 
-  // TODO: validate reset token
-
+  // DONE: validate reset token
+  @Post("validate-reset-token")
+  async validateResetToken(@Body() dto: validateResetTokenDto): Promise<validateResetTokenResponse> {
+    return this.authService.validateResetToken(dto);
+  }
 }
