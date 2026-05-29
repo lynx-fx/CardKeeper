@@ -11,6 +11,7 @@ import { MailModule } from './mail/mail.module';
 import { BullModule } from '@nestjs/bullmq';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [UserModule, CardModule, ImageModule, PrismaModule, AuthModule,
@@ -27,7 +28,7 @@ import { APP_GUARD } from '@nestjs/core';
         ttl: 400,
         limit: 50
       }
-    ])
+    ]), S3Module
   ],
   controllers: [AppController],
   providers: [AppService, {
