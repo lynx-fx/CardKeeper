@@ -12,6 +12,7 @@ import * as crypto from "crypto";
 const frontend = process.env.NODE_ENV == "production"
   ? process.env.FRONT_END_HOSTED
   : process.env.FRONT_END_LOCAL;
+  
 @Injectable()
 export class AuthService {
 

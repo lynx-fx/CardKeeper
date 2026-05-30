@@ -36,7 +36,7 @@ model Card {
   category       String
   purchaseDate   DateTime
   warrantyExpiry DateTime
-  purchsePrice   Int
+  purchasePrice   Int
   store          String
   serialNumber   String
   warrantyType   WarrantyType

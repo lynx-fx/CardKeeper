@@ -3,7 +3,7 @@ import { CardService } from './card.service';
 import { CardController } from './card.controller';
 
 @Module({
+  controllers: [CardController],
   providers: [CardService],
-  controllers: [CardController]
 })
 export class CardModule {}
