@@ -8,7 +8,7 @@ export class UserService {
 
     async findAllUsers() {
         return this.prisma.user.findMany({
-            // select: {isActive: true},
+            // where: {isActive: true}
         })
     }
 

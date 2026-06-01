@@ -8,33 +8,36 @@ import { JwtService } from '@nestjs/jwt';
 import { changePasswordDto, changePasswordResponse, forgotPasswordDto, forgotPasswordResponse, resetPasswordDto, resetPasswordResponse, validateResetTokenDto, validateResetTokenResponse } from './dto/password.dto';
 import { MailService } from '../mail/mail.service';
 import * as crypto from "crypto";
+import { UserService } from '../user-service/user-service.service';
+import { User } from '@prisma/client';
 
 const frontend = process.env.NODE_ENV == "production"
   ? process.env.FRONT_END_HOSTED
   : process.env.FRONT_END_LOCAL;
-  
+
 @Injectable()
 export class AuthService {
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
+    private readonly userService: UserService,
   ) {
   }
 
   // DONE: login
   async login(dto: LoginUserDto): Promise<LoginUserReponse> {
-    const existingUser = await this.findUserByEmail(dto.email);
-
-    if (!existingUser) this.incorrectPassword();
+    const existingUser: User = await this.userService.findExistingUser(undefined, dto.email);
 
     const isMatch = await comparePassword(dto.password, existingUser.password);
-
-    if (!isMatch) this.incorrectPassword();
+    if (!isMatch) throw new UnauthorizedException({
+      success: false,
+      message: AUTH_RESPONSE.INVALID_CREDENTIALS
+    });;
 
     const payload = {
-      user_Id: existingUser.user_id,
+      userId: existingUser.userId,
     }
 
     const token = this.jwtService.sign(payload);
@@ -49,9 +52,11 @@ export class AuthService {
 
   // DONE: register
   async register(dto: RegisterUserDto): Promise<RegisterUserResponse> {
-    const existingUser = await this.findUserByEmail(dto.email);
-
-    if (existingUser) this.userAlreadyExists();
+    const existingUser = await this.prisma.user.findUnique({where:{email: dto.email}});
+    if (existingUser) throw new ConflictException({
+      success: false,
+      message: AUTH_RESPONSE.USER_ALREADY_EXISTS
+    });
 
     const hashedPassword = await hashPassword(dto.password);
 
@@ -70,16 +75,18 @@ export class AuthService {
   }
 
   // DONE: change pass
-  async changePassword(user_id: number, dto: changePasswordDto): Promise<changePasswordResponse> {
-    const existingUser = await this.findUserById(user_id);
-
-    if (!existingUser) this.userNotFound();
+  async changePassword(userId: number, dto: changePasswordDto): Promise<changePasswordResponse> {
+    const existingUser: User = await this.userService.findExistingUser(userId);
 
     const isMatch: boolean = await comparePassword(dto.old_password, existingUser.password);
-    if (!isMatch) this.incorrectPassword();
+
+    if (!isMatch) throw new UnauthorizedException({
+      success: false,
+      message: AUTH_RESPONSE.INVALID_CREDENTIALS
+    });;
 
     await this.prisma.user.update({
-      where: { user_id: user_id },
+      where: { userId: userId },
       data: {
         password: await hashPassword(dto.new_password)
       }
@@ -93,13 +100,18 @@ export class AuthService {
 
   // DONE: reset pass
   async resetPassword(dto: resetPasswordDto): Promise<resetPasswordResponse> {
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: dto.email }
-    })
-    if (!existingUser || existingUser.token == null) this.userNotFound();
+    const existingUser: User = await this.userService.findExistingUser(undefined, dto.email);
+
+    if (!existingUser.token) throw new ConflictException({
+      success: false,
+      message: AUTH_RESPONSE.USER_ALREADY_EXISTS
+    });
 
     const isValid = await compareHash(dto.code, existingUser.token);
-    if (!isValid) this.userUnauthorized();
+    if (!isValid) throw new ConflictException({
+      success: false,
+      message: AUTH_RESPONSE.USER_ALREADY_EXISTS
+    });
 
     await this.prisma.user.update({
       where: { email: dto.email },
@@ -119,8 +131,7 @@ export class AuthService {
   async forgotPassword(dto: forgotPasswordDto): Promise<forgotPasswordResponse> {
     const code = crypto.randomInt(100000, 1000000).toString()
 
-    const existingUser = await this.findUserByEmail(dto.email);
-    if (!existingUser) this.userNotFound();
+    const existingUser: User = await this.userService.findExistingUser(undefined, dto.email);
 
     await this.prisma.user.update({
       where: { email: dto.email },
@@ -142,57 +153,21 @@ export class AuthService {
 
   // DONE: validate reset token
   async validateResetToken(dto: validateResetTokenDto): Promise<validateResetTokenResponse> {
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: dto.email }
-    })
-    if (!existingUser || existingUser.token == null) this.userNotFound();
+    const existingUser: User = await this.userService.findExistingUser(undefined, dto.email);
+    if (!existingUser.token) throw new UnauthorizedException({
+      success: false,
+      message: AUTH_RESPONSE.UNAUTHORIZED
+    });
 
     const isValid = await compareHash(dto.code, existingUser.token);
-    if (!isValid) this.userUnauthorized();
+    if (!isValid) throw new UnauthorizedException({
+      success: false,
+      message: AUTH_RESPONSE.UNAUTHORIZED
+    });
 
     return {
       success: true,
     }
-  }
-
-  private findUserByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: { email }
-    })
-  }
-
-  private findUserById(user_id: number) {
-    return this.prisma.user.findUnique({
-      where: { user_id }
-    })
-  }
-
-  private userNotFound(): never {
-    throw new NotFoundException({
-      success: false,
-      message: AUTH_RESPONSE.USER_NOT_FOUND
-    })
-  }
-
-  private userUnauthorized(): never {
-    throw new UnauthorizedException({
-      success: false,
-      message: AUTH_RESPONSE.UNAUTHORIZED
-    })
-  }
-
-  private userAlreadyExists(): never {
-    throw new ConflictException({
-      success: false,
-      message: AUTH_RESPONSE.USER_ALREADY_EXISTS
-    })
-  }
-
-  private incorrectPassword(): never {
-    throw new UnauthorizedException({
-      success: false,
-      message: AUTH_RESPONSE.INVALID_CREDENTIALS
-    });
   }
 
 }
