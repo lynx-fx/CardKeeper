@@ -7,9 +7,9 @@ import { AUTH_RESPONSE } from '../auth/constants/auth-messages';
 export class UserService {
     constructor(private readonly prisma: PrismaService) { };
 
-    async findExistingUser(user_id?: number, email?: string): Promise<User> {
-        const user = user_id
-            ? await this.prisma.user.findUnique({ where: { user_id } })
+    async findExistingUser(userId?: number, email?: string): Promise<User> {
+        const user = userId
+            ? await this.prisma.user.findUnique({ where: { userId } })
             : email
                 ? await this.prisma.user.findUnique({ where: { email } })
                 : null;
