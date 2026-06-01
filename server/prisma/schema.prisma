@@ -19,7 +19,7 @@ enum WarrantyType {
 }
 
 model User {
-  user_id         Int       @id @default(autoincrement())
+  userId         Int       @id @default(autoincrement())
   userName        String
   email           String    @unique
   password        String
@@ -30,7 +30,7 @@ model User {
 }
 
 model Card {
-  card_id        Int          @id @default(autoincrement())
+  cardId        Int          @id @default(autoincrement())
   productName    String
   brand          String
   category       String
@@ -44,16 +44,16 @@ model Card {
   imageUri       String? // banner image
   isActive       Boolean      @default(true)
 
-  user    User @relation(fields: [user_id], references: [user_id])
-  user_id Int
+  user    User @relation(fields: [userId], references: [userId])
+  userId Int
 
   images Image[]
 }
 
 model Image {
-  image_id Int    @id @default(autoincrement())
+  imageId Int    @id @default(autoincrement())
   imageUri String
 
-  card    Card @relation(fields: [card_id], references: [card_id])
-  card_id Int
+  card    Card @relation(fields: [cardId], references: [cardId])
+  cardId Int
 }

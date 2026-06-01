@@ -11,6 +11,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { S3Module } from './s3/s3.module';
 import { CardModule } from './card/card.module';
+// import { UserServiceModule } from './user-service/user-service.module';
 
 @Module({
   imports: [UserModule, CardModule, PrismaModule, AuthModule,
