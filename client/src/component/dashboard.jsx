@@ -288,7 +288,7 @@ export default function WarrantyDashboard() {
           purchasePrice: "",
           store: "",
           serialNumber: "",
-          warrantyType: "Limited Warranty",
+          warrantyType: "Limited",
           description: "",
         });
         clearImages();
@@ -483,7 +483,7 @@ export default function WarrantyDashboard() {
           purchasePrice: "",
           store: "",
           serialNumber: "",
-          warrantyType: "Limited Warranty",
+          warrantyType: "Limited",
           description: "",
         });
       } else {
@@ -952,9 +952,9 @@ export default function WarrantyDashboard() {
                       })
                     }
                   >
-                    <option value="Limited Warranty">Limited Warranty</option>
-                    <option value="Extended Warranty">Extended Warranty</option>
-                    <option value="Manufacturer Warranty">
+                    <option value="Limited">Limited Warranty</option>
+                    <option value="Extended">Extended Warranty</option>
+                    <option value="Manufacturer">
                       Manufacturer Warranty
                     </option>
                     <option value="Store Warranty">Store Warranty</option>

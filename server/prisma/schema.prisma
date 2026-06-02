@@ -12,10 +12,10 @@ datasource db {
 }
 
 enum WarrantyType {
-  BRAND
-  STORE
-  EXTENDED
-  OHTER
+  Limited
+  Store
+  Extended
+  Manufacturer
 }
 
 model User {

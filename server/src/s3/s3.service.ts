@@ -24,7 +24,8 @@ export class S3Service {
     });
     this.bucketName = this.configService.get<string>('AWS_S3_BUCKET')!;
   }
-
+  
+  
   // Upload a file
   async uploadFile(file: any, key: string): Promise<string> {
     const command = new PutObjectCommand({
