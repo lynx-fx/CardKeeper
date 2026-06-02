@@ -313,23 +313,6 @@
   margin-top: auto;
 }
 
-.btn-danger {
-  background: #dc3545;
-  color: #111111;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 40px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex: 1;
-  min-width: 0;
-}
-
-.btn-danger:hover {
-  background: #c82333;
-}
-
 .btn-small {
   flex: 1;
   min-width: 0;
@@ -339,6 +322,48 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-small:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-small.btn-primary {
+  background: rgba(163, 255, 18, 0.1);
+  color: #a3ff12;
+  border: 1px solid rgba(163, 255, 18, 0.3);
+}
+
+.btn-small.btn-primary:hover {
+  background: rgba(163, 255, 18, 0.2);
+  border-color: rgba(163, 255, 18, 0.5);
+  box-shadow: 0 0 10px rgba(163, 255, 18, 0.2);
+}
+
+.btn-danger, .btn-small.btn-danger {
+  background: rgba(220, 53, 69, 0.1);
+  color: #ff4d4d;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  padding: 8px 12px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-danger:hover, .btn-small.btn-danger:hover {
+  background: rgba(220, 53, 69, 0.2);
+  border-color: rgba(220, 53, 69, 0.5);
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.2);
 }
 
 .modal-overlay {

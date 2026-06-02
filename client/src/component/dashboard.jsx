@@ -317,8 +317,8 @@ export default function WarrantyDashboard() {
           method: "GET",
           headers: {
             "content-type": "application/json",
+            Authorization: `Bearer ${Cookies.get("token")}`,
           },
-          
         }
       );
       setIsLoading(false);
@@ -716,17 +716,19 @@ export default function WarrantyDashboard() {
                       <div className="warranty-image">
                         {warranty.placeholderImage ? (
                           <img
-                            src={`${VITE_HOST}/images/${warranty.placeholderImage}`}
+                            src={`${warranty.placeholderImage}`}
                             alt={`${warranty.productName} warranty`}
                             className="warranty-thumbnail"
                             onError={(e) => {
-                              e.target.src =
-                                "/placeholder.svg?height=150&width=150";
+                              if (!e.target.dataset.hasError) {
+                                e.target.dataset.hasError = "true";
+                                e.target.src = "https://placehold.co/150x150/111111/a3b8b0?text=No+Image";
+                              }
                             }}
                           />
                         ) : (
                           <img
-                            src="/placeholder.svg?height=150&width=150"
+                            src="https://placehold.co/150x150/111111/a3b8b0?text=No+Image"
                             alt={`${warranty.productName} placeholder`}
                             className="warranty-thumbnail"
                           />
@@ -1324,17 +1326,19 @@ export default function WarrantyDashboard() {
                   <div className="main-image">
                     {loadedImages?.images && loadedImages.images.length > 0 ? (
                       <img
-                        src={`${VITE_HOST}/images/${loadedImages.images[selectedImageIndex]?.imageUri}`}
+                        src={`${loadedImages.images[selectedImageIndex]?.imageUri}`}
                         alt={`${selectedWarranty.productName} warranty document`}
                         className="detail-main-image"
                         onError={(e) => {
-                          e.target.src =
-                            "/placeholder.svg?height=400&width=400";
+                          if (!e.target.dataset.hasError) {
+                            e.target.dataset.hasError = "true";
+                            e.target.src = "https://placehold.co/400x400/111111/a3b8b0?text=No+Image";
+                          }
                         }}
                       />
                     ) : (
                       <img
-                        src="/placeholder.svg?height=400&width=400"
+                        src="https://placehold.co/400x400/111111/a3b8b0?text=No+Image"
                         alt={`${selectedWarranty.productName} placeholder`}
                         className="detail-main-image"
                       />
@@ -1349,15 +1353,17 @@ export default function WarrantyDashboard() {
                           className="thumbnail-container"
                         >
                           <img
-                            src={`${VITE_HOST}/images/${imageObj.imageUri}`}
+                            src={`${imageObj.imageUri}`}
                             alt={`Warranty document ${index + 1}`}
                             className={`thumbnail ${
                               index === selectedImageIndex ? "active" : ""
                             }`}
                             onClick={() => setSelectedImageIndex(index)}
                             onError={(e) => {
-                              e.target.src =
-                                "/placeholder.svg?height=80&width=80";
+                              if (!e.target.dataset.hasError) {
+                                e.target.dataset.hasError = "true";
+                                e.target.src = "https://placehold.co/80x80/111111/a3b8b0?text=No+Image";
+                              }
                             }}
                           />
                           <button
