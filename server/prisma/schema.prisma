@@ -40,8 +40,8 @@ model Card {
   store          String
   serialNumber   String
   warrantyType   WarrantyType
-  description    String?
-  imageUri       String? // banner image
+  description    String
+  imageUri       String // banner image
   isActive       Boolean      @default(true)
 
   user    User @relation(fields: [userId], references: [userId])

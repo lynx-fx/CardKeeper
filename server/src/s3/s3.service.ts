@@ -7,6 +7,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@nestjs/config';
+import { Express } from 'express';
 
 @Injectable()
 export class S3Service {
@@ -25,7 +26,7 @@ export class S3Service {
   }
 
   // Upload a file
-  async uploadFile(file: Express.Multer.File, key: string): Promise<string> {
+  async uploadFile(file: any, key: string): Promise<string> {
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
       Key: key,
