@@ -12,6 +12,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { S3Module } from './s3/s3.module';
 import { CardModule } from './card/card.module';
 // import { UserServiceModule } from './user-service/user-service.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [UserModule, CardModule, PrismaModule, AuthModule,
@@ -28,7 +29,7 @@ import { CardModule } from './card/card.module';
         ttl: 400,
         limit: 50
       }
-    ]), S3Module
+    ]), S3Module, ImageModule,
   ],
   controllers: [AppController],
   providers: [AppService, {

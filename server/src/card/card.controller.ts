@@ -22,7 +22,7 @@ export class CardController {
     @Body() createCardDto: CreateCardDto,
     @UploadedFiles() files : any
   ){
-    return this.cardService.create(+req.user.user_id, createCardDto, files);
+    return this.cardService.create(+req.user.userId, createCardDto, files);
   }
 
   @ApiOkResponse({
@@ -31,7 +31,7 @@ export class CardController {
   @Get()
   @UseGuards(JwtGuard)
   findAll(@Request() req) {
-    return this.cardService.findAll(+req.user.user_id);
+    return this.cardService.findAll(+req.user.userId);
   }
 
   @ApiOkResponse({
@@ -40,7 +40,7 @@ export class CardController {
   @Get(':id')
   @UseGuards(JwtGuard)
   findOne(@Request() req, @Param('id') id: string) {
-    return this.cardService.findOne(+req.user.user_id, +id);
+    return this.cardService.findOne(+req.user.userId, +id);
   }
 
   @ApiOkResponse({
@@ -49,7 +49,7 @@ export class CardController {
   @Patch(':id')
   @UseGuards(JwtGuard)
   update(@Request() req,@Param('id') id: string, @Body() updateCardDto: UpdateCardDto) {
-    return this.cardService.update(+req.user.user_id, +id, updateCardDto);
+    return this.cardService.update(+req.user.userId, +id, updateCardDto);
   }
 
   @ApiOkResponse({
@@ -58,6 +58,6 @@ export class CardController {
   @Delete(':id')
   @UseGuards(JwtGuard)
   remove(@Request() req,@Param('id') id: string) {
-    return this.cardService.remove(+req.user.user_id, +id);
+    return this.cardService.remove(+req.user.userId, +id);
   }
 }
