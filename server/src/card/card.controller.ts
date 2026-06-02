@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Request, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Request, Param, Delete, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto, CreateCardResponseDto, DeleteCardResponseDto, GetCardResponseDto, GetCardsResponseDto, UpdateCardResponseDto } from './dto/card.dto';
 import { UpdateCardDto } from './dto/card.dto';
 import { JwtGuard } from '../../guard/jwtVerifyGuard';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('card')
 export class CardController {
@@ -14,8 +15,14 @@ export class CardController {
   })
   @Post()
   @UseGuards(JwtGuard)
-  create(@Request() req, @Body() createCardDto: CreateCardDto){
-    return this.cardService.create(+req.user.user_id, createCardDto);
+  @UseInterceptors(FilesInterceptor('image', 5))
+  @ApiConsumes('multipart/form-data')
+  create(
+    @Request() req,
+    @Body() createCardDto: CreateCardDto,
+    @UploadedFiles() files : any
+  ){
+    return this.cardService.create(+req.user.userId, createCardDto, files);
   }
 
   @ApiOkResponse({
@@ -24,7 +31,7 @@ export class CardController {
   @Get()
   @UseGuards(JwtGuard)
   findAll(@Request() req) {
-    return this.cardService.findAll(+req.user.user_id);
+    return this.cardService.findAll(+req.user.userId);
   }
 
   @ApiOkResponse({
@@ -33,7 +40,7 @@ export class CardController {
   @Get(':id')
   @UseGuards(JwtGuard)
   findOne(@Request() req, @Param('id') id: string) {
-    return this.cardService.findOne(+req.user.user_id, +id);
+    return this.cardService.findOne(+req.user.userId, +id);
   }
 
   @ApiOkResponse({
@@ -42,7 +49,7 @@ export class CardController {
   @Patch(':id')
   @UseGuards(JwtGuard)
   update(@Request() req,@Param('id') id: string, @Body() updateCardDto: UpdateCardDto) {
-    return this.cardService.update(+req.user.user_id, +id, updateCardDto);
+    return this.cardService.update(+req.user.userId, +id, updateCardDto);
   }
 
   @ApiOkResponse({
@@ -51,6 +58,6 @@ export class CardController {
   @Delete(':id')
   @UseGuards(JwtGuard)
   remove(@Request() req,@Param('id') id: string) {
-    return this.cardService.remove(+req.user.user_id, +id);
+    return this.cardService.remove(+req.user.userId, +id);
   }
 }

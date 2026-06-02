@@ -60,12 +60,6 @@ export class CreateCardDto {
     @ApiProperty()
     @IsString()
     description!: string;
-
-    @ApiProperty()
-    @IsString()
-    imageUri!: string;
-
-
 }
 
 export class UpdateCardDto extends PartialType(CreateCardDto){ 
@@ -91,6 +85,8 @@ export class CreateCardResponseDto {
     success!: boolean;
     @ApiProperty()
     message!: string
+    @ApiProperty()
+    card!: CardDto
 }
 
 export class UpdateCardResponseDto {

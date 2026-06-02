@@ -1,28 +1,57 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CardDto, CreateCardDto, CreateCardResponseDto, GetCardResponseDto, GetCardsResponseDto, UpdateCardDto } from './dto/card.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { AUTH_RESPONSE } from '../auth/constants/auth-messages';
-import { User } from '@prisma/client';
+import { Card, User } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
 import { UserService } from '../user-service/user-service.service';
+import { S3Service } from '../s3/s3.service';
 
 
 @Injectable()
 export class CardService {
 
-  constructor(private readonly prisma: PrismaService, private readonly userService: UserService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService,
+    private readonly s3Service: S3Service,
+  ) { }
 
-  async create(user: number, createCardDto: CreateCardDto): Promise<CreateCardResponseDto> {
+  async create(user: number, createCardDto: CreateCardDto, files: any): Promise<CreateCardResponseDto> {
     const existingUser: User = await this.userService.findExistingUser(user);
 
-    await this.prisma.card.create({
-      data: {
-        ...createCardDto,
-        userId: user,
-        isActive: true,
+    const imageUris: string[] = [];
+    if (files?.length > 0) {
+      for (const file of files) {
+        const key = `cards/${existingUser.userId}/${Date.now()}-${file.originalname}`;
+        const url = await this.s3Service.uploadFile(file, key);
+        imageUris.push(url)
       }
-    })
-    return { success: true, message: "Card created" };
+    } else {
+      throw new BadRequestException({ success: false, message: "At least one image must be provided" })
+    }
+
+    const card : Card = await this.prisma.$transaction(async (tx) => {
+      const card = await tx.card.create({
+        data: {
+          ...createCardDto,
+          userId: user,
+          isActive: true,
+          imageUri: imageUris[0] // this is the banner picture so that the whole images dont have to be fetched everytime
+        }
+      });
+
+      await tx.image.createMany({
+        data: imageUris.map((url) => ({ cardId: card.cardId, imageUri: url }))
+      })
+
+      return card
+    });
+
+    return { success: true, message: "Card created", card: {
+      ...card,
+      purchaseDate: card.purchaseDate.toISOString(),
+      warrantyExpiry: card.warrantyExpiry.toISOString(),
+    } };
   }
 
   async findAll(user: number): Promise<GetCardsResponseDto> {
@@ -57,7 +86,7 @@ export class CardService {
     const existingUser: User = await this.userService.findExistingUser(user);
 
     await this.prisma.card.update({
-      where: { cardId },
+      where: { cardId, userId: existingUser.userId },
       data: {
         ...updateCardDto
       }
@@ -73,6 +102,7 @@ export class CardService {
     if (!card) throw new NotFoundException({ success: false, message: "Card not found" });
 
     // delete the images first and then card
+    // to avoid referential integrity violation
     await this.prisma.$transaction([
       this.prisma.image.deleteMany({
         where: { cardId }
