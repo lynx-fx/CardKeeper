@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./../styles/navbar.css";
 import Loading from "./loading.jsx";
+import Cookies from "js-cookie";
 
 export default function Navbar() {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,35 +25,15 @@ const VITE_HOST = import.meta.env.PROD
 
   // Determine navbar content based on current route only
   const isLandingPage = location.pathname === "/";
-  const isAuthPage = ["/login", "/signup", "/forgot-password"].includes(
+  const isAuthPage = ["/login", "/signup"].includes(
     location.pathname
   );
   const isDashboardPage = location.pathname === "/dashboard";
 
   const handleLogout = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${VITE_HOST}/api/auth/logout`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-          toast.success("Logged out successfully");
-          setIsLoading(false);
-          window.location.href = data.redirect;
-      } else {
-        setIsLoading(false);
-        toast.error("Something went wrong.");
-      }
-    } catch (err) {
-      console.log(err);
-    }
+    Cookies.remove("token");
+    toast.success("Logged out successfully");
+    window.location.href = "/";
   };
 
   return (

@@ -38,9 +38,16 @@ const VITE_HOST = import.meta.env.PROD
     setIsValidating(true);
     try {
       const response = await fetch(
-        `${VITE_HOST}/api/auth/validateToken?email=${email}&token=${token}`,
+        `${VITE_HOST}/api/auth/validate-reset-token`,
         {
-          method: "GET",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            code: token,
+          }),
         }
       );
 
@@ -108,14 +115,16 @@ const VITE_HOST = import.meta.env.PROD
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${VITE_HOST}/api/auth/resetPassword?email=${email}`,
+        `${VITE_HOST}/api/auth/reset-password`,
         {
           method: "POST",
           headers: {
             "content-type": "application/json",
           },
           body: JSON.stringify({
-            newPassword: formData.password,
+            new_password: formData.password,
+            email: email,
+            code: token,
           }),
         }
       );
@@ -183,7 +192,7 @@ const VITE_HOST = import.meta.env.PROD
               </div>
 
               <div className="form-actions-vertical">
-                <Link to="/forgot-password" className="btn-primary full-width">
+                <Link to="/login?forgot=true" className="btn-primary full-width">
                   Request New Reset Link
                 </Link>
                 <Link to="/login" className="btn-secondary full-width">

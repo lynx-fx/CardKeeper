@@ -1,0 +1,286 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.split-auth-page {
+  display: flex;
+  min-height: 100vh;
+  background-color: #000;
+  color: #fff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.split-left {
+  flex: 6;
+  background: linear-gradient(145deg, #071f15 0%, #174230 40%, #0a1f18 100%);
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add a glowing orb effect to the background */
+.split-left::before {
+  content: "";
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(46, 139, 87, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+  filter: blur(40px);
+  z-index: 1;
+}
+
+.split-left-content {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+}
+
+.split-left h1 {
+  font-size: 3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.split-left p {
+  color: #a3b8b0;
+  font-size: 1rem;
+  margin-bottom: 3rem;
+  line-height: 1.5;
+}
+
+.split-steps {
+  display: flex;
+  gap: 1rem;
+}
+
+.step-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 12px;
+  flex: 1;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.step-card.active {
+  background: #ffffff;
+  color: #000;
+}
+
+.step-card.active p {
+  color: #000;
+}
+
+.step-number-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.step-card.active .step-number-circle {
+  background: #000;
+  color: #fff;
+}
+
+.step-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.split-right {
+  flex: 4;
+  background-color: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.split-form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.split-form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.split-form-header h2 {
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.split-form-header p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.split-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.split-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.split-form-group label {
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.split-form-group input {
+  background-color: #1a1a1a;
+  border: 1px solid transparent;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.split-form-group input:focus {
+  outline: none;
+  border-color: #333;
+  background-color: #222;
+}
+
+.split-form-group input.error {
+  border-color: #dc3545;
+}
+
+.split-error-message {
+  color: #dc3545;
+  font-size: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+.split-form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.split-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #888;
+  cursor: pointer;
+}
+
+.split-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.split-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.split-btn-submit {
+  background-color: #fff;
+  color: #000;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+.split-btn-submit:active {
+  transform: scale(0.98);
+}
+
+.split-btn-submit:hover {
+  opacity: 0.9;
+}
+
+.split-btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.split-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+@media (max-width: 768px) {
+  .split-auth-page {
+    flex-direction: column;
+  }
+  .split-left {
+    display: none; /* Hide the green graphic section on mobile for cleaner form access */
+  }
+  .split-right {
+    padding: 2rem 1rem;
+  }
+}
+
+/* Modal Styles */
+.split-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.split-modal {
+  background-color: #0a0a0a;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #333;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.split-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.split-modal-close:hover {
+  color: #fff;
+}

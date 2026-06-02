@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Cookies from "js-cookie";
 import Navbar from "./navbar.jsx";
 import Loading from "./loading.jsx";
 import "./../styles/dashboard.css";
@@ -128,15 +129,16 @@ export default function WarrantyDashboard() {
     const formData = new FormData();
 
     files.forEach((file) => {
-      formData.append("img", file);
+      formData.append("image", file);
     });
     formData.append("cardId", selectedWarranty.id);
 
     try {
-      const response = await fetch(`${VITE_HOST}/api/card/addImages`, {
+      const response = await fetch(`${VITE_HOST}/api/image`, {
         method: "POST",
         body: formData,
-        credentials: "include",
+        headers: { Authorization: `Bearer ${Cookies.get("token")}`
+        },
       });
 
       const data = await response.json();
@@ -167,18 +169,18 @@ export default function WarrantyDashboard() {
 
   const handleRemoveDetailImage = async (imageIndex) => {
     const imageId =
-      loadedImages.images[imageIndex]._id || loadedImages.images[imageIndex].id;
+      loadedImages.images[imageIndex].imageId || loadedImages.images[imageIndex].id;
 
     try {
-      const response = await fetch(`${VITE_HOST}/api/card/removeImage`, {
+      const response = await fetch(`${VITE_HOST}/api/image`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          imageId,
+          iamgeIds: [imageId],
         }),
-        credentials: "include",
+        
       });
 
       const data = await response.json();
@@ -248,19 +250,26 @@ export default function WarrantyDashboard() {
 
       // Add warranty data
       Object.keys(newWarranty).forEach((key) => {
-        formData.append(key, newWarranty[key]);
+        let value = newWarranty[key];
+        if (key === "purchasePrice") {
+          value = Number(value.toString().replace(/[^0-9.]/g, ""));
+        } else if (key === "purchaseDate") {
+          value = new Date(value).toISOString();
+        }
+        formData.append(key, value);
       });
-      formData.append("warrantyExpiry", warrantyExpiry);
+      formData.append("warrantyExpiry", warrantyExpiry.toISOString());
 
       // Add images
       selectedImages.forEach((image) => {
-        formData.append("img", image);
+        formData.append("image", image);
       });
 
-      const response = await fetch(`${VITE_HOST}/api/card/createCard`, {
+      const response = await fetch(`${VITE_HOST}/api/card`, {
         method: "POST",
         body: formData,
-        credentials: "include",
+        headers: { Authorization: `Bearer ${Cookies.get("token")}`
+        },
       });
 
       const data = await response.json();
@@ -303,13 +312,13 @@ export default function WarrantyDashboard() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${VITE_HOST}/api/card/getImages?cardId=${selectedWarranty.id}`,
+        `${VITE_HOST}/api/image/${selectedWarranty.id}`,
         {
           method: "GET",
           headers: {
             "content-type": "application/json",
           },
-          credentials: "include",
+          
         }
       );
       setIsLoading(false);
@@ -333,12 +342,13 @@ export default function WarrantyDashboard() {
   const loadCards = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${VITE_HOST}/api/card/getCard`, {
+      const response = await fetch(`${VITE_HOST}/api/card`, {
         method: "GET",
         headers: {
           "content-type": "application/json",
+          Authorization: `Bearer ${Cookies.get("token")}`
         },
-        credentials: "include",
+        
       });
       setIsLoading(false);
 
@@ -346,7 +356,7 @@ export default function WarrantyDashboard() {
       if (response.ok && data.success) {
         const formattedWarranties = data.cards
           .map((card) => ({
-            id: card._id,
+            id: card.cardId,
             productName: card.productName,
             brand: card.brand,
             purchaseDate: card.purchaseDate.split("T")[0],
@@ -368,9 +378,9 @@ export default function WarrantyDashboard() {
 
         setWarranties((prev) => [...prev, ...formattedWarranties]);
       } else {
-        setTimeout(() => {
-          toast.error(data.message || "Something went wrong");
-        }, 3000);
+        // setTimeout(() => {
+        //   toast.error(data.message || "Something went wrong");
+        // }, 3000);
       }
     } catch (err) {
       toast.error("Something went wrong.");
@@ -434,25 +444,25 @@ export default function WarrantyDashboard() {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`${VITE_HOST}/api/card/updateCard`, {
-        method: "PUT",
+      const response = await fetch(`${VITE_HOST}/api/card/${editingWarranty.id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("token")}`
         },
         body: JSON.stringify({
           productName: warrantyData.productName,
           brand: warrantyData.brand,
-          purchaseDate: warrantyData.purchaseDate,
-          warrantyExpiry: warrantyData.warrantyExpiry,
+          purchaseDate: new Date(warrantyData.purchaseDate).toISOString(),
+          warrantyExpiry: warrantyExpiry.toISOString(),
           category: warrantyData.category,
-          purchasePrice: warrantyData.purchasePrice,
+          purchasePrice: Number(warrantyData.purchasePrice.toString().replace(/[^0-9.]/g, "")),
           store: warrantyData.store,
           serialNumber: warrantyData.serialNumber,
           warrantyType: warrantyData.warrantyType,
           description: warrantyData.description,
-          cardId: editingWarranty.id,
         }),
-        credentials: "include",
+        
       });
 
       const data = await response.json();
@@ -489,15 +499,13 @@ export default function WarrantyDashboard() {
   const handleConfirmDelete = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${VITE_HOST}/api/card/deleteCard`, {
+      const response = await fetch(`${VITE_HOST}/api/card/${deletingWarranty.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("token")}`
         },
-        credentials: "include",
-        body: JSON.stringify({
-          cardId: deletingWarranty.id,
-        }),
+        
       });
 
       const data = await response.json();
@@ -567,6 +575,7 @@ export default function WarrantyDashboard() {
         <Navbar />
 
         <main className="dashboard-main">
+          <div className="dashboard-glow"></div>
           <div className="container">
             <div className="dashboard-header-section">
               <div className="dashboard-title">
@@ -583,14 +592,14 @@ export default function WarrantyDashboard() {
 
             <div className="dashboard-stats">
               <div className="stat-card">
-                <div className="stat-icon">📋</div>
+                <div className="stat-icon">▰</div>
                 <div className="stat-content">
                   <h3>{warranties.length}</h3>
                   <p>Total Warranties</p>
                 </div>
               </div>
               <div className="stat-card">
-                <div className="stat-icon">✅</div>
+                <div className="stat-icon">●</div>
                 <div className="stat-content">
                   <h3>
                     {
@@ -603,7 +612,7 @@ export default function WarrantyDashboard() {
                 </div>
               </div>
               <div className="stat-card">
-                <div className="stat-icon">⚠️</div>
+                <div className="stat-icon">◐</div>
                 <div className="stat-content">
                   <h3>
                     {
@@ -617,7 +626,7 @@ export default function WarrantyDashboard() {
                 </div>
               </div>
               <div className="stat-card">
-                <div className="stat-icon">❌</div>
+                <div className="stat-icon">○</div>
                 <div className="stat-content">
                   <h3>
                     {
@@ -1336,7 +1345,7 @@ export default function WarrantyDashboard() {
                     <div className="image-thumbnails">
                       {loadedImages.images.map((imageObj, index) => (
                         <div
-                          key={imageObj._id || index}
+                          key={imageObj.imageId || index}
                           className="thumbnail-container"
                         >
                           <img

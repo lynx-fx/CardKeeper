@@ -2,6 +2,7 @@ import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { WarrantyType } from "@prisma/client";
 import { Transform } from "class-transformer";
 import { IsBoolean, IsDate, IsDateString, IsEmail, IsNumber, IsString, IsStrongPassword } from "class-validator";
+import { Type } from "class-transformer";
 
 
 export class CardDto {
@@ -18,6 +19,7 @@ export class CardDto {
     warrantyType!: WarrantyType;
     description!: string;
     imageUri!: string;
+    images?: any[];
 }
 
 export class CreateCardDto {
@@ -43,6 +45,7 @@ export class CreateCardDto {
 
     @ApiProperty()
     @IsNumber()
+    @Type(() => Number)
     purchasePrice!: number;
 
     @ApiProperty()

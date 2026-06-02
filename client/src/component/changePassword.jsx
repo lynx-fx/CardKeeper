@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Navbar from "./navbar.jsx";
@@ -78,15 +79,16 @@ export default function ChangePassword() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${VITE_HOST}/api/auth/changePassword`, {
+      const response = await fetch(`${VITE_HOST}/api/auth/change-password`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
+          Authorization: `Bearer ${Cookies.get("token")}`
         },
-        credentials: "include",
+        
         body: JSON.stringify({
-          newPassword: formData.newPassword,
-          oldPassword: formData.currentPassword,
+          new_password: formData.newPassword,
+          old_password: formData.currentPassword,
         }),
       });
 
@@ -249,7 +251,7 @@ export default function ChangePassword() {
                   className="btn-primary"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Changing Password..." : "Change Password"}
+                  {isLoading ? "Changing..." : "Change"}
                 </button>
               </div>
             </form>

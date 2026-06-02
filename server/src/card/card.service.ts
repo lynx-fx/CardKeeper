@@ -71,7 +71,10 @@ export class CardService {
   async findOne(user: number, cardId: number): Promise<GetCardResponseDto> {
     const existingUser: User = await this.userService.findExistingUser(user);
 
-    const card = await this.prisma.card.findUnique({ where: { cardId } });
+    const card = await this.prisma.card.findUnique({
+      where: { cardId },
+      include: { images: true }
+    });
 
     if (!card) {
       throw new NotFoundException({ success: false, message: "Card details not fonud" })

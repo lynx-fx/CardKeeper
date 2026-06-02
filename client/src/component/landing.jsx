@@ -1,147 +1,215 @@
-"use client";
-
 import { Link } from "react-router-dom";
-import Navbar from "./navbar.jsx";
 import "./../styles/landing.css";
-import { useEffect } from "react";
 
 export default function Landing() {
-  const VITE_HOST = import.meta.env.PROD
-    ? import.meta.env.VITE_BACKEND_HOSTED
-    : import.meta.env.VITE_BACKEND_LOCAL;
-
-  // waking up the server
-  useEffect(() => {
-    fetch(`${VITE_HOST}/ping`).catch(console.error);
-  }, []);
-
   return (
     <div className="landing">
-      <Navbar />
+      {/* Bespoke Header */}
+      <nav className="astra-nav">
+        <Link to="/" className="astra-logo">
+          <span className="astra-logo-icon">▰</span> CardKeeper
+        </Link>
+        <div className="astra-nav-links">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it Works</a>
+          <a href="#testimonials">Testimonials</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div className="astra-nav-buttons">
+          <Link to="/login" className="btn-astra-dark">Log In</Link>
+          <Link to="/signup" className="btn-astra-neon">Get Started</Link>
+        </div>
+      </nav>
 
-      <section className="hero">
-        <div className="container">
-          <div className="hero-content">
-            <h1>Never Lose a Warranty Again</h1>
-            <p>
-              Store, organize, and track all your warranty cards in one secure
-              digital place. Get reminders before they expire and access them
-              anywhere, anytime.
+      {/* Hero Section */}
+      <section className="astra-hero">
+        <div className="astra-hero-box">
+          <div className="astra-hero-glow"></div>
+          
+          {/* Abstract floating elements */}
+          <div className="astra-float-card card-1">
+            <div className="card-header"></div>
+            <div className="card-body"></div>
+          </div>
+          <div className="astra-float-card card-2">
+            <div className="card-badge"></div>
+          </div>
+          
+          <div className="astra-hero-content-wrapper">
+            <div className="astra-hero-tag">
+              <span className="pulse-dot"></span> Smart Warranty Management
+            </div>
+            <h1 className="astra-hero-title">
+              Never Lose a <span className="text-gradient">Warranty</span> Again
+            </h1>
+            <p className="astra-hero-subtitle">
+              Store, organize, and track all your warranty cards in one secure digital place. 
+              Get reminders before they expire, completely eliminating the friction of traditional paper storage.
             </p>
-            <div className="hero-buttons">
-              <Link to="/signup" className="btn-primary">
-                Get Started Free
-              </Link>
-              <button className="btn-secondary">Watch Demo</button>
+            <div className="astra-hero-actions">
+              <Link to="/signup" className="btn-astra-neon-large">Get Started Free <span>›</span></Link>
+              <a href="#how-it-works" className="btn-astra-glass-large">See How it Works</a>
             </div>
-          </div>
-          <div className="hero-image">
-            <img
-              src="warranty-blog-header.png"
-              alt="Warranty management dashboard"
-            />
+            
+            <div className="astra-hero-social-proof">
+              <div className="avatars">
+                <img src="https://i.pravatar.cc/100?img=1" alt="user" />
+                <img src="https://i.pravatar.cc/100?img=2" alt="user" />
+                <img src="https://i.pravatar.cc/100?img=3" alt="user" />
+                <img src="https://i.pravatar.cc/100?img=4" alt="user" />
+                <div className="avatar-more">10k+</div>
+              </div>
+              <span>Trusted by thousands of users worldwide</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="features" className="features">
-        <div className="container">
+      {/* Client Logos (Optional / Aesthetic) */}
+      <section className="astra-logos">
+        <span>Samsung</span>
+        <span>LG</span>
+        <span>Apple</span>
+        <span>Sony</span>
+        <span>Canon</span>
+        <span>Bose</span>
+      </section>
+
+      {/* Stats Section */}
+      <section className="astra-stats">
+        <div className="astra-stat-item">
+          <h3>1M+</h3>
+          <p>Warranties Tracked</p>
+        </div>
+        <div className="astra-stat-item">
+          <h3>$5M+</h3>
+          <p>Saved for Users</p>
+        </div>
+        <div className="astra-stat-item">
+          <h3>99.9%</h3>
+          <p>Uptime Guaranteed</p>
+        </div>
+      </section>
+
+      {/* Feature Split Section */}
+      <section id="features" className="astra-feature">
+        <div className="astra-feature-content">
+          <span className="accent">The warranty first platform</span>
           <h2>Why Choose CardKeeper?</h2>
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">📱</div>
-              <h3>Digital Storage</h3>
-              <p>
-                Scan and store warranty cards digitally. No more lost papers or
-                forgotten receipts.
-              </p>
+          <p>
+            Scan and store warranty cards digitally. No more lost papers or forgotten receipts. 
+            Outcome focused organization that ensures you always have the details you need when making a claim.
+          </p>
+          
+          <div className="astra-pill-list">
+            <div className="astra-pill-item active">
+              <span>Smart Reminders</span>
+              <span>›</span>
             </div>
-            <div className="feature-card">
-              <div className="feature-icon">🔔</div>
-              <h3>Smart Reminders</h3>
-              <p>
-                Get notified before your warranties expire so you never miss a
-                claim opportunity.
-              </p>
+            <div className="astra-pill-item">
+              <span>Secure & Private</span>
+              <span>›</span>
             </div>
-            <div className="feature-card">
-              <div className="feature-icon">🔒</div>
-              <h3>Secure & Private</h3>
-              <p>
-                Your warranty information is encrypted and stored securely in
-                the cloud.
-              </p>
+            <div className="astra-pill-item">
+              <span>Easy Organization</span>
+              <span>›</span>
             </div>
-            <div className="feature-card">
-              <div className="feature-icon">📊</div>
-              <h3>Easy Organization</h3>
-              <p>
-                Categorize by product type, purchase date, or warranty status
-                for quick access.
-              </p>
-            </div>
+          </div>
+        </div>
+        
+        <div className="astra-feature-graphic">
+          <div className="astra-floating-element">
+            <i>↻</i>
           </div>
         </div>
       </section>
 
-      <section id="how-it-works" className="how-it-works">
-        <div className="container">
-          <h2>How It Works</h2>
-          <div className="steps">
-            <div className="step">
-              <div className="step-number">1</div>
-              <h3>Add Your Warranties</h3>
-              <p>
-                Upload photos of warranty cards or manually enter warranty
-                details
-              </p>
-            </div>
-            <div className="step">
-              <div className="step-number">2</div>
-              <h3>Organize & Categorize</h3>
-              <p>Sort warranties by product type, store, or expiration date</p>
-            </div>
-            <div className="step">
-              <div className="step-number">3</div>
-              <h3>Get Reminders</h3>
-              <p>Receive notifications before warranties expire</p>
-            </div>
-            <div className="step">
-              <div className="step-number">4</div>
-              <h3>Make Claims</h3>
-              <p>
-                Access warranty details instantly when you need to make a claim
-              </p>
-            </div>
+      {/* Centered Feature Section */}
+      <section id="how-it-works" className="astra-centered-feature">
+        <h2>Faster. Smarter. Organized.</h2>
+        <p>
+          Follow these simple steps to never miss a claim opportunity. 
+          Use our intelligent organization tools, lower your mental friction, and facilitate seamless tracking.
+        </p>
+
+        <div className="astra-large-card">
+          <div className="astra-large-card-content">
+            <h3>Optimized for claims</h3>
+            <p>
+              Designed with a focus on reliability, the system employs robust organization protocols, 
+              regular expiration updates, and advanced reminders to ensure you never miss a warranty deadline.
+            </p>
+            <Link to="/signup" className="btn-astra-dark">Learn More <span>›</span></Link>
+          </div>
+          <div className="astra-large-card-graphic">
+            <div className="astra-graphic-panel"></div>
+            <div className="astra-small-float">▰</div>
           </div>
         </div>
       </section>
 
-      <footer id="contact" className="footer">
-        <div className="container">
-          <div className="footer-content">
-            <div className="footer-section">
-              <h3>CardKeeper</h3>
-              <p>Your digital warranty management solution</p>
-            </div>
-            <div className="footer-section">
-              <h4>Contact</h4>
-              <p>support@CardKeeper.com</p>
-              {/* <p>1-800-WARRANTY</p> */}
-            </div>
-            <div className="footer-section">
-              <h4>Legal</h4>
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
-            </div>
-            <div className="footer-section">
-              <h4>Location</h4>
-              <a href="#">Nepal</a>
+      {/* Testimonials Section
+      <section id="testimonials" className="astra-testimonials">
+        <h2>Loved by thousands of users</h2>
+        <div className="astra-testimonial-grid">
+          <div className="astra-testimonial-card">
+            <div className="astra-quote">"CardKeeper completely changed how I manage my electronics. I no longer have a drawer full of fading receipts. When my monitor broke, I had the warranty info in 3 seconds."</div>
+            <div className="astra-author">
+              <div className="astra-avatar">SJ</div>
+              <div className="astra-author-info">
+                <strong>Sarah Jenkins</strong>
+                <span>Tech Enthusiast</span>
+              </div>
             </div>
           </div>
-          <div className="footer-bottom">
-            <p>&copy; 2024 CardKeeper. All rights reserved.</p>
+          <div className="astra-testimonial-card">
+            <div className="astra-quote">"I run a small business and tracking warranties for our equipment used to be a nightmare. CardKeeper's reminders mean we never miss a claim window anymore."</div>
+            <div className="astra-author">
+              <div className="astra-avatar">MR</div>
+              <div className="astra-author-info">
+                <strong>Mark Robinson</strong>
+                <span>Studio Owner</span>
+              </div>
+            </div>
           </div>
+          <div className="astra-testimonial-card">
+            <div className="astra-quote">"The UI is gorgeous and it just works. I scanned all my home appliance warranties in one afternoon and now I have total peace of mind."</div>
+            <div className="astra-author">
+              <div className="astra-avatar">AL</div>
+              <div className="astra-author-info">
+                <strong>Amanda Lee</strong>
+                <span>Homeowner</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section> */}
+
+      {/* Footer */}
+      <footer id="contact" className="astra-footer">
+        <div className="astra-footer-brand">
+          <Link to="/" className="astra-logo">
+            <span className="astra-logo-icon">▰</span> CardKeeper
+          </Link>
+          <p>Your digital warranty vault. Keep track of purchases, expiration dates, and get reminders when it matters.</p>
+        </div>
+        <div className="astra-footer-section">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#integrations">Integrations</a>
+        </div>
+        <div className="astra-footer-section">
+          <h4>Resources</h4>
+          <a href="#help">Help Center</a>
+          <a href="#guides">Guides</a>
+          <a href="#api">API Status</a>
+        </div>
+        <div className="astra-footer-section">
+          <h4>Legal</h4>
+          <a href="#privacy">Privacy Policy</a>
+          <a href="#terms">Terms of Service</a>
+          <a href="#contact">Contact Us</a>
         </div>
       </footer>
     </div>

@@ -39,11 +39,11 @@ body {
 
 /* Enhanced button animations with mobile optimization */
 .btn-primary {
-  background: #007bff;
-  color: white;
+  background: #a3ff12;
+  color: #000;
   border: none;
   padding: 12px 24px;
-  border-radius: 6px;
+  border-radius: 40px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -75,23 +75,23 @@ body {
 }
 
 .btn-primary:hover {
-  background: #0056b3;
+  background: #b5ff3a;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(163, 255, 18, 0.2);
   text-decoration: none;
 }
 
 .btn-primary:active {
   transform: translateY(0);
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .btn-secondary {
   background: transparent;
-  color: #007bff;
-  border: 2px solid #007bff;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 10px 22px;
-  border-radius: 6px;
+  border-radius: 40px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -114,7 +114,7 @@ body {
   left: 0;
   width: 0;
   height: 100%;
-  background: #007bff;
+  background: rgba(255, 255, 255, 0.1);
   transition: width 0.3s ease;
   z-index: -1;
 }
@@ -126,7 +126,7 @@ body {
 .btn-secondary:hover {
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.2);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   text-decoration: none;
 }
 
@@ -307,13 +307,13 @@ textarea:focus {
 
 @keyframes focusPulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   }
 }
 
