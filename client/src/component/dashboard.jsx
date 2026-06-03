@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Cookies from "js-cookie";
 import Navbar from "./navbar.jsx";
 import Loading from "./loading.jsx";
 import "./../styles/dashboard.css";
@@ -38,6 +39,8 @@ export default function WarrantyDashboard() {
   const VITE_HOST = import.meta.env.PROD
     ? import.meta.env.VITE_BACKEND_HOSTED
     : import.meta.env.VITE_BACKEND_LOCAL;
+
+  const BASE_IMAGE = import.meta.env.VITE_S3_BASE_URL;
   const MAX_IMAGES = 5;
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -68,7 +71,7 @@ export default function WarrantyDashboard() {
   const handleImageSelect = (event, isDetailModal = false) => {
     const files = Array.from(event.target.files);
     const currentImages = isDetailModal
-      ? selectedWarranty?.images?.length || 0
+      ? loadedImages?.images?.length || 0
       : selectedImages.length;
 
     if (currentImages + files.length > MAX_IMAGES) {
@@ -128,15 +131,16 @@ export default function WarrantyDashboard() {
     const formData = new FormData();
 
     files.forEach((file) => {
-      formData.append("img", file);
+      formData.append("image", file);
     });
     formData.append("cardId", selectedWarranty.id);
 
     try {
-      const response = await fetch(`${VITE_HOST}/api/card/addImages`, {
+      const response = await fetch(`${VITE_HOST}/api/image`, {
         method: "POST",
         body: formData,
-        credentials: "include",
+        headers: { Authorization: `Bearer ${Cookies.get("token")}`
+        },
       });
 
       const data = await response.json();
@@ -167,18 +171,18 @@ export default function WarrantyDashboard() {
 
   const handleRemoveDetailImage = async (imageIndex) => {
     const imageId =
-      loadedImages.images[imageIndex]._id || loadedImages.images[imageIndex].id;
+      loadedImages.images[imageIndex].imageId || loadedImages.images[imageIndex].id;
 
     try {
-      const response = await fetch(`${VITE_HOST}/api/card/removeImage`, {
+      const response = await fetch(`${VITE_HOST}/api/image`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          imageId,
+          iamgeIds: [imageId],
         }),
-        credentials: "include",
+        
       });
 
       const data = await response.json();
@@ -248,19 +252,26 @@ export default function WarrantyDashboard() {
 
       // Add warranty data
       Object.keys(newWarranty).forEach((key) => {
-        formData.append(key, newWarranty[key]);
+        let value = newWarranty[key];
+        if (key === "purchasePrice") {
+          value = Number(value.toString().replace(/[^0-9.]/g, ""));
+        } else if (key === "purchaseDate") {
+          value = new Date(value).toISOString();
+        }
+        formData.append(key, value);
       });
-      formData.append("warrantyExpiry", warrantyExpiry);
+      formData.append("warrantyExpiry", warrantyExpiry.toISOString());
 
       // Add images
       selectedImages.forEach((image) => {
-        formData.append("img", image);
+        formData.append("image", image);
       });
 
-      const response = await fetch(`${VITE_HOST}/api/card/createCard`, {
+      const response = await fetch(`${VITE_HOST}/api/card`, {
         method: "POST",
         body: formData,
-        credentials: "include",
+        headers: { Authorization: `Bearer ${Cookies.get("token")}`
+        },
       });
 
       const data = await response.json();
@@ -279,7 +290,7 @@ export default function WarrantyDashboard() {
           purchasePrice: "",
           store: "",
           serialNumber: "",
-          warrantyType: "Limited Warranty",
+          warrantyType: "Limited",
           description: "",
         });
         clearImages();
@@ -303,13 +314,13 @@ export default function WarrantyDashboard() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${VITE_HOST}/api/card/getImages?cardId=${selectedWarranty.id}`,
+        `${VITE_HOST}/api/image/${selectedWarranty.id}`,
         {
           method: "GET",
           headers: {
             "content-type": "application/json",
+            Authorization: `Bearer ${Cookies.get("token")}`,
           },
-          credentials: "include",
         }
       );
       setIsLoading(false);
@@ -333,12 +344,13 @@ export default function WarrantyDashboard() {
   const loadCards = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${VITE_HOST}/api/card/getCard`, {
+      const response = await fetch(`${VITE_HOST}/api/card`, {
         method: "GET",
         headers: {
           "content-type": "application/json",
+          Authorization: `Bearer ${Cookies.get("token")}`
         },
-        credentials: "include",
+        
       });
       setIsLoading(false);
 
@@ -346,7 +358,7 @@ export default function WarrantyDashboard() {
       if (response.ok && data.success) {
         const formattedWarranties = data.cards
           .map((card) => ({
-            id: card._id,
+            id: card.cardId,
             productName: card.productName,
             brand: card.brand,
             purchaseDate: card.purchaseDate.split("T")[0],
@@ -362,15 +374,15 @@ export default function WarrantyDashboard() {
             warrantyType: card.warrantyType,
             description: card.description,
             isActive: card.isActive,
-            placeholderImage: card.imageUri || "default.png",
+            placeholderImage: `${BASE_IMAGE}${card.imageUri}` || "default.png",
           }))
           .filter((warranty) => warranty.isActive);
 
         setWarranties((prev) => [...prev, ...formattedWarranties]);
       } else {
-        setTimeout(() => {
-          toast.error(data.message || "Something went wrong");
-        }, 3000);
+        // setTimeout(() => {
+        //   toast.error(data.message || "Something went wrong");
+        // }, 3000);
       }
     } catch (err) {
       toast.error("Something went wrong.");
@@ -434,25 +446,25 @@ export default function WarrantyDashboard() {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`${VITE_HOST}/api/card/updateCard`, {
-        method: "PUT",
+      const response = await fetch(`${VITE_HOST}/api/card/${editingWarranty.id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("token")}`
         },
         body: JSON.stringify({
           productName: warrantyData.productName,
           brand: warrantyData.brand,
-          purchaseDate: warrantyData.purchaseDate,
-          warrantyExpiry: warrantyData.warrantyExpiry,
+          purchaseDate: new Date(warrantyData.purchaseDate).toISOString(),
+          warrantyExpiry: warrantyExpiry.toISOString(),
           category: warrantyData.category,
-          purchasePrice: warrantyData.purchasePrice,
+          purchasePrice: Number(warrantyData.purchasePrice.toString().replace(/[^0-9.]/g, "")),
           store: warrantyData.store,
           serialNumber: warrantyData.serialNumber,
-          warrantyType: warrantyData.warrantyType,
+          WarrantyType: warrantyData.warrantyType,
           description: warrantyData.description,
-          cardId: editingWarranty.id,
         }),
-        credentials: "include",
+        
       });
 
       const data = await response.json();
@@ -473,7 +485,7 @@ export default function WarrantyDashboard() {
           purchasePrice: "",
           store: "",
           serialNumber: "",
-          warrantyType: "Limited Warranty",
+          warrantyType: "Limited",
           description: "",
         });
       } else {
@@ -489,15 +501,13 @@ export default function WarrantyDashboard() {
   const handleConfirmDelete = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${VITE_HOST}/api/card/deleteCard`, {
+      const response = await fetch(`${VITE_HOST}/api/card/${deletingWarranty.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("token")}`
         },
-        credentials: "include",
-        body: JSON.stringify({
-          cardId: deletingWarranty.id,
-        }),
+        
       });
 
       const data = await response.json();
@@ -518,6 +528,7 @@ export default function WarrantyDashboard() {
       setIsLoading(false);
     }
   };
+
 
   const getStatusColor = (expiry) => {
     const today = new Date();
@@ -567,6 +578,7 @@ export default function WarrantyDashboard() {
         <Navbar />
 
         <main className="dashboard-main">
+          <div className="dashboard-glow"></div>
           <div className="container">
             <div className="dashboard-header-section">
               <div className="dashboard-title">
@@ -583,14 +595,14 @@ export default function WarrantyDashboard() {
 
             <div className="dashboard-stats">
               <div className="stat-card">
-                <div className="stat-icon">📋</div>
+                <div className="stat-icon">▰</div>
                 <div className="stat-content">
                   <h3>{warranties.length}</h3>
                   <p>Total Warranties</p>
                 </div>
               </div>
               <div className="stat-card">
-                <div className="stat-icon">✅</div>
+                <div className="stat-icon">●</div>
                 <div className="stat-content">
                   <h3>
                     {
@@ -603,7 +615,7 @@ export default function WarrantyDashboard() {
                 </div>
               </div>
               <div className="stat-card">
-                <div className="stat-icon">⚠️</div>
+                <div className="stat-icon">◐</div>
                 <div className="stat-content">
                   <h3>
                     {
@@ -617,7 +629,7 @@ export default function WarrantyDashboard() {
                 </div>
               </div>
               <div className="stat-card">
-                <div className="stat-icon">❌</div>
+                <div className="stat-icon">○</div>
                 <div className="stat-content">
                   <h3>
                     {
@@ -707,17 +719,19 @@ export default function WarrantyDashboard() {
                       <div className="warranty-image">
                         {warranty.placeholderImage ? (
                           <img
-                            src={`${VITE_HOST}/images/${warranty.placeholderImage}`}
+                            src={`${warranty.placeholderImage}`}
                             alt={`${warranty.productName} warranty`}
                             className="warranty-thumbnail"
                             onError={(e) => {
-                              e.target.src =
-                                "/placeholder.svg?height=150&width=150";
+                              if (!e.target.dataset.hasError) {
+                                e.target.dataset.hasError = "true";
+                                e.target.src = "https://placehold.co/150x150/111111/a3b8b0?text=No+Image";
+                              }
                             }}
                           />
                         ) : (
                           <img
-                            src="/placeholder.svg?height=150&width=150"
+                            src="https://placehold.co/150x150/111111/a3b8b0?text=No+Image"
                             alt={`${warranty.productName} placeholder`}
                             className="warranty-thumbnail"
                           />
@@ -762,7 +776,7 @@ export default function WarrantyDashboard() {
                           View Details
                         </button>
                         <button
-                          className="btn-small"
+                          className="btn-small btn-light"
                           onClick={() => handleEditWarranty(warranty)}
                         >
                           Edit
@@ -943,9 +957,9 @@ export default function WarrantyDashboard() {
                       })
                     }
                   >
-                    <option value="Limited Warranty">Limited Warranty</option>
-                    <option value="Extended Warranty">Extended Warranty</option>
-                    <option value="Manufacturer Warranty">
+                    <option value="Limited">Limited Warranty</option>
+                    <option value="Extended">Extended Warranty</option>
+                    <option value="Manufacturer">
                       Manufacturer Warranty
                     </option>
                     <option value="Store Warranty">Store Warranty</option>
@@ -1315,17 +1329,19 @@ export default function WarrantyDashboard() {
                   <div className="main-image">
                     {loadedImages?.images && loadedImages.images.length > 0 ? (
                       <img
-                        src={`${VITE_HOST}/images/${loadedImages.images[selectedImageIndex]?.imageUri}`}
+                        src={`${BASE_IMAGE}${loadedImages.images[selectedImageIndex]?.imageUri}`}
                         alt={`${selectedWarranty.productName} warranty document`}
                         className="detail-main-image"
                         onError={(e) => {
-                          e.target.src =
-                            "/placeholder.svg?height=400&width=400";
+                          if (!e.target.dataset.hasError) {
+                            e.target.dataset.hasError = "true";
+                            e.target.src = "https://placehold.co/400x400/111111/a3b8b0?text=No+Image";
+                          }
                         }}
                       />
                     ) : (
                       <img
-                        src="/placeholder.svg?height=400&width=400"
+                        src="https://placehold.co/400x400/111111/a3b8b0?text=No+Image"
                         alt={`${selectedWarranty.productName} placeholder`}
                         className="detail-main-image"
                       />
@@ -1336,19 +1352,21 @@ export default function WarrantyDashboard() {
                     <div className="image-thumbnails">
                       {loadedImages.images.map((imageObj, index) => (
                         <div
-                          key={imageObj._id || index}
+                          key={imageObj.imageId || index}
                           className="thumbnail-container"
                         >
                           <img
-                            src={`${VITE_HOST}/images/${imageObj.imageUri}`}
+                            src={`${BASE_IMAGE}${imageObj.imageUri}`}
                             alt={`Warranty document ${index + 1}`}
                             className={`thumbnail ${
                               index === selectedImageIndex ? "active" : ""
                             }`}
                             onClick={() => setSelectedImageIndex(index)}
                             onError={(e) => {
-                              e.target.src =
-                                "/placeholder.svg?height=80&width=80";
+                              if (!e.target.dataset.hasError) {
+                                e.target.dataset.hasError = "true";
+                                e.target.src = "https://placehold.co/80x80/111111/a3b8b0?text=No+Image";
+                              }
                             }}
                           />
                           <button
@@ -1473,7 +1491,6 @@ export default function WarrantyDashboard() {
                     >
                       Edit
                     </button>
-                    <button className="btn-secondary">Download PDF</button>
                     <button
                       className="btn-danger"
                       onClick={() => handleDeleteWarranty(selectedWarranty)}

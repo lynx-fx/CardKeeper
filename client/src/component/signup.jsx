@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Navbar from "./navbar.jsx";
 import Loading from "./loading.jsx";
-import "./../styles/auth.css";
+import "./../styles/split-auth.css";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -77,9 +78,9 @@ const VITE_HOST = import.meta.env.PROD
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${VITE_HOST}/api/auth/signup`, {
+      const response = await fetch(`${VITE_HOST}/api/auth/register`, {
         method: "POST",
-        // credentials: "include",
+        // 
         headers: {
           "Content-Type": "application/json",
         },
@@ -123,18 +124,41 @@ const VITE_HOST = import.meta.env.PROD
     <>
       {isLoading && <Loading />}
 
-      <div className="auth-page">
-        <Navbar />
+      <div className="split-auth-page">
+        {/* Left Side Graphics */}
+        <div className="split-left">
+          <div className="split-left-content">
+            <h1>Get Started<br/>with Us</h1>
+            <p>
+              Complete these easy steps to register your account and never lose a warranty again.
+            </p>
+            <div className="split-steps">
+              <div className="step-card active">
+                <div className="step-number-circle">1</div>
+                <div className="step-title">Sign up your account</div>
+              </div>
+              <div className="step-card">
+                <div className="step-number-circle">2</div>
+                <div className="step-title">Set up your workspace</div>
+              </div>
+              <div className="step-card">
+                <div className="step-number-circle">3</div>
+                <div className="step-title">Set up your profile</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <div className="auth-container">
-          <div className="auth-card">
-            <div className="auth-header">
-              <h1>Create Account</h1>
-              <p>Join WarrantyKeeper and never lose a warranty again</p>
+        {/* Right Side Form */}
+        <div className="split-right">
+          <div className="split-form-container">
+            <div className="split-form-header">
+              <h2>Sign Up Account</h2>
+              <p>Enter your personal data to create your account.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="auth-form">
-              <div className="form-group">
+            <form onSubmit={handleSubmit} className="split-form">
+              <div className="split-form-group">
                 <label htmlFor="name">Full Name</label>
                 <input
                   type="text"
@@ -143,15 +167,15 @@ const VITE_HOST = import.meta.env.PROD
                   value={formData.name}
                   onChange={handleChange}
                   className={errors.name ? "error" : ""}
-                  placeholder="Enter your full name"
+                  placeholder="Your name"
                 />
                 {errors.name && (
-                  <span className="error-message">{errors.name}</span>
+                  <span className="split-error-message">{errors.name}</span>
                 )}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="email">Email Address</label>
+              <div className="split-form-group">
+                <label htmlFor="email">Email</label>
                 <input
                   type="email"
                   id="email"
@@ -159,14 +183,14 @@ const VITE_HOST = import.meta.env.PROD
                   value={formData.email}
                   onChange={handleChange}
                   className={errors.email ? "error" : ""}
-                  placeholder="Enter your email"
+                  placeholder="mail@example.com"
                 />
                 {errors.email && (
-                  <span className="error-message">{errors.email}</span>
+                  <span className="split-error-message">{errors.email}</span>
                 )}
               </div>
 
-              <div className="form-group">
+              <div className="split-form-group">
                 <label htmlFor="password">Password</label>
                 <input
                   type="password"
@@ -175,14 +199,17 @@ const VITE_HOST = import.meta.env.PROD
                   value={formData.password}
                   onChange={handleChange}
                   className={errors.password ? "error" : ""}
-                  placeholder="Create a password"
+                  placeholder="Enter your password"
                 />
+                <span className="split-error-message" style={{ color: "#666", fontSize: "0.75rem", marginTop: "0" }}>
+                  Must be at least 8 characters.
+                </span>
                 {errors.password && (
-                  <span className="error-message">{errors.password}</span>
+                  <span className="split-error-message">{errors.password}</span>
                 )}
               </div>
 
-              <div className="form-group">
+              <div className="split-form-group">
                 <label htmlFor="confirmPassword">Confirm Password</label>
                 <input
                   type="password"
@@ -194,14 +221,14 @@ const VITE_HOST = import.meta.env.PROD
                   placeholder="Confirm your password"
                 />
                 {errors.confirmPassword && (
-                  <span className="error-message">
+                  <span className="split-error-message">
                     {errors.confirmPassword}
                   </span>
                 )}
               </div>
 
-              <div className="form-options">
-                <label className="checkbox-label">
+              <div className="split-form-options" style={{ marginTop: "0.5rem" }}>
+                <label className="split-checkbox-label">
                   <input type="checkbox" required />
                   <span>
                     I agree to the Terms of Service and Privacy Policy
@@ -211,20 +238,18 @@ const VITE_HOST = import.meta.env.PROD
 
               <button
                 type="submit"
-                className="btn-primary full-width"
+                className="split-btn-submit"
                 disabled={isLoading}
               >
-                {isLoading ? "Creating account..." : "Create Account"}
+                {isLoading ? "Creating account..." : "Sign Up"}
               </button>
             </form>
 
-            <div className="auth-footer">
-              <p>
-                Already have an account?{" "}
-                <Link to="/login" className="link-button">
-                  Sign in here
-                </Link>
-              </p>
+            <div className="split-footer">
+              Already have an account?{" "}
+              <Link to="/login" className="split-link">
+                Log in
+              </Link>
             </div>
           </div>
         </div>

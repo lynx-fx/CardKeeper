@@ -64,27 +64,28 @@ export class ImageService {
   async remove(userId: number, imageIds: number[]): Promise<DeleteImageResponseDto> {
     if (imageIds.length === 0) throw new BadRequestException({ success: false, message: "No images provided" });
 
-    const images: Image[] = await this.prisma.image.findMany({
-      where: {
-        imageId: {
-          in: imageIds
+    const [images] = await this.prisma.$transaction([
+      this.prisma.image.findMany({
+        where: {
+          imageId: {
+            in: imageIds
+          },
+          card: { userId }
         },
-        card: { userId }
-      },
-    });
+      }),
+      this.prisma.image.deleteMany({
+        where: {
+          imageId: {
+            in: imageIds
+          },
+          card: { userId }
+        }
+      })
+    ]);
 
-    await Promise.all(
-      images.map((image) => this.s3Service.deleteFile(image.imageUri)
-      ));
-
-    await this.prisma.image.deleteMany({
-      where: {
-        imageId: {
-          in: imageIds
-        },
-        card: { userId }
-      }
-    })
+    void Promise.allSettled(
+      images.map((image) => this.s3Service.deleteFile(image.imageUri))
+    );
     return { success: true, message: "Image deleted" }
   }
 }

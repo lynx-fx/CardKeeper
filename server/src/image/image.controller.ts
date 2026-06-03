@@ -17,7 +17,7 @@ export class ImageController {
   @UseInterceptors(FilesInterceptor('image', 5))
   @ApiConsumes('Multipart/form-data')
   create(@Request() req, @Body() createImageDto: CreateImageDto, @UploadedFiles() files: any) {
-    return this.imageService.create(+req.userId, createImageDto, files);
+    return this.imageService.create(+req.user.userId, createImageDto, files);
   }
 
   @ApiOkResponse({
@@ -26,7 +26,7 @@ export class ImageController {
   @Get(':id')
   @UseGuards(JwtGuard)
   findByCardId(@Request() req, @Param('id') cardId: string) {
-    return this.imageService.findByCardId(+req.userId, +cardId);
+    return this.imageService.findByCardId(+req.user.userId, +cardId);
   }
 
   @ApiOkResponse({
@@ -35,6 +35,6 @@ export class ImageController {
   @Delete()
   @UseGuards(JwtGuard)
   remove(@Request() req, @Body() images: DeleteImageDto) {
-    return this.imageService.remove(+req.userId, images.iamgeIds);
+    return this.imageService.remove(+req.user.userId, images.iamgeIds);
   }
 }

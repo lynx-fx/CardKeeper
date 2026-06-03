@@ -23,14 +23,14 @@ export class CardService {
     if (files?.length > 0) {
       for (const file of files) {
         const key = `cards/${existingUser.userId}/${Date.now()}-${file.originalname}`;
-        const url = await this.s3Service.uploadFile(file, key);
-        imageUris.push(url)
+        await this.s3Service.uploadFile(file, key);
+        imageUris.push(key)
       }
     } else {
       throw new BadRequestException({ success: false, message: "At least one image must be provided" })
     }
 
-    const card : Card = await this.prisma.$transaction(async (tx) => {
+    const card: Card = await this.prisma.$transaction(async (tx) => {
       const card = await tx.card.create({
         data: {
           ...createCardDto,
@@ -47,11 +47,13 @@ export class CardService {
       return card
     });
 
-    return { success: true, message: "Card created", card: {
-      ...card,
-      purchaseDate: card.purchaseDate.toISOString(),
-      warrantyExpiry: card.warrantyExpiry.toISOString(),
-    } };
+    return {
+      success: true, message: "Card created", card: {
+        ...card,
+        purchaseDate: card.purchaseDate.toISOString(),
+        warrantyExpiry: card.warrantyExpiry.toISOString(),
+      }
+    };
   }
 
   async findAll(user: number): Promise<GetCardsResponseDto> {
@@ -71,7 +73,10 @@ export class CardService {
   async findOne(user: number, cardId: number): Promise<GetCardResponseDto> {
     const existingUser: User = await this.userService.findExistingUser(user);
 
-    const card = await this.prisma.card.findUnique({ where: { cardId } });
+    const card = await this.prisma.card.findUnique({
+      where: { cardId },
+      include: { images: true }
+    });
 
     if (!card) {
       throw new NotFoundException({ success: false, message: "Card details not fonud" })
@@ -98,8 +103,11 @@ export class CardService {
   async remove(user: number, cardId: number) {
     const existingUser: User = await this.userService.findExistingUser(user);
 
-    const card = await this.prisma.card.findFirst({ where: { cardId, userId: existingUser.userId } });
-    if (!card) throw new NotFoundException({ success: false, message: "Card not found" });
+    const card = await this.prisma.card.findFirst({
+      where: { cardId, userId: existingUser.userId },
+      include: { images: true }
+    });
+    if (!card) throw new NotFoundException({ succerss: false, message: "Card not found" });
 
     // delete the images first and then card
     // to avoid referential integrity violation
@@ -110,9 +118,12 @@ export class CardService {
       this.prisma.card.delete({
         where: { cardId }
       })
-    ])
+    ]);
+
+    void Promise.allSettled(
+      card.images.map((image) => this.s3Service.deleteFile(image.imageUri))
+    );
 
     return { success: true, message: "Card successfully deleted" };
   }
 }
-
