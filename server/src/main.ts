@@ -21,7 +21,7 @@ async function bootstrap() {
       process.env.FRONT_END_LOCAL,
     ],
     credentials: true,
-    methods: ["POST", "PUT", "UPDATE", "PATCH", "GET"],
+    methods: ["POST", "PUT", "PATCH", "GET", "DELETE"],
   })
 
   const config = new DocumentBuilder()

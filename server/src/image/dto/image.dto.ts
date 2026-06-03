@@ -1,5 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsString, IsInt, IsArray, IsIn } from 'class-validator';
 
 export class imageModel {
@@ -11,6 +12,7 @@ export class imageModel {
 
 export class CreateImageDto {
   @ApiProperty()
+  @Type(() => Number)
   @IsInt()
   cardId!: number;
 }

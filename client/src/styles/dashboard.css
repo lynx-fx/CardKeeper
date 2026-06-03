@@ -322,7 +322,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-radius: 40px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
   background: rgba(255, 255, 255, 0.05);
@@ -333,6 +333,17 @@
 .btn-small:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-small.btn-light {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-small.btn-light:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .btn-small.btn-primary {
@@ -352,7 +363,7 @@
   color: #ff4d4d;
   border: 1px solid rgba(220, 53, 69, 0.3);
   padding: 8px 12px;
-  border-radius: 40px;
+  border-radius: 8px;
   font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -373,6 +384,8 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -381,8 +394,11 @@
 }
 
 .modal {
-  background: #050505;
+  background: rgba(10, 10, 10, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
@@ -404,10 +420,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: sticky;
   top: 0;
-  background: #050505;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 1;
 }
 

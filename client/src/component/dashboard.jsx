@@ -39,6 +39,8 @@ export default function WarrantyDashboard() {
   const VITE_HOST = import.meta.env.PROD
     ? import.meta.env.VITE_BACKEND_HOSTED
     : import.meta.env.VITE_BACKEND_LOCAL;
+
+  const BASE_IMAGE = import.meta.env.VITE_S3_BASE_URL;
   const MAX_IMAGES = 5;
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -69,7 +71,7 @@ export default function WarrantyDashboard() {
   const handleImageSelect = (event, isDetailModal = false) => {
     const files = Array.from(event.target.files);
     const currentImages = isDetailModal
-      ? selectedWarranty?.images?.length || 0
+      ? loadedImages?.images?.length || 0
       : selectedImages.length;
 
     if (currentImages + files.length > MAX_IMAGES) {
@@ -372,7 +374,7 @@ export default function WarrantyDashboard() {
             warrantyType: card.warrantyType,
             description: card.description,
             isActive: card.isActive,
-            placeholderImage: card.imageUri || "default.png",
+            placeholderImage: `${BASE_IMAGE}${card.imageUri}` || "default.png",
           }))
           .filter((warranty) => warranty.isActive);
 
@@ -459,7 +461,7 @@ export default function WarrantyDashboard() {
           purchasePrice: Number(warrantyData.purchasePrice.toString().replace(/[^0-9.]/g, "")),
           store: warrantyData.store,
           serialNumber: warrantyData.serialNumber,
-          warrantyType: warrantyData.warrantyType,
+          WarrantyType: warrantyData.warrantyType,
           description: warrantyData.description,
         }),
         
@@ -526,6 +528,7 @@ export default function WarrantyDashboard() {
       setIsLoading(false);
     }
   };
+
 
   const getStatusColor = (expiry) => {
     const today = new Date();
@@ -773,7 +776,7 @@ export default function WarrantyDashboard() {
                           View Details
                         </button>
                         <button
-                          className="btn-small"
+                          className="btn-small btn-light"
                           onClick={() => handleEditWarranty(warranty)}
                         >
                           Edit
@@ -1326,7 +1329,7 @@ export default function WarrantyDashboard() {
                   <div className="main-image">
                     {loadedImages?.images && loadedImages.images.length > 0 ? (
                       <img
-                        src={`${loadedImages.images[selectedImageIndex]?.imageUri}`}
+                        src={`${BASE_IMAGE}${loadedImages.images[selectedImageIndex]?.imageUri}`}
                         alt={`${selectedWarranty.productName} warranty document`}
                         className="detail-main-image"
                         onError={(e) => {
@@ -1353,7 +1356,7 @@ export default function WarrantyDashboard() {
                           className="thumbnail-container"
                         >
                           <img
-                            src={`${imageObj.imageUri}`}
+                            src={`${BASE_IMAGE}${imageObj.imageUri}`}
                             alt={`Warranty document ${index + 1}`}
                             className={`thumbnail ${
                               index === selectedImageIndex ? "active" : ""
@@ -1488,7 +1491,6 @@ export default function WarrantyDashboard() {
                     >
                       Edit
                     </button>
-                    <button className="btn-secondary">Download PDF</button>
                     <button
                       className="btn-danger"
                       onClick={() => handleDeleteWarranty(selectedWarranty)}
