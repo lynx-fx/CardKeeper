@@ -2,6 +2,7 @@
   color: #fff;
   min-height: 100vh;
   background: #050505;
+  overflow-x: hidden;
 }
 
 
