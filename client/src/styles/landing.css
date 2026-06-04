@@ -759,7 +759,15 @@
 
 @media (max-width: 480px) {
   .astra-nav {
-    padding: 1rem;
+    padding: 1rem 1.25rem;
+  }
+  .astra-nav-buttons {
+    gap: 0.5rem;
+  }
+  .astra-nav-buttons .btn-astra-dark,
+  .astra-nav-buttons .btn-astra-neon {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
   }
   .astra-hero-box {
     padding: 6rem 1rem;
