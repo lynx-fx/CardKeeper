@@ -24,16 +24,19 @@ async function bootstrap() {
     methods: ["POST", "PUT", "PATCH", "GET", "DELETE"],
   })
 
-  const config = new DocumentBuilder()
-    .setTitle("CardKeeper API")
-    .setDescription("Api documentation for cardkeeper")
-    .setVersion("0.0.1")
-    .addBearerAuth()
-    .build();
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle("CardKeeper API")
+      .setDescription("Api documentation for cardkeeper")
+      .setVersion("0.0.1")
+      .addBearerAuth()
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+    const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('swagger', app, document);
+    SwaggerModule.setup('swagger', app, document);
+  }
+
 
   await app.listen(process.env.PORT ?? 3000);
 }

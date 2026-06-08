@@ -83,7 +83,7 @@ export class AuthService {
     if (!isMatch) throw new UnauthorizedException({
       success: false,
       message: AUTH_RESPONSE.INVALID_CREDENTIALS
-    });;
+    });
 
     await this.prisma.user.update({
       where: { userId: userId },
@@ -108,9 +108,9 @@ export class AuthService {
     });
 
     const isValid = await compareHash(dto.code, existingUser.token);
-    if (!isValid) throw new ConflictException({
+    if (!isValid) throw new UnauthorizedException({
       success: false,
-      message: AUTH_RESPONSE.USER_ALREADY_EXISTS
+      message: AUTH_RESPONSE.UNAUTHORIZED
     });
 
     await this.prisma.user.update({
@@ -129,9 +129,9 @@ export class AuthService {
 
   // DONE: forgot password
   async forgotPassword(dto: forgotPasswordDto): Promise<forgotPasswordResponse> {
-    const code = crypto.randomInt(100000, 1000000).toString()
-
     const existingUser: User = await this.userService.findExistingUser(undefined, dto.email);
+    
+    const code = crypto.randomInt(100000, 1000000).toString();
 
     await this.prisma.user.update({
       where: { email: dto.email },
