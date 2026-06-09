@@ -7,7 +7,8 @@ import { UserService } from '../user-service/user-service.service';
 import { RegisterUserDto } from './dto/register.dto';
 import { AUTH_RESPONSE } from './constants/auth-messages';
 import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { comparePassword } from '../../helper/hash';
+import { compareHash, comparePassword } from '../../helper/hash';
+import { ChangePasswordDto, ResetPasswordDto, ForgotPasswordDto, ValidateResetTokenDto } from './dto/password.dto';
 
 jest.mock('../../helper/hash', () => ({
   hashPassword: jest.fn().mockResolvedValue('hashpassword'),
@@ -18,7 +19,11 @@ jest.mock('../../helper/hash', () => ({
 
 describe('AuthService', () => {
   let service: AuthService;
-  let dto: RegisterUserDto;
+  let userDto: RegisterUserDto;
+  let passwordDto: ChangePasswordDto;
+  let resetPasswordDto: ResetPasswordDto;
+  let forgotPasswordDto: ForgotPasswordDto;
+  let validateResetTokenDto: ValidateResetTokenDto;
 
   const mockPrismaService = {
     user: {
@@ -37,13 +42,30 @@ describe('AuthService', () => {
   }
 
   const mockMailService = {
-    sendResetPasswordEmail: jest.fn(),
+    sendRequestCode: jest.fn(),
   }
 
   beforeEach(async () => {
-    dto = new RegisterUserDto();
-    dto.userName = 'testuser';
-    dto.email = 'example@gmail.com';
+    userDto = new RegisterUserDto();
+    userDto.userName = 'testuser';
+    userDto.email = 'example@gmail.com';
+
+    passwordDto = new ChangePasswordDto();
+    passwordDto.old_password = "Password";
+    passwordDto.new_password = "NewPassword";
+
+    resetPasswordDto = new ResetPasswordDto();
+    resetPasswordDto.new_password = "Newpassword";
+    resetPasswordDto.email = "test@gmail.com";
+    resetPasswordDto.code = "code";
+
+    forgotPasswordDto = new ForgotPasswordDto();
+    forgotPasswordDto.email = "test@gmail.com";
+
+    validateResetTokenDto = new ValidateResetTokenDto();
+    validateResetTokenDto.code = "code";
+    validateResetTokenDto.email = "test@gmail.com";
+
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [AuthService,
@@ -66,7 +88,7 @@ describe('AuthService', () => {
     mockPrismaService.user.findUnique.mockResolvedValueOnce(null);
     mockPrismaService.user.create.mockResolvedValueOnce({});
 
-    const result = await service.register(dto);
+    const result = await service.register(userDto);
     expect(result).toEqual({
       success: true,
       message: AUTH_RESPONSE.REGISTER,
@@ -74,8 +96,8 @@ describe('AuthService', () => {
   });
 
   it('should return error if user already exists', async () => {
-    mockPrismaService.user.findUnique.mockResolvedValueOnce({ id: 1, email: dto.email });
-    await expect(service.register(dto)).rejects.toThrow(ConflictException);
+    mockPrismaService.user.findUnique.mockResolvedValueOnce({ id: 1, email: userDto.email });
+    await expect(service.register(userDto)).rejects.toThrow(ConflictException);
   });
 
 
@@ -84,11 +106,11 @@ describe('AuthService', () => {
     mockUserService.findExistingUser.mockResolvedValueOnce({
       userId: 1,
       email: 'example@gmail.com',
-    })
-    expect(await service.login(dto)).toEqual({
+    });
+    expect(await service.login(userDto)).toEqual({
       success: true,
       message: AUTH_RESPONSE.LOGIN,
-    })
+    });
   });
 
   it('should throw error on invalid password', async () => {
@@ -97,14 +119,134 @@ describe('AuthService', () => {
       email: 'example@gmail.com',
     });
     (comparePassword as jest.Mock).mockResolvedValueOnce(false);
-    await expect(service.login(dto)).rejects.toThrow(UnauthorizedException);
+    await expect(service.login(userDto)).rejects.toThrow(UnauthorizedException);
   });
 
   it('should throw error non existing user', async () => {
     mockUserService.findExistingUser.mockRejectedValueOnce(new NotFoundException());
-    await expect(service.login(dto)).rejects.toThrow(NotFoundException);
+    await expect(service.login(userDto)).rejects.toThrow(NotFoundException);
+  });
+
+  // change password
+  it('shoud change users password', async () => {
+    mockUserService.findExistingUser.mockResolvedValueOnce({
+      password: 'Test@1234',
+      email: 'example@gmail.com',
+    });
+    expect(await service.changePassword(1, passwordDto)).toEqual({
+      success: true,
+      message: AUTH_RESPONSE.PASSWORD,
+    });
+  });
+
+  it('should reject invalid password', async () => {
+    mockUserService.findExistingUser.mockResolvedValueOnce({
+      password: 'Test@1234',
+      email: 'example@gmail.com',
+    });
+    (comparePassword as jest.Mock).mockResolvedValueOnce(false);
+
+    await expect(service.changePassword(1, passwordDto))
+      .rejects
+      .toThrow(UnauthorizedException);
+  });
+
+  it('should handle non existing user', async () => {
+    mockUserService.findExistingUser.mockRejectedValueOnce(new NotFoundException());
+    await expect(service.changePassword(1, passwordDto))
+      .rejects
+      .toThrow(NotFoundException);
   });
 
   // reset password
+  it("should reset user's password", async () => {
+    mockUserService.findExistingUser.mockResolvedValueOnce({
+      password: 'Test@1234',
+      email: 'example@gmail.com',
+      token: "code"
+    });
+
+    expect(await service.resetPassword(resetPasswordDto)).toEqual({
+      success: true,
+      message: "Password updated"
+    });
+  });
+
+  it("shouldn't let user change password without token", async () => {
+    mockUserService.findExistingUser.mockResolvedValueOnce({
+      email: 'example@gmail.com',
+    });
+
+    await expect(service.resetPassword(resetPasswordDto))
+      .rejects
+      .toThrow(ConflictException);
+  });
+
+  it("should check for token before changing password", async () => {
+    mockUserService.findExistingUser.mockResolvedValueOnce({
+      password: 'Test@1234',
+      email: 'example@gmail.com',
+      token: "code"
+    });
+    (compareHash as jest.Mock).mockResolvedValueOnce(false);
+
+    await expect(service.resetPassword(resetPasswordDto))
+      .rejects
+      .toThrow(UnauthorizedException);
+  });
+
+  // forgot password
+  it("should let user request mail", async () => {
+    mockUserService.findExistingUser.mockResolvedValueOnce({
+      email: 'example@gmail.com',
+    });
+    mockMailService.sendRequestCode.mockResolvedValueOnce({});
+
+    expect(await service.forgotPassword(forgotPasswordDto)).toEqual({
+      success: true,
+      message: AUTH_RESPONSE.FORGOT
+    })
+  });
+
+  it("should not mail non existing user", async () => {
+    mockUserService.findExistingUser.mockRejectedValueOnce(new NotFoundException());
+
+    await expect(service.forgotPassword(forgotPasswordDto))
+      .rejects
+      .toThrow(NotFoundException);
+  });
+
+  // validate reset token
+  it('should validate reset token', async () => {
+    mockUserService.findExistingUser.mockResolvedValueOnce({
+      email: 'example@gmail.com',
+      token: 'code',
+    });
+    
+    expect(await service.validateResetToken(validateResetTokenDto)).toEqual({ success: true });
+  });
+  
+  it('should throw error when user has missing reset token', async () => {
+    mockUserService.findExistingUser.mockResolvedValueOnce({
+      email: 'example@gmail.com',
+    });
+    
+    await expect(service.validateResetToken(validateResetTokenDto))
+    .rejects
+    .toThrow(UnauthorizedException);
+  });
+  
+  it('should throw error on invalid token', async () => {
+    mockUserService.findExistingUser.mockResolvedValueOnce({
+      email: 'example@gmail.com',
+      token: 'code',
+    });
+
+    (compareHash as jest.Mock).mockResolvedValueOnce(false);
+
+    await expect(service.validateResetToken(validateResetTokenDto))
+    .rejects
+    .toThrow(UnauthorizedException);
+  });
 
 });

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, 
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login.dto';
 import { RegisterUserDto, RegisterUserResponse } from './dto/register.dto';
-import { changePasswordDto, forgotPasswordDto, forgotPasswordResponse, resetPasswordDto, resetPasswordResponse, validateResetTokenDto, validateResetTokenResponse } from './dto/password.dto';
+import { ChangePasswordDto, ForgotPasswordDto, ForgotPasswordResponse, ResetPasswordDto, ResetPasswordResponse, ValidateResetTokenDto, ValidateResetTokenResponse } from './dto/password.dto';
 import { JwtGuard } from '../../guard/jwtVerifyGuard';
 
 type loginResponse = {
@@ -29,25 +29,25 @@ export class AuthController {
   // DONE: change pass
   @Post("change-password")
   @UseGuards(JwtGuard)
-  async changePassword(@Request() req, @Body() dto: changePasswordDto) {
+  async changePassword(@Request() req, @Body() dto: ChangePasswordDto) {
     return this.authService.changePassword(+req.user.userId, dto);
   }
 
   // DONE: reset pass
   @Post("reset-password")
-  async resetPassword(@Body() dto: resetPasswordDto): Promise<resetPasswordResponse> {
+  async resetPassword(@Body() dto: ResetPasswordDto): Promise<ResetPasswordResponse> {
     return this.authService.resetPassword(dto);
   }
 
   // DONE: forgot password
   @Post("forgot-password")
-  async forgotPassword(@Body() dto: forgotPasswordDto): Promise<forgotPasswordResponse> {
+  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<ForgotPasswordResponse> {
     return this.authService.forgotPassword(dto);
   }
 
   // DONE: validate reset token
   @Post("validate-reset-token")
-  async validateResetToken(@Body() dto: validateResetTokenDto): Promise<validateResetTokenResponse> {
+  async validateResetToken(@Body() dto: ValidateResetTokenDto): Promise<ValidateResetTokenResponse> {
     return this.authService.validateResetToken(dto);
   }
 }

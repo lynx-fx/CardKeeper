@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { compareHash, comparePassword, hashPassword, hashResetCode } from '../../helper/hash';
 import { AUTH_RESPONSE } from './constants/auth-messages';
 import { JwtService } from '@nestjs/jwt';
-import { changePasswordDto, changePasswordResponse, forgotPasswordDto, forgotPasswordResponse, resetPasswordDto, resetPasswordResponse, validateResetTokenDto, validateResetTokenResponse } from './dto/password.dto';
+import { ChangePasswordDto, ChangePasswordResponse, ForgotPasswordDto, ForgotPasswordResponse, ResetPasswordDto, ResetPasswordResponse, ValidateResetTokenDto, ValidateResetTokenResponse } from './dto/password.dto';
 import { MailService } from '../mail/mail.service';
 import * as crypto from "crypto";
 import { UserService } from '../user-service/user-service.service';
@@ -75,7 +75,7 @@ export class AuthService {
   }
 
   // DONE: change pass
-  async changePassword(userId: number, dto: changePasswordDto): Promise<changePasswordResponse> {
+  async changePassword(userId: number, dto: ChangePasswordDto): Promise<ChangePasswordResponse> {
     const existingUser: User = await this.userService.findExistingUser(userId);
 
     const isMatch: boolean = await comparePassword(dto.old_password, existingUser.password);
@@ -99,12 +99,12 @@ export class AuthService {
   }
 
   // DONE: reset pass
-  async resetPassword(dto: resetPasswordDto): Promise<resetPasswordResponse> {
+  async resetPassword(dto: ResetPasswordDto): Promise<ResetPasswordResponse> {
     const existingUser: User = await this.userService.findExistingUser(undefined, dto.email);
 
     if (!existingUser.token) throw new ConflictException({
       success: false,
-      message: AUTH_RESPONSE.USER_ALREADY_EXISTS
+      message: AUTH_RESPONSE.USER_NOT_FOUND
     });
 
     const isValid = await compareHash(dto.code, existingUser.token);
@@ -128,7 +128,7 @@ export class AuthService {
   }
 
   // DONE: forgot password
-  async forgotPassword(dto: forgotPasswordDto): Promise<forgotPasswordResponse> {
+  async forgotPassword(dto: ForgotPasswordDto): Promise<ForgotPasswordResponse> {
     const existingUser: User = await this.userService.findExistingUser(undefined, dto.email);
     
     const code = crypto.randomInt(100000, 1000000).toString();
@@ -152,7 +152,7 @@ export class AuthService {
 
 
   // DONE: validate reset token
-  async validateResetToken(dto: validateResetTokenDto): Promise<validateResetTokenResponse> {
+  async validateResetToken(dto: ValidateResetTokenDto): Promise<ValidateResetTokenResponse> {
     const existingUser: User = await this.userService.findExistingUser(undefined, dto.email);
     if (!existingUser.token) throw new UnauthorizedException({
       success: false,
