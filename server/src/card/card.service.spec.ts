@@ -16,6 +16,9 @@ describe('CardService', () => {
       update: jest.fn(),
       findFirst: jest.fn(),
       delete: jest.fn(),
+    },
+    image: {
+      deleteMany: jest.fn(),
     }
   };
 
@@ -51,7 +54,7 @@ describe('CardService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('should create a new card', () => {
+  describe('create', () => {
     it('should create a card and return the created card response', async () => {
       const userId = 1;
       const existingUser = { userId };
@@ -124,6 +127,163 @@ describe('CardService', () => {
 
       await expect(service.create(1, {} as any, [])).rejects.toThrow(BadRequestException);
       await expect(service.create(1, {} as any, undefined)).rejects.toThrow('At least one image must be provided');
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all cards for the user', async () => {
+      const userId = 1;
+      const existingUser = { userId };
+      const cards = [
+        {
+          cardId: 1,
+          productName: 'Phone',
+          brand: 'Example',
+          category: 'Electronics',
+          purchaseDate: new Date('2025-01-01T00:00:00.000Z'),
+          warrantyExpiry: new Date('2026-01-01T00:00:00.000Z'),
+          purchasePrice: 699,
+          store: 'Store A',
+          serialNumber: 'SN123456',
+          warrantyType: 'MANUFACTURER',
+          description: 'Test device',
+          imageUri: 'cards/1/123-test.jpg',
+        },
+      ];
+
+      mockUserService.findExistingUser.mockResolvedValue(existingUser);
+      mockPrismaService.card.findMany.mockResolvedValue(cards);
+
+      const result = await service.findAll(userId);
+
+      expect(mockUserService.findExistingUser).toHaveBeenCalledWith(userId);
+      expect(mockPrismaService.card.findMany).toHaveBeenCalledWith({ where: { userId } });
+      expect(result).toEqual({
+        success: true,
+        cards: [
+          {
+            ...cards[0],
+            purchaseDate: '2025-01-01T00:00:00.000Z',
+            warrantyExpiry: '2026-01-01T00:00:00.000Z',
+          },
+        ],
+      });
+    });
+
+    it('should throw NotFoundException when no cards exist', async () => {
+      const userId = 1;
+      mockUserService.findExistingUser.mockResolvedValue({ userId });
+      mockPrismaService.card.findMany.mockResolvedValue([]);
+
+      await expect(service.findAll(userId)).rejects.toThrow('No cards available');
+    });
+  });
+
+  describe('findOne', () => {
+    it('should return a single card with images', async () => {
+      const userId = 1;
+      const cardId = 101;
+      const existingUser = { userId };
+      const card = {
+        cardId,
+        productName: 'Phone',
+        brand: 'Example',
+        category: 'Electronics',
+        purchaseDate: new Date('2025-01-01T00:00:00.000Z'),
+        warrantyExpiry: new Date('2026-01-01T00:00:00.000Z'),
+        purchasePrice: 699,
+        store: 'Store A',
+        serialNumber: 'SN123456',
+        warrantyType: 'MANUFACTURER',
+        description: 'Test device',
+        imageUri: 'cards/1/123-test.jpg',
+        images: [{ imageUri: 'cards/1/123-test.jpg' }],
+      };
+
+      mockUserService.findExistingUser.mockResolvedValue(existingUser);
+      mockPrismaService.card.findUnique.mockResolvedValue(card);
+
+      const result = await service.findOne(userId, cardId);
+
+      expect(mockUserService.findExistingUser).toHaveBeenCalledWith(userId);
+      expect(mockPrismaService.card.findUnique).toHaveBeenCalledWith({ where: { cardId }, include: { images: true } });
+      expect(result).toEqual({
+        success: true,
+        card: {
+          ...card,
+          purchaseDate: '2025-01-01T00:00:00.000Z',
+          warrantyExpiry: '2026-01-01T00:00:00.000Z',
+        },
+      });
+    });
+
+    it('should throw NotFoundException when the card does not exist', async () => {
+      const userId = 1;
+      const cardId = 101;
+
+      mockUserService.findExistingUser.mockResolvedValue({ userId });
+      mockPrismaService.card.findUnique.mockResolvedValue(null);
+
+      await expect(service.findOne(userId, cardId)).rejects.toThrow('Card details not fonud');
+    });
+  });
+
+  describe('update', () => {
+    it('should update the card and return success message', async () => {
+      const userId = 1;
+      const cardId = 101;
+      const updateCardDto = { productName: 'Updated Phone' };
+
+      mockUserService.findExistingUser.mockResolvedValue({ userId });
+      mockPrismaService.card.update.mockResolvedValue({});
+
+      const result = await service.update(userId, cardId, updateCardDto as any);
+
+      expect(mockUserService.findExistingUser).toHaveBeenCalledWith(userId);
+      expect(mockPrismaService.card.update).toHaveBeenCalledWith({
+        where: { cardId, userId },
+        data: updateCardDto,
+      });
+      expect(result).toEqual({ success: true, message: 'Updated Phone udpated successfully' });
+    });
+  });
+
+  describe('remove', () => {
+    it('should delete card and its images', async () => {
+      const userId = 1;
+      const cardId = 101;
+      const existingUser = { userId };
+      const card = {
+        cardId,
+        images: [{ imageUri: 'cards/1/101-test.jpg' }],
+      };
+
+      mockUserService.findExistingUser.mockResolvedValue(existingUser);
+      mockPrismaService.card.findFirst.mockResolvedValue(card);
+      mockPrismaService.image.deleteMany.mockResolvedValue({ count: 1 });
+      mockPrismaService.card.delete.mockResolvedValue({});
+      mockPrismaService.$transaction.mockResolvedValue([{}, {}]);
+
+      const result = await service.remove(userId, cardId);
+
+      expect(mockUserService.findExistingUser).toHaveBeenCalledWith(userId);
+      expect(mockPrismaService.card.findFirst).toHaveBeenCalledWith({ where: { cardId, userId }, include: { images: true } });
+      expect(mockPrismaService.$transaction).toHaveBeenCalledWith([
+        expect.any(Object),
+        expect.any(Object),
+      ]);
+      expect(mockS3Service.deleteFile).toHaveBeenCalledWith('cards/1/101-test.jpg');
+      expect(result).toEqual({ success: true, message: 'Card successfully deleted' });
+    });
+
+    it('should throw NotFoundException when trying to delete missing card', async () => {
+      const userId = 1;
+      const cardId = 101;
+
+      mockUserService.findExistingUser.mockResolvedValue({ userId });
+      mockPrismaService.card.findFirst.mockResolvedValue(null);
+
+      await expect(service.remove(userId, cardId)).rejects.toThrow('Card not found');
     });
   });
 });
