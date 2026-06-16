@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNumber, IsString } from "class-validator";
 
-export class changePasswordDto {
+export class ChangePasswordDto {
     @ApiProperty()
     @IsString()
     old_password!: string;
@@ -11,7 +11,7 @@ export class changePasswordDto {
     new_password!: string;
 }
 
-export class resetPasswordDto {
+export class ResetPasswordDto {
     @ApiProperty()
     @IsString()
     new_password!: string;
@@ -25,7 +25,7 @@ export class resetPasswordDto {
     email!: string;
 }
 
-export class validateResetTokenDto {
+export class ValidateResetTokenDto {
     @ApiProperty()
     @IsString()
     code!: string;
@@ -35,27 +35,27 @@ export class validateResetTokenDto {
     email!: string;
 }
 
-export class forgotPasswordDto {
+export class ForgotPasswordDto {
     @ApiProperty()
     @IsEmail()
     email!: string;
 }
 
-export class changePasswordResponse {
+export class ChangePasswordResponse {
     success!: boolean;
     message!: string;
 }
 
-export class resetPasswordResponse {
+export class ResetPasswordResponse {
     success!: boolean;
     message!: string;
 }
 
-export class forgotPasswordResponse {
+export class ForgotPasswordResponse {
     success!: boolean;
     message!: string;
 }
 
-export class validateResetTokenResponse {
+export class ValidateResetTokenResponse {
     success!: boolean;
 }

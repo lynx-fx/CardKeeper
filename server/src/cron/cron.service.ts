@@ -12,7 +12,6 @@ export class CronService {
 
     @Cron(CronExpression.EVERY_MINUTE)
     async sendExpiryReminder() {
-        console.log("Running cron")
         // search for 7 days expiry date here
         const target = new Date();
         target.setDate(target.getDate() + 7);
