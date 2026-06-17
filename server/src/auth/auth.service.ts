@@ -146,7 +146,8 @@ export class AuthService {
 
     return {
       success: true,
-      message: AUTH_RESPONSE.FORGOT
+      message: AUTH_RESPONSE.FORGOT,
+      ...(process.env.NODE_ENV === "development" && {code})
     }
   }
 

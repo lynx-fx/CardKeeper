@@ -8,7 +8,6 @@ import { RegisterUserDto } from './dto/register.dto';
 import { ChangePasswordDto, ForgotPasswordDto, ResetPasswordDto, ValidateResetTokenDto } from './dto/password.dto';
 import { AUTH_RESPONSE } from './constants/auth-messages';
 import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { channel } from 'diagnostics_channel';
 
 describe('AuthService', () => {
     let authService: AuthService;
@@ -42,7 +41,9 @@ describe('AuthService', () => {
         userDto = new RegisterUserDto();
         userDto.userName = 'testuser';
         userDto.email = 'example@gmail.com';
+        userDto.email = 'example@gmail.com';
         userDto.password = 'password@123';
+
 
         passwordDto = new ChangePasswordDto();
         passwordDto.old_password = "password@123";
@@ -50,15 +51,15 @@ describe('AuthService', () => {
 
         resetPasswordDto = new ResetPasswordDto();
         resetPasswordDto.new_password = "Newpassword";
-        resetPasswordDto.email = "test@gmail.com";
+        resetPasswordDto.email = "example@gmail.com";
         resetPasswordDto.code = "code";
 
         forgotPasswordDto = new ForgotPasswordDto();
-        forgotPasswordDto.email = "test@gmail.com";
+        forgotPasswordDto.email = 'example@gmail.com';
 
         validateResetTokenDto = new ValidateResetTokenDto();
         validateResetTokenDto.code = "code";
-        validateResetTokenDto.email = "test@gmail.com";
+        validateResetTokenDto.email = "example@gmail.com";
 
         await prismaService.user.deleteMany();
     });
@@ -82,8 +83,8 @@ describe('AuthService', () => {
         it('should throw error if user already exists', async () => {
             await authService.register(userDto);
             await expect(authService.register(userDto))
-            .rejects
-            .toThrow(ConflictException);
+                .rejects
+                .toThrow(ConflictException);
         });
     });
 
@@ -141,6 +142,80 @@ describe('AuthService', () => {
             await expect(authService.changePassword(+user!.userId, passwordDto)).
                 rejects
                 .toThrow(UnauthorizedException);
+        });
+    });
+
+    describe('forgot password', () => {
+        it('should send a mail with reset password link', async () => {
+            await authService.register(userDto);
+            mockMailService.sendRequestCode.mockResolvedValueOnce(true);
+            expect(await authService.forgotPassword(forgotPasswordDto)).toEqual({
+                success: true,
+                message: AUTH_RESPONSE.FORGOT,
+                code: expect.any(String),
+            });
+        });
+
+        it('should handle none existent users', async () => {
+            await expect(authService.forgotPassword(forgotPasswordDto))
+                .rejects
+                .toThrow(NotFoundException);
         })
     });
+
+    describe('reset-password', () => {
+        it('should change users password', async () => {
+            // creating user
+            await authService.register(userDto);
+
+            // adding token
+            const result = await authService.forgotPassword(userDto);
+            resetPasswordDto.code = (result as any).code;
+            expect(await authService.resetPassword(resetPasswordDto)).toEqual({
+                success: true,
+                message: "Password updated"
+            });
+        });
+
+        it('should handle invalid tokens', async () => {
+            // creating user
+            await authService.register(userDto);
+
+            // adding token
+            await authService.forgotPassword(userDto);
+            await expect(authService.resetPassword(resetPasswordDto))
+                .rejects
+                .toThrow(UnauthorizedException);
+        });
+
+        it('should throw error when user doesnt exists', async () => {
+            await expect(authService.resetPassword(resetPasswordDto)).rejects.toThrow(NotFoundException);
+        });
+    });
+
+    describe('validate reset token', () => {
+        it('should validate reset token', async () => {
+            await authService.register(userDto);
+            const result = await authService.forgotPassword(forgotPasswordDto);
+            validateResetTokenDto.code = (result as any).code;
+            expect(await authService.validateResetToken(validateResetTokenDto))
+                .toEqual({
+                    success: true,
+                });
+        });
+
+        it('should throw error when user is non existent', async () => {
+            await expect(authService.validateResetToken(validateResetTokenDto))
+                .rejects
+                .toThrow(NotFoundException);
+        });
+
+        it('should throw error on invalid token', async () => {
+            await authService.register(userDto);
+            await authService.forgotPassword(forgotPasswordDto);
+            await expect(authService.validateResetToken(validateResetTokenDto))
+                .rejects
+                .toThrow(UnauthorizedException);
+        })
+    })
 });
