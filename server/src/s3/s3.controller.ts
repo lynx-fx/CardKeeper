@@ -1,5 +1,6 @@
 import { Controller, Post, Delete, Param, UploadedFile, UseInterceptors, Get } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import 'multer';
 import { S3Service } from './s3.service';
 
 @Controller('files')
