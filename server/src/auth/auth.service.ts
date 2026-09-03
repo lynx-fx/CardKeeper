@@ -32,7 +32,7 @@ export class AuthService {
 
     const isMatch = await comparePassword(dto.password, existingUser.password);
     if (!isMatch) throw new UnauthorizedException({
-      success: false,
+    success: false,
       message: AUTH_RESPONSE.INVALID_CREDENTIALS
     });;
 
